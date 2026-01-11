@@ -22,6 +22,8 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
+    <!-- AOS Animations -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 </head>
 
 <body>
@@ -123,6 +125,16 @@
 
     <!-- Flask Static JS -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- AOS Initialization -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100,
+            easing: 'ease-out-back'
+        });
+    </script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

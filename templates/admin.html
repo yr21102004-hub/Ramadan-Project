@@ -297,6 +297,10 @@
                                 <input type="tel" name="phone" required placeholder="01xxxxxxxxx">
                             </div>
                             <div class="form-group">
+                                <label>البريد الإلكتروني</label>
+                                <input type="email" name="email" placeholder="example@domain.com">
+                            </div>
+                            <div class="form-group">
                                 <label>العنوان / المشروع</label>
                                 <input type="text" name="project_location" placeholder="مثال: فيلا التجمع الخامس">
                             </div>
@@ -320,6 +324,9 @@
                                         <h4 style="color: #D4AF37; margin: 0; font-size: 1.2rem;">{{ user.full_name }}
                                             <span style="font-size: 0.8rem; color: #777;">({{ user.username }})</span>
                                         </h4>
+                                        <p style="font-size: 0.9rem; color: #ccc; margin: 10px 0;">
+                                            <strong>البريد الإلكتروني:</strong> {{ user.email or 'لا يوجد' }}
+                                        </p>
                                         <p style="font-size: 0.9rem; color: #ccc; margin: 10px 0;">
                                             <strong>المشروع:</strong> {{ user.project_location or 'غير محدد' }}
                                         </p>
@@ -346,6 +353,10 @@
                                         </form>
 
                                         <div style="display: flex; gap: 10px;">
+                                            <a href="{{ url_for('user_profile', username=user.username) }}"
+                                                class="btn btn-outline"
+                                                style="padding: 5px 15px; font-size: 0.8rem; color: #4aa3ff; border-color: #4aa3ff;">عرض
+                                                الملف الكامل</a>
                                             <form action="{{ url_for('delete_user', username=user.username) }}"
                                                 method="POST" style="display:inline;"
                                                 onsubmit="return confirm('هل أنت متأكد من حذف هذا المستخدم؟');">

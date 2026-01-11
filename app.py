@@ -9,6 +9,10 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from dotenv import load_dotenv
+import pyotp
+import qrcode
+import io
+import base64
 
 # Load environment variables
 load_dotenv()
@@ -84,6 +88,8 @@ class User(UserMixin):
         self.username = user_data.get('username')
         self.role = user_data.get('role', 'user')
         self.full_name = user_data.get('full_name')
+        self.two_factor_enabled = user_data.get('two_factor_enabled', False)
+        self.two_factor_secret = user_data.get('two_factor_secret')
 
     @staticmethod
     def get(username):
@@ -283,6 +289,11 @@ def login():
         user_data = users_table.get(UserQuery.username == username)
         
         if user_data and bcrypt.check_password_hash(user_data.get('password', ''), password):
+            if user.two_factor_enabled:
+                # Store username in session temporarily to verify 2FA
+                session['2fa_user'] = username
+                return redirect(url_for('verify_2fa'))
+            
             login_user(user)
             auto_backup() # Autonomous Resilience: Backup state on successful admin/user session start
             return redirect(url_for('admin' if user.role == 'admin' else 'index'))
@@ -292,6 +303,31 @@ def login():
         flash('اسم المستخدم أو كلمة المرور غير صحيحة')
 
     return render_template('login.html', captcha_q=None)
+
+@app.route('/verify_2fa', methods=['GET', 'POST'])
+def verify_2fa():
+    if '2fa_user' not in session:
+        return redirect(url_for('login'))
+        
+    if request.method == 'POST':
+        code = request.form.get('code')
+        username = session['2fa_user']
+        user = User.get(username)
+        
+        if not user:
+            session.pop('2fa_user', None)
+            return redirect(url_for('login'))
+            
+        totp = pyotp.TOTP(user.two_factor_secret)
+        if totp.verify(code):
+            login_user(user)
+            session.pop('2fa_user', None)
+            flash('تم تسجيل الدخول بنجاح')
+            return redirect(url_for('admin' if user.role == 'admin' else 'index'))
+        else:
+            flash('رمز التحقق غير صحيح')
+            
+    return render_template('verify_2fa.html')
 
 @app.route('/logout')
 @login_required
@@ -306,6 +342,7 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
         phone = request.form.get('phone')
+        email = request.form.get('email', '')
         project_description = request.form.get('project_description', 'لا يوجد وصف للمشروع')
         
         if User.get(username):
@@ -322,6 +359,7 @@ def register():
             'username': username,
             'password': hashed_password,
             'full_name': full_name,
+            'email': email,
             'phone': phone,
             'role': role,
             'project_location': 'غير محدد',
@@ -419,6 +457,7 @@ def add_user():
     username = request.form.get('username')
     full_name = request.form.get('full_name')
     phone = request.form.get('phone')
+    email = request.form.get('email', '')
     project_location = request.form.get('project_location')
     project_description = request.form.get('project_description', 'لا يوجد وصف')
     
@@ -431,6 +470,7 @@ def add_user():
         'username': username,
         'password': password,
         'full_name': full_name,
+        'email': email,
         'phone': phone,
         'project_location': project_location,
         'project_description': project_description,
@@ -496,13 +536,70 @@ def admin_chats():
 @app.route('/admin/backup')
 @login_required
 def admin_backup():
-    flash("النسخ الاحتياطي معطل في النسخة المبسطة.")
-    return redirect(url_for('admin'))
+    if current_user.role != 'admin':
+        return "Access Denied", 403
+    
+    try:
+        import shutil
+        from flask import send_file
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+        if not os.path.exists('backups'):
+            os.makedirs('backups')
+        
+        backup_path = f'backups/manual_backup_{timestamp}.json'
+        shutil.copy2('database.json', backup_path)
+        
+        # Log the event
+        log_security_event("Manual Backup", f"Admin {current_user.username} created a backup", severity="low")
+        
+        flash("تم إنشاء النسخة الاحتياطية بنجاح.")
+        return send_file(backup_path, as_attachment=True)
+        
+    except Exception as e:
+        flash(f"فشل إنشاء النسخة الاحتياطية: {str(e)}")
+        return redirect(url_for('admin'))
 
 @app.route('/admin/setup_2fa')
 @login_required
 def setup_2fa():
-    flash("2FA معطل في النسخة المبسطة.")
+    # If already set up but not enabled, we still show the secret
+    if not current_user.two_factor_secret:
+        secret = pyotp.random_base32()
+        UserQuery = Query()
+        users_table.update({'two_factor_secret': secret}, UserQuery.username == current_user.username)
+        # Re-fetch user to update current_user object attributes if needed
+        user_data = users_table.get(UserQuery.username == current_user.username)
+        current_user.two_factor_secret = secret
+    else:
+        secret = current_user.two_factor_secret
+
+    otp_uri = pyotp.totp.TOTP(secret).provisioning_uri(
+        name=current_user.username, 
+        issuer_name="Ramadan Paints"
+    )
+    
+    # Generate QR Code
+    img = qrcode.make(otp_uri)
+    buf = io.BytesIO()
+    img.save(buf)
+    qr_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    
+    return render_template('setup_2fa.html', qr_code=qr_b64, secret=secret)
+
+@app.route('/admin/toggle_2fa', methods=['POST'])
+@login_required
+def toggle_2fa():
+    action = request.form.get('action') # 'enable' or 'disable'
+    UserQuery = Query()
+    
+    if action == 'enable':
+        users_table.update({'two_factor_enabled': True}, UserQuery.username == current_user.username)
+        flash('تم تفعيل المصادقة الثنائية بنجاح')
+    else:
+        users_table.update({'two_factor_enabled': False}, UserQuery.username == current_user.username)
+        flash('تم تعطيل المصادقة الثنائية')
+        
     return redirect(url_for('admin'))
 
 @app.route('/user/<username>')
@@ -519,8 +616,11 @@ def user_profile(username):
     user_obj = {
         'full_name': user_data.get('full_name'),
         'username': user_data.get('username'),
+        'email': user_data.get('email', 'لا يوجد'),
         'phone': user_data.get('phone'),
-        'project_location': user_data.get('project_location', 'None'),
+        'project_location': user_data.get('project_location', 'غير محدد'),
+        'project_description': user_data.get('project_description', 'لا يوجد وصف'),
+        'project_percentage': user_data.get('project_percentage', 0),
         'created_at': user_data.get('created_at')
     }
     return render_template('user_dashboard.html', user=user_obj)

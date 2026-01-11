@@ -10,32 +10,33 @@
 
         <div class="row align-items-start" style="display: flex; flex-wrap: wrap; gap: 40px;">
             <!-- Content Side -->
-            <div class="col-lg-6" style="flex: 1; min-width: 300px;">
+            <div class="col-lg-6" style="flex: 1; min-width: 300px;" data-aos="fade-left">
                 <p class="lead" style="font-size: 1.2rem; line-height: 1.8; color: #ddd; margin-bottom: 30px;">
                     {{ service.description }}
                 </p>
 
-                <h3 style="color: var(--primary-color); margin-bottom: 20px;">مميزات الخدمة:</h3>
+                <h3 style="color: var(--primary-color); margin-bottom: 20px;" data-aos="fade-up">مميزات الخدمة:</h3>
                 <ul class="service-features-list" style="list-style: none; padding: 0;">
                     {% for feature in service.features %}
-                    <li style="margin-bottom: 15px; display: flex; align-items: center;">
+                    <li style="margin-bottom: 15px; display: flex; align-items: center;" data-aos="fade-up"
+                        data-aos-delay="{{ loop.index * 100 }}">
                         <i class="fas fa-check-circle" style="color: var(--primary-color); margin-left: 10px;"></i>
                         {{ feature }}
                     </li>
                     {% endfor %}
                 </ul>
 
-                <div class="mt-5" style="margin-top: 40px;">
+                <div class="mt-5" style="margin-top: 40px;" data-aos="fade-up" data-aos-delay="500">
                     <a href="{{ url_for('contact') }}" class="btn btn-primary">اطلب الخدمة الآن</a>
                     <a href="{{ url_for('services') }}" class="btn btn-outline" style="margin-right: 15px;">عودة
                         للخدمات</a>
                 </div>
             </div>
 
-            <!-- Image Side (Placeholder or specific image if available) -->
-            <div class="col-lg-6" style="flex: 1; min-width: 300px;">
-                <div class="service-image-container"
-                    style="border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <!-- Image Side -->
+            <div class="col-lg-6" style="flex: 1; min-width: 300px;" data-aos="fade-right">
+                <div class="service-image-container premium-card"
+                    style="border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); padding: 0;">
                     <!-- Using a generic placeholder if image missing, or generate one later -->
                     {% if service.image %}
                     <img src="{{ url_for('static', filename=service.image) }}" alt="{{ service.title }}"

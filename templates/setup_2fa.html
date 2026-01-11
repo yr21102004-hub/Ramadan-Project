@@ -3,28 +3,43 @@
 {% block content %}
 <section class="section-padding" style="margin-top: 80px;">
     <div class="container">
-        <div class="contact-form" style="max-width: 500px; margin: 0 auto;">
-            <h3 class="text-center text-gold">إعداد المصادقة الثنائية (2FA)</h3>
-            <p class="text-center text-muted-dynamic">امسح كود QR باستخدام Google Authenticator</p>
+        <div
+            style="background: var(--surface-light); padding: 40px; border-radius: 20px; max-width: 600px; margin: 0 auto; border: 1px solid var(--primary); text-align: center;">
+            <h2 class="section-title">إعداد المصادقة الثنائية (2FA)</h2>
+            <div class="divider center-divider"></div>
 
-            <div style="text-align: center; margin: 20px 0;">
-                <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code"
-                    style="border: 5px solid white; border-radius: 10px;">
-                <p style="margin-top: 10px; color: #aaa; font-family: monospace;">Secret: {{ secret }}</p>
+            <p style="margin-bottom: 30px; color: var(--text-muted);">
+                قم بزيادة أمان حسابك عن طريق تفعيل المصادقة الثنائية. امسح رمز الاستجابة السريعة (QR Code) باستخدام
+                تطبيق Google Authenticator أو Microsoft Authenticator.
+            </p>
+
+            <div
+                style="background: white; padding: 20px; display: inline-block; border-radius: 10px; margin-bottom: 30px;">
+                <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" style="display: block;">
             </div>
 
-            <form action="{{ url_for('setup_2fa') }}" method="POST">
-                
-                <input type="hidden" name="secret" value="{{ secret }}">
+            <div style="background: var(--surface); padding: 15px; border-radius: 10px; margin-bottom: 30px;">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">الرمز السري (في حال تعذر
+                    المسح):</p>
+                <code
+                    style="color: var(--primary); font-size: 1.2rem; font-weight: bold; letter-spacing: 2px;">{{ secret }}</code>
+            </div>
 
-                <div class="form-group">
-                    <label>أدخل الكود من التطبيق لتأكيد التفعيل</label>
-                    <input type="text" name="token" required placeholder="123456"
-                        style="text-align: center; letter-spacing: 5px; font-size: 1.2rem;">
-                </div>
-
-                <button type="submit" class="btn btn-primary btn-block">تفعيل الحماية</button>
+            <form action="{{ url_for('toggle_2fa') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% if current_user.two_factor_enabled %}
+                <input type="hidden" name="action" value="disable">
+                <button type="submit" class="btn btn-outline" style="border-color: #ff4a4a; color: #ff4a4a;">تعطيل
+                    المصادقة الثنائية</button>
+                {% else %}
+                <input type="hidden" name="action" value="enable">
+                <button type="submit" class="btn btn-primary btn-block">تفعيل الآن</button>
+                {% endif %}
             </form>
+
+            <div style="margin-top: 20px;">
+                <a href="{{ url_for('admin') }}" style="color: var(--text-muted);">العودة للوحة التحكم</a>
+            </div>
         </div>
     </div>
 </section>

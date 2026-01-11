@@ -5,55 +5,95 @@
     <div class="container">
 
         <div
-            style="background: #1E1E1E; padding: 40px; border-radius: 20px; max-width: 800px; margin: 0 auto; border: 1px solid #D4AF37;">
+            style="background: var(--surface-light); padding: 40px; border-radius: 20px; max-width: 800px; margin: 0 auto; border: 1px solid var(--primary); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+
+            <!-- Header Section -->
             <div style="text-align: center; margin-bottom: 30px;">
                 <span
-                    style="background: #D4AF37; color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">ملف
-                    العميل</span>
-                <h2 style="margin-top: 15px; font-size: 2.5rem;">{{ user.full_name }}</h2>
-                <p style="color: #aaa; font-size: 1.1rem;">{{ user.project_location }}</p>
+                    style="background: var(--primary); color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
+                    ملف العميل
+                </span>
+                <h2 style="margin-top: 15px; font-size: 2.5rem; color: var(--text);">{{ user.full_name or 'عميل' }}</h2>
+                <p style="color: var(--text-muted); font-size: 1.1rem;">{{ user.project_location or 'تحديد الموقع قيد
+                    التنفيذ' }}</p>
             </div>
 
             <div class="divider center-divider"></div>
 
+            <!-- Profile Info Grid -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                <div class="info-item"
-                    style="background: #121212; padding: 20px; border-radius: 10px; margin-bottom: 0;">
-                    <i class="fas fa-user"></i>
+
+                <div class="info-item" style="background: var(--surface); padding: 20px; border-radius: 10px;"
+                    data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-user" aria-hidden="true"></i>
                     <div>
-                        <h4 style="margin: 0; color: #888;">اسم المستخدم</h4>
+                        <h4 style="margin: 0; color: var(--text-muted);">اسم المستخدم</h4>
                         <p style="margin: 5px 0 0 0; font-size: 1.1rem;">{{ user.username }}</p>
                     </div>
                 </div>
 
-                <div class="info-item"
-                    style="background: #121212; padding: 20px; border-radius: 10px; margin-bottom: 0;">
-                    <i class="fas fa-phone"></i>
+                <div class="info-item" style="background: var(--surface); padding: 20px; border-radius: 10px;"
+                    data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
                     <div>
-                        <h4 style="margin: 0; color: #888;">رقم الهاتف</h4>
-                        <p style="margin: 5px 0 0 0; font-size: 1.1rem;">{{ user.phone }}</p>
+                        <h4 style="margin: 0; color: var(--text-muted);">البريد الإلكتروني</h4>
+                        <p style="margin: 5px 0 0 0; font-size: 1.1rem;">{{ user.email if user.email else 'لا يوجد
+                            حالياً' }}</p>
+                    </div>
+                </div>
+
+                <div class="info-item" style="background: var(--surface); padding: 20px; border-radius: 10px;"
+                    data-aos="fade-up" data-aos-delay="400">
+                    <i class="fas fa-phone" aria-hidden="true"></i>
+                    <div>
+                        <h4 style="margin: 0; color: var(--text-muted);">رقم الهاتف</h4>
+                        <p style="margin: 5px 0 0 0; font-size: 1.1rem;">{{ user.phone if user.phone else 'غير مسجل' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-item" style="background: var(--surface); padding: 20px; border-radius: 10px;"
+                    data-aos="fade-up" data-aos-delay="500">
+                    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                    <div>
+                        <h4 style="margin: 0; color: var(--text-muted);">تاريخ الإضافة</h4>
+                        <p style="margin: 5px 0 0 0; font-size: 1.1rem;">{{ user.created_at if user.created_at else
+                            'تاريخ قديم' }}</p>
                     </div>
                 </div>
 
                 <div class="info-item"
-                    style="background: #121212; padding: 20px; border-radius: 10px; margin-bottom: 0;">
-                    <i class="fas fa-calendar-alt"></i>
+                    style="background: var(--surface); padding: 20px; border-radius: 10px; grid-column: span 2;"
+                    data-aos="fade-up" data-aos-delay="600">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                     <div>
-                        <h4 style="margin: 0; color: #888;">تاريخ الإضافة</h4>
-                        <p style="margin: 5px 0 0 0; font-size: 1.1rem;">{{ user.created_at }}</p>
+                        <h4 style="margin: 0; color: var(--text-muted);">وصف المشروع</h4>
+                        <p style="margin: 5px 0 0 0; font-size: 1rem; line-height: 1.6; white-space: pre-line;">
+                            {{ user.project_description if user.project_description else 'لا يوجد وصف للمشروع حالياً' }}
+                        </p>
                     </div>
                 </div>
 
+                <!-- Progress Section -->
                 <div class="info-item"
-                    style="background: #121212; padding: 20px; border-radius: 10px; margin-bottom: 0;">
-                    <i class="fas fa-tools"></i>
-                    <div>
-                        <h4 style="margin: 0; color: #888;">حالة المشروع</h4>
-                        <p style="margin: 5px 0 0 0; font-size: 1.1rem; color: #D4AF37;">جاري العمل</p>
+                    style="background: var(--surface); padding: 20px; border-radius: 10px; grid-column: span 2;"
+                    data-aos="fade-up" data-aos-delay="700">
+                    <i class="fas fa-tasks" aria-hidden="true"></i>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0; color: var(--text-muted);">نسبة الإنجاز بمشروعك</h4>
+                        <div
+                            style="background: #333; height: 10px; border-radius: 5px; margin-top: 10px; overflow: hidden;">
+                            {% set percent = user.project_percentage or 0 %}
+                            <div style="width: {{ percent }}%; background: var(--primary); height: 100%;"></div>
+                        </div>
+                        <p style="margin: 5px 0 0 0; font-size: 1.1rem; color: var(--primary); text-align: left;">
+                            {{ percent }}%
+                        </p>
                     </div>
                 </div>
             </div>
 
+            <!-- Navigation Actions -->
             <div style="margin-top: 40px; text-align: center;">
                 {% if current_user.role == 'admin' %}
                 <a href="{{ url_for('admin') }}" class="btn btn-outline">العودة للوحة التحكم</a>
@@ -61,8 +101,8 @@
                 <a href="{{ url_for('index') }}" class="btn btn-outline">العودة للرئيسية</a>
                 {% endif %}
             </div>
-        </div>
 
+        </div>
     </div>
 </section>
 {% endblock %}

@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="section-padding" style="margin-top: 80px;">
+    <div class="container">
+        <div
+            style="background: var(--surface-light); padding: 40px; border-radius: 20px; max-width: 450px; margin: 0 auto; border: 1px solid var(--primary); text-align: center;">
+            <i class="fas fa-shield-alt" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 10px;">تحقق الأمان</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">يرجى إدخال رمز التحقق المكون من 6 أرقام من تطبيق
+                المصادقة الخاص بك.</p>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div
+                style="background: rgba(255, 74, 74, 0.1); color: #ff4a4a; padding: 10px; border-radius: 5px; margin-bottom: 20px; font-size: 0.9rem;">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('verify_2fa') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <input type="text" name="code" required placeholder="000000" maxlength="6" autofocus
+                        style="text-align: center; font-size: 2rem; letter-spacing: 10px; padding: 15px; background: var(--dark); border: 2px solid var(--border-color); border-radius: 10px; color: var(--primary); width: 100%;">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">تحقق ودخول</button>
+            </form>
+
+            <div style="margin-top: 30px;">
+                <a href="{{ url_for('logout') }}" style="color: var(--text-muted); font-size: 0.9rem;">إلغاء وتسجيل
+                    الخروج</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Only allow numbers
+    document.querySelector('input[name="code"]').addEventListener('input', function (e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+</script>
+{% endblock %}
