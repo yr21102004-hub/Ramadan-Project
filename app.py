@@ -34,6 +34,13 @@ from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Force Secure Session settings
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+    PERMANENT_SESSION_LIFETIME=1800 # 30 minutes session timeout
+)
+
 # Initialize extensions
 bcrypt = Bcrypt(app)
 csrf = CSRFProtect(app)
@@ -72,6 +79,29 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return "<h1>500 Internal Server Error</h1><p>Please try again.</p>", 500
+
+# Security Headers Middleware
+@app.after_request
+def add_security_headers(response):
+    # Prevent browsers from incorrectly detecting non-scripts as scripts
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    # Prevent clickjacking by not allowing the site to be embedded in iframes
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    # Enable browser XSS protection (for older browsers)
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    # Referrer Policy
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    # Content Security Policy (Basic - allowing CDN for Chart.js/FontAwesome)
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+        "style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+        "font-src 'self' fonts.gstatic.com https://cdnjs.cloudflare.com; "
+        "img-src 'self' data: https:; "
+        "connect-src 'self'; "
+        "frame-src 'self';"
+    )
+    return response
 
 # ============================================
 # Backward Compatibility - URL Aliases

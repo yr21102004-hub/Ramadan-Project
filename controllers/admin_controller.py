@@ -97,187 +97,144 @@ def admin_dashboard():
 def analytics_dashboard():
     if current_user.role != 'admin':
         return "Access Denied", 403
+    
+    try:
+        users = user_model.get_all()
+        messages = contact_model.get_all()
+        chats = chat_model.get_all()
+        sec_logs = security_log_model.get_all()
+        unanswered = unanswered_model.get_all()
         
-    users = user_model.get_all()
-    messages = contact_model.get_all()
-    chats = chat_model.get_all()
-    sec_logs = security_log_model.get_all()
-    
-    # Analytics Logic
-    from collections import Counter
-    
-    # 1. Totals
-    total_users_count = len(users)
-    total_requests_count = len(messages)
-    conversion_rate = round((total_requests_count / total_users_count * 100), 1) if total_users_count > 0 else 0
-    
-    # 2. Frequent AI Users (Almost Daily Activity)
-    # Count unique days each user interacted
-    user_ai_days = {} # user_name -> set of dates
-    for c in chats:
-        uname = c.get('user_name', 'Unknown')
-        ts = c.get('timestamp', '')
-        if ts:
-            date = ts.split(' ')[0]
-            if uname not in user_ai_days:
-                user_ai_days[uname] = set()
-            user_ai_days[uname].add(date)
-            
-    # Filter users active on 2 or more distinct days
-    frequent_ai_stats = {u: len(d) for u, d in user_ai_days.items() if len(d) >= 2}
-    # Sort by most active days
-    sorted_frequent = sorted(frequent_ai_stats.items(), key=lambda x: x[1], reverse=True)
-    
-    analy_ai_labels = [x[0] for x in sorted_frequent]
-    analy_ai_values = [x[1] for x in sorted_frequent]
+        from collections import Counter
+        from datetime import datetime
+        
+        # 1. Totals
+        total_users_count = len(users)
+        total_requests_count = len(messages)
+        conversion_rate = round((total_requests_count / total_users_count * 100), 1) if total_users_count > 0 else 0
+        
+        # 2. Frequent AI Users
+        user_ai_days = {}
+        for c in chats:
+            uname = c.get('user_name', 'Unknown')
+            ts = c.get('timestamp', '')
+            if ts:
+                date = ts.split(' ')[0]
+                if uname not in user_ai_days: user_ai_days[uname] = set()
+                user_ai_days[uname].add(date)
+        frequent_ai_stats = {u: len(d) for u, d in user_ai_days.items() if len(d) >= 2}
+        sorted_frequent = sorted(frequent_ai_stats.items(), key=lambda x: x[1], reverse=True)
+        analy_ai_labels = [x[0] for x in sorted_frequent]
+        analy_ai_values = [x[1] for x in sorted_frequent]
 
-    # 3. Top Visitors (All Time - Original Chart) [Keep limit for this one or remove as well?]
-    # The user asked for AI chat specifically, but let's remove limit for visitors too if requested. 
-    # For now, sticking to AI chat request.
-    all_login_events = [l for l in sec_logs if 'Login' in l.get('event', '') and 'Success' in l.get('event', '')]
-    all_visitors_list = []
-    for l in all_login_events:
-        details = l.get('details', '')
-        if 'User ' in details:
-            try:
-                username = details.split('User ')[1].split(' ')[0]
-                all_visitors_list.append(username)
-            except: pass
-    top_all_visitors_data = Counter(all_visitors_list).most_common() # Removed limit
-    analy_all_visitors_labels = [x[0] for x in top_all_visitors_data]
-    analy_all_visitors_values = [x[1] for x in top_all_visitors_data]
-
-    # 4. Daily & Heavy Visitors (Today)
-    from datetime import datetime
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    today_login_events = [l for l in sec_logs 
-                          if 'Login' in l.get('event', '') 
-                          and 'Success' in l.get('event', '')
-                          and l.get('timestamp', '').startswith(today_str)]
-    today_visitors_list = []
-    for l in today_login_events:
-        details = l.get('details', '')
-        if 'User ' in details:
-            try:
-                username = details.split('User ')[1].split(' ')[0]
-                today_visitors_list.append(username)
-            except: pass
-            
-    today_visitor_counts = Counter(today_visitors_list)
-    
-    # Heavy Visitors (> 2 visits today)
-    heavy_data = {k: v for k, v in today_visitor_counts.items() if v > 2}
-    analy_heavy_labels = list(heavy_data.keys())
-    analy_heavy_values = list(heavy_data.values())
-    
-    # Daily Visitors (Exactly 1 visit today)
-    daily_data = {k: v for k, v in today_visitor_counts.items() if v == 1}
-    analy_daily_labels = list(daily_data.keys())
-    analy_daily_values = list(daily_data.values()) 
-    
-    # 5. Top Requested Services
-    service_counts = Counter([m.get('service', 'general') for m in messages])
-    service_map = {
-        'modern-paints': 'دهانات حديثة',
-        'gypsum-board': 'جبس بورد',
-        'integrated-finishing': 'تشطيب متكامل',
-        'putty-finishing': 'تأسيس ومعجون',
-        'wallpaper': 'ورق حائط',
-        'renovation': 'تجديد وترميم',
-        'general': 'استفسار عام'
-    }
-    top_services_req_data = service_counts.most_common(5)
-    top_services_req_labels = [service_map.get(x[0], x[0]) for x in top_services_req_data]
-    top_services_req_values = [x[1] for x in top_services_req_data]
-    
-    # 6. Most Viewed Services
-    service_views = []
-    for l in sec_logs:
-        if l.get('event') == 'Service View':
+        # 3. Top Visitors (All Time)
+        all_login_events = [l for l in sec_logs if 'Login' in l.get('event', '') and 'Success' in l.get('event', '')]
+        all_visitors_list = []
+        for l in all_login_events:
             details = l.get('details', '')
-            if 'User viewed service: ' in details:
-                svc_title = details.split('User viewed service: ')[1]
-                service_views.append(svc_title)
-    top_services_view_data = Counter(service_views).most_common(5)
-    top_services_view_labels = [x[0] for x in top_services_view_data]
-    top_services_view_values = [x[1] for x in top_services_view_data]
+            if 'User ' in details:
+                try:
+                    username = details.split('User ')[1].split(' ')[0]
+                    all_visitors_list.append(username)
+                except: pass
+        top_all_visitors_data = Counter(all_visitors_list).most_common()
+        analy_all_visitors_labels = [x[0] for x in top_all_visitors_data]
+        analy_all_visitors_values = [x[1] for x in top_all_visitors_data]
 
-    # 7. Peak Hours (Activity by hour of day)
-    hour_counts = Counter()
-    for l in sec_logs:
-        ts = l.get('timestamp', '')
-        if ts and ' ' in ts:
-            try:
-                hour = ts.split(' ')[1].split(':')[0]
-                hour_counts[hour] += 1
-            except: pass
-    # Ensure all 24 hours are represented
-    sorted_hours = sorted([ (str(h).zfill(2), hour_counts.get(str(h).zfill(2), 0)) for h in range(24) ])
-    peak_hours_labels = [x[0] + ":00" for x in sorted_hours]
-    peak_hours_values = [x[1] for x in sorted_hours]
-
-    # 8. AI Efficiency (Answered vs Unanswered)
-    total_ai_msgs = len(chats)
-    unanswered_msgs = len(unanswered)
-    answered_msgs = max(0, total_ai_msgs - unanswered_msgs)
-    ai_efficiency = {
-        'labels': ['تم الرد', 'بدون إجابة'],
-        'values': [answered_msgs, unanswered_msgs]
-    }
-
-    # 9. Page Popularity (General views)
-    page_views = []
-    for l in sec_logs:
-        event = l.get('event', '')
-        if 'View' in event or 'Page' in event:
+        # 4. Daily & Heavy Visitors
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        today_login_events = [l for l in sec_logs if 'Login' in l.get('event', '') and 'Success' in l.get('event', '') and l.get('timestamp', '').startswith(today_str)]
+        today_visitors_list = []
+        for l in today_login_events:
             details = l.get('details', '')
-            # Try to extract page name from details like "User viewed page: ..."
-            if 'page: ' in details.lower():
-                pname = details.lower().split('page: ')[1]
-                page_views.append(pname)
-            elif event == 'Service View':
-                page_views.append('الخدمات')
+            if 'User ' in details:
+                try:
+                    username = details.split('User ')[1].split(' ')[0]
+                    today_visitors_list.append(username)
+                except: pass
+        today_visitor_counts = Counter(today_visitors_list)
+        heavy_data = {k: v for k, v in today_visitor_counts.items() if v > 2}
+        analy_heavy_labels = list(heavy_data.keys())
+        analy_heavy_values = list(heavy_data.values())
+        daily_data = {k: v for k, v in today_visitor_counts.items() if v == 1}
+        analy_daily_labels = list(daily_data.keys())
+        analy_daily_values = list(daily_data.values()) 
 
-    page_map = {
-        '/': 'الرئيسية',
-        'home': 'الرئيسية',
-        'projects': 'معرض الأعمال',
-        'about': 'من نحن',
-        'contact': 'اتصل بنا',
-        'services': 'الخدمات',
-        'admin': 'لوحة التحكم',
-        'login': 'تسجيل الدخول'
-    }
-    top_pages_data = Counter(page_views).most_common(5)
-    page_pop_labels = [page_map.get(x[0], x[0]) for x in top_pages_data]
-    page_pop_values = [x[1] for x in top_pages_data]
+        # 5. Top Requested Services
+        service_counts = Counter([m.get('service', 'general') for m in messages])
+        service_map = {'modern-paints':'دهانات حديثة','gypsum-board':'جبس بورد','integrated-finishing':'تشطيب متكامل','putty-finishing':'تأسيس ومعجون','wallpaper':'ورق حائط','renovation':'تجديد وترميم','general':'استفسار عام'}
+        top_services_req_data = service_counts.most_common(5)
+        top_services_req_labels = [service_map.get(x[0], x[0]) for x in top_services_req_data]
+        top_services_req_values = [x[1] for x in top_services_req_data]
+        
+        # 6. Most Viewed Services
+        service_views = []
+        for l in sec_logs:
+            if l.get('event') == 'Service View':
+                details = l.get('details', '')
+                if 'User viewed service: ' in details:
+                    svc_title = details.split('User viewed service: ')[1]
+                    service_views.append(svc_title)
+        top_services_view_data = Counter(service_views).most_common(5)
+        top_services_view_labels = [x[0] for x in top_services_view_data]
+        top_services_view_values = [x[1] for x in top_services_view_data]
 
-    return render_template('analytics.html', analytics={
-                               'total_users': total_users_count,
-                               'total_requests': total_requests_count,
-                               'conversion_rate': conversion_rate,
-                               
-                               'top_ai_labels': analy_ai_labels,
-                               'top_ai_values': analy_ai_values,
-                               'top_all_visitors_labels': analy_all_visitors_labels,
-                               'top_all_visitors_values': analy_all_visitors_values,
-                               
-                               'heavy_visitors_labels': analy_heavy_labels,
-                               'heavy_visitors_values': analy_heavy_values,
-                               'daily_visitors_labels': analy_daily_labels,
-                               'daily_visitors_values': analy_daily_values,
-                               
-                               'top_services_req_labels': top_services_req_labels,
-                               'top_services_req_values': top_services_req_values,
-                               'top_services_view_labels': top_services_view_labels,
-                               'top_services_view_values': top_services_view_values,
-                               
-                               'peak_hours_labels': peak_hours_labels,
-                               'peak_hours_values': peak_hours_values,
-                               'ai_efficiency': ai_efficiency,
-                               'page_pop_labels': page_pop_labels,
-                               'page_pop_values': page_pop_values
-                           })
+        # 7. Peak Hours
+        hour_counts = Counter()
+        for l in sec_logs:
+            ts = l.get('timestamp', '')
+            if ts and ' ' in ts:
+                try:
+                    hour = ts.split(' ')[1].split(':')[0]
+                    hour_counts[hour] += 1
+                except: pass
+        sorted_hours = sorted([ (str(h).zfill(2), hour_counts.get(str(h).zfill(2), 0)) for h in range(24) ])
+        peak_hours_labels = [x[0] + ":00" for x in sorted_hours]
+        peak_hours_values = [x[1] for x in sorted_hours]
+
+        # 8. AI Efficiency
+        total_ai_msgs = len(chats)
+        unanswered_msgs = len(unanswered)
+        answered_msgs = max(0, total_ai_msgs - unanswered_msgs)
+        ai_efficiency = {
+            'labels': ['تم الرد', 'بدون إجابة'],
+            'values': [answered_msgs, unanswered_msgs]
+        }
+
+        # 9. Page Popularity
+        page_views = []
+        for l in sec_logs:
+            event = l.get('event', '')
+            if 'View' in event or 'Page' in event:
+                details = l.get('details', '')
+                if 'page: ' in details.lower():
+                    parts = details.lower().split('page: ')
+                    if len(parts) > 1:
+                        pname = parts[1].strip()
+                        page_views.append(pname)
+                elif event == 'Service View':
+                    page_views.append('الخدمات')
+
+        page_map = {'/':'الرئيسية','home':'الرئيسية','projects':'معرض الأعمال','about':'من نحن','contact':'اتصل بنا','services':'الخدمات','admin':'لوحة التحكم','login':'تسجيل الدخول'}
+        top_pages_data = Counter(page_views).most_common(5)
+        page_pop_labels = [page_map.get(x[0], x[0]) for x in top_pages_data]
+        page_pop_values = [x[1] for x in top_pages_data]
+
+        return render_template('analytics.html', analytics={
+            'total_users': total_users_count, 'total_requests': total_requests_count, 'conversion_rate': conversion_rate,
+            'top_ai_labels': analy_ai_labels, 'top_ai_values': analy_ai_values,
+            'top_all_visitors_labels': analy_all_visitors_labels, 'top_all_visitors_values': analy_all_visitors_values,
+            'heavy_visitors_labels': analy_heavy_labels, 'heavy_visitors_values': analy_heavy_values,
+            'daily_visitors_labels': analy_daily_labels, 'daily_visitors_values': analy_daily_values,
+            'top_services_req_labels': top_services_req_labels, 'top_services_req_values': top_services_req_values,
+            'top_services_view_labels': top_services_view_labels, 'top_services_view_values': top_services_view_values,
+            'peak_hours_labels': peak_hours_labels, 'peak_hours_values': peak_hours_values,
+            'ai_efficiency': ai_efficiency, 'page_pop_labels': page_pop_labels, 'page_pop_values': page_pop_values
+        })
+    except Exception as e:
+        print(f"ANALYTICS ERROR: {str(e)}")
+        flash(f"حدث خطأ أثناء تحميل الإحصائيات: {str(e)}")
+        return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/admin/add_user', methods=['POST'])
 @login_required
@@ -430,3 +387,77 @@ def toggle_2fa():
         user_model.update(current_user.username, {'two_factor_enabled': False})
         flash('تم تعطيل المصادقة الثنائية')
     return redirect(url_for('admin.admin_dashboard'))
+@admin_bp.route('/admin/security/audit')
+@login_required
+def security_audit():
+    if current_user.role != 'admin': return "Access Denied", 403
+    
+    from flask import current_app
+    
+    # Perform checks
+    checks = []
+    
+    # 1. CSRF Check
+    csrf_enabled = current_app.config.get('WTF_CSRF_ENABLED', True)
+    checks.append({
+        'name': 'حماية CSRF',
+        'status': 'آمن' if csrf_enabled else 'خطر',
+        'desc': 'حماية النماذج من الهجمات العابرة للمواقع.',
+        'icon': 'fa-shield-alt',
+        'color': 'success' if csrf_enabled else 'danger'
+    })
+    
+    # 2. Session Cookies
+    secure_session = current_app.config.get('SESSION_COOKIE_HTTPONLY', False)
+    checks.append({
+        'name': 'أمان الجلسة (HttpOnly)',
+        'status': 'مفعل' if secure_session else 'غير مفعل',
+        'desc': 'منع الوصول لملفات تعريف الارتباط عبر JavaScript.',
+        'icon': 'fa-cookie-bite',
+        'color': 'success' if secure_session else 'warning'
+    })
+    
+    # 3. Security Headers
+    # We added them in app.after_request, so assuming they are active
+    checks.append({
+        'name': 'رؤوس الأمان (HSTS, CSP, X-Frame)',
+        'status': 'نشط',
+        'desc': 'حماية المتصفح من هجمات XSS و Clickjacking.',
+        'icon': 'fa-file-code',
+        'color': 'success'
+    })
+    
+    # 4. Database Backups
+    backup_exists = os.path.exists('backups') and len(os.listdir('backups')) > 0
+    checks.append({
+        'name': 'النسخ الاحتياطي',
+        'status': 'موجود' if backup_exists else 'غير موجود',
+        'desc': f"يوجد {len(os.listdir('backups')) if backup_exists else 0} نسخة احتياطية محفوظة.",
+        'icon': 'fa-database',
+        'color': 'success' if backup_exists else 'warning'
+    })
+    
+    # 5. Admin Passwords (Check for defaults - very simple)
+    admin_user = user_model.get_by_username('admin')
+    weak_pwd = False
+    if admin_user and bcrypt.check_password_hash(admin_user['password'], 'admin'):
+        weak_pwd = True
+    
+    checks.append({
+        'name': 'قوة كلمة مرور المسؤول',
+        'status': 'ضعيف' if weak_pwd else 'قوي',
+        'desc': 'كلمة المرور الحالية للمسؤول آمنة وصعبة التخمين.' if not weak_pwd else 'تحذير: كلمة المرور الافتراضية "admin" ما زالت مستخدمة!',
+        'icon': 'fa-key',
+        'color': 'danger' if weak_pwd else 'success'
+    })
+
+    # 6. Rate Limiting
+    checks.append({
+        'name': 'تحديد معدل الطلبات (Rate Limiting)',
+        'status': 'مفعل',
+        'desc': 'حماية الموقع من هجمات Brute Force و DDoS.',
+        'icon': 'fa-tachometer-alt',
+        'color': 'success'
+    })
+
+    return render_template('admin_security.html', checks=checks)

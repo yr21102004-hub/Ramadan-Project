@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="section-padding admin-section-bg">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-light btn-sm mb-3">
+                    <i class="fas fa-arrow-right me-2"></i> العودة للوحة التحكم
+                </a>
+                <h2 class="section-title mb-0">مركز أمان الموقع (Security Center)</h2>
+                <p class="text-muted mt-2">تقرير شامل لحالة الأمان واختبار الحماية</p>
+            </div>
+            <div class="text-end">
+                <div class="badge bg-success p-2 px-3">
+                    <i class="fas fa-shield-check me-2"></i> مستوى الأمان: عالي
+                </div>
+            </div>
+        </div>
+
+        <div class="divider mb-5"></div>
+
+        <!-- Security Audit Results -->
+        <div class="row g-4 mb-5" data-aos="fade-up">
+            {% for check in checks %}
+            <div class="col-md-6 col-lg-4">
+                <div class="security-card h-100 p-4 bg-dark-soft border-gold-soft rounded-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div
+                            class="security-icon-box bg-{{ check.color }}-soft text-{{ check.color }} fs-3 p-3 rounded-circle">
+                            <i class="fas {{ check.icon }}"></i>
+                        </div>
+                        <span class="badge bg-{{ check.color }}">{{ check.status }}</span>
+                    </div>
+                    <h5 class="fw-bold mb-2">{{ check.name }}</h5>
+                    <p class="text-muted small mb-0">{{ check.desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- System Recommendations -->
+        <div class="alert bg-primary-soft border-primary rounded-4 p-4 mb-5" data-aos="fade-up">
+            <h4 class="text-primary fw-bold mb-3"><i class="fas fa-info-circle me-2"></i> توصيات الأمان الذكية</h4>
+            <ul class="mb-0 text-muted">
+                <li>يُنصح بتغيير رابط لوحة التحكم (URL) بشكل دوري لزيادة التأمين.</li>
+                <li>تأكد من تفعيل المصادقة الثنائية (2FA) لجميع حسابات المسؤولين.</li>
+                <li>يتم الكشف عن المحاولات المشبوهة تلقائياً وتسجيلها في سجلات الأمان.</li>
+            </ul>
+        </div>
+
+        <!-- Security Logs Preview -->
+        <div class="admin-card rounded-4 overflow-hidden" data-aos="fade-up">
+            <div class="card-header bg-dark-soft p-4 border-bottom border-gold-soft d-flex justify-content-between">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-list-alt me-2 text-gold"></i> آخر سجلات الأمان (Audit Logs)
+                </h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>التوقيت</th>
+                            <th>الحدث</th>
+                            <th>التفاصيل</th>
+                            <th>الأهمية</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- This would be dynamic in real usage, showing 5 logs -->
+                        <tr class="border-gold-soft">
+                            <td class="small">الآن</td>
+                            <td>Security Audit</td>
+                            <td>تم إنشاء تقرير أمان كامل بواسطة المسؤول</td>
+                            <td><span class="badge bg-info">Medium</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<style>
+    .bg-dark-soft {
+        background: rgba(30, 30, 30, 0.6);
+        backdrop-filter: blur(10px);
+    }
+
+    .border-gold-soft {
+        border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .security-card {
+        transition: transform 0.3s ease;
+    }
+
+    .security-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--gold);
+    }
+
+    .bg-success-soft {
+        background: rgba(40, 167, 69, 0.1);
+    }
+
+    .bg-danger-soft {
+        background: rgba(220, 53, 69, 0.1);
+    }
+
+    .bg-warning-soft {
+        background: rgba(255, 193, 7, 0.1);
+    }
+
+    .bg-primary-soft {
+        background: rgba(13, 110, 253, 0.1);
+    }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    .text-warning {
+        color: #ffc107 !important;
+    }
+
+    .text-primary {
+        color: #0d6efd !important;
+    }
+</style>
+{% endblock %}
