@@ -70,6 +70,7 @@ async function submitContactForm() {
     const name = nameInput.value;
     const phone = phoneInput.value;
     const message = messageInput.value;
+    const service = document.getElementById("service") ? document.getElementById("service").value : "general";
 
     // Change button state
     let originalText = "ارسال الرسالة";
@@ -80,7 +81,7 @@ async function submitContactForm() {
     }
 
     // Database Payload
-    const formData = { name, phone, message };
+    const formData = { name, phone, message, service };
 
     let isSuccess = false;
 

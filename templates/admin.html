@@ -18,6 +18,279 @@
 
         <div class="divider mb-5"></div>
 
+        <!-- Analytics Dashboard (Power BI Style) -->
+        <!-- Analytics Quick Access -->
+        <div class="row mb-5" data-aos="fade-up">
+            <div class="col-12">
+                <div class="card bg-dark border-0 shadow-lg overflow-hidden position-relative">
+                    <div class="card-body p-5">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h3 class="text-gold mb-3"><i class="fas fa-chart-pie me-2"></i> إحصائيات الموقع
+                                    والتقارير</h3>
+                                <p class="text-white-50 mb-4" style="font-size: 1.1rem; line-height: 1.6;">
+                                    اطلع على تحليل شامل لأداء الموقع، تفاعل المستخدمين مع الذكاء الاصطناعي، الزيارات
+                                    اليومية،
+                                    والخدمات الأكثر طلباً ومشاهدة.
+                                </p>
+                                <a href="{{ url_for('admin.analytics_dashboard') }}" class="btn btn-gold btn-lg px-5">
+                                    <i class="fas fa-external-link-alt me-2"></i> عرض الإحصائيات الكاملة
+                                </a>
+                            </div>
+                            <div class="col-md-4 text-center d-none d-md-block">
+                                <i class="fas fa-chart-line text-gold opacity-25" style="font-size: 8rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Decorative Circle -->
+                    <div class="position-absolute bg-gold rounded-circle opacity-10"
+                        style="width: 300px; height: 300px; top: -100px; right: -50px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart.js Library -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Charts Contexts
+                var ctxAi = document.getElementById('aiChart');
+                var ctxAllTime = document.getElementById('allTimeVisitorsChart');
+                var ctxChat = document.getElementById('chatChart');
+                var ctxLogin = document.getElementById('loginChart');
+                var ctxServicesReq = document.getElementById('servicesReqChart');
+                var ctxServicesView = document.getElementById('servicesViewChart');
+
+                // Dynamic Colors
+                function getColors(count) {
+                    var colors = ['#4caf50', '#2196f3', '#f44336', '#ffc107', '#9c27b0', '#00bcd4', '#e91e63'];
+                    var result = [];
+                    for (var i = 0; i < count; i++) result.push(colors[i % colors.length]);
+                    return result;
+                }
+
+                // Chart Options
+                const commonOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    devicePixelRatio: 3,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#ccc',
+                                font: { family: 'Cairo', size: 12 },
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        }
+                    },
+                    layout: { padding: 10 }
+                };
+
+                // 1. Top AI Chat Users (Original)
+                if (ctxAi) {
+                    new Chart(ctxAi, {
+                        type: 'doughnut',
+                        data: {
+                            labels: {{ analytics.top_ai_labels | tojson }},
+                datasets: [{
+                    data: {{ analytics.top_ai_values | tojson }},
+                backgroundColor: getColors({{ analytics.top_ai_values | length }}),
+                borderWidth: 0,
+                hoverOffset: 10
+                            }]
+                        },
+                options: commonOptions
+                    });
+                }
+
+            // 2. All Time Visitors (Original)
+            if (ctxAllTime) {
+                new Chart(ctxAllTime, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {{ analytics.top_all_visitors_labels | tojson }},
+            datasets: [{
+                data: {{ analytics.top_all_visitors_values | tojson }},
+                backgroundColor: getColors({{ analytics.top_all_visitors_values | length }}),
+                borderWidth: 0,
+                hoverOffset: 10
+                            }]
+                        },
+            options: commonOptions
+                    });
+                }
+
+            // 3. Heavy Visitors (Today)
+            if (ctxChat) {
+                new Chart(ctxChat, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {{ analytics.heavy_visitors_labels | tojson }},
+            datasets: [{
+                data: {{ analytics.heavy_visitors_values | tojson }},
+                backgroundColor: getColors({{ analytics.heavy_visitors_values | length }}),
+                borderWidth: 0,
+                hoverOffset: 10
+                            }]
+                        },
+            options: commonOptions
+                    });
+                }
+
+            // 4. Daily Visitors (Today)
+            if (ctxLogin) {
+                new Chart(ctxLogin, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {{ analytics.daily_visitors_labels | tojson }},
+            datasets: [{
+                data: {{ analytics.daily_visitors_values | tojson }},
+                backgroundColor: getColors({{ analytics.daily_visitors_values | length }}),
+                borderWidth: 0,
+                hoverOffset: 10
+                            }]
+                        },
+            options: commonOptions
+                    });
+                }
+
+            // 5. Top Requested Services
+            if (ctxServicesReq) {
+                new Chart(ctxServicesReq, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {{ analytics.top_services_req_labels | tojson }},
+            datasets: [{
+                data: {{ analytics.top_services_req_values | tojson }},
+                backgroundColor: getColors({{ analytics.top_services_req_values | length }}),
+                borderWidth: 0,
+                hoverOffset: 10
+                            }]
+                        },
+            options: commonOptions
+                    });
+                }
+
+            // 6. Top Viewed Services
+            if (ctxServicesView) {
+                new Chart(ctxServicesView, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {{ analytics.top_services_view_labels | tojson }},
+            datasets: [{
+                data: {{ analytics.top_services_view_values | tojson }},
+                backgroundColor: getColors({{ analytics.top_services_view_values | length }}),
+                borderWidth: 0,
+                hoverOffset: 10
+                            }]
+                        },
+            options: commonOptions
+                    });
+                }
+            });
+        </script>
+
+        <style>
+            .msg-content {
+                max-width: 200px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: block;
+            }
+
+            .kpi-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+            }
+
+            .kpi-card {
+                background: var(--surface);
+                padding: 20px;
+                border-radius: 15px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                transition: transform 0.3s;
+            }
+
+            .kpi-card:hover {
+                transform: translateY(-5px);
+                border-color: var(--primary);
+            }
+
+            .kpi-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+            }
+
+            .bg-primary-soft {
+                background: rgba(33, 150, 243, 0.15);
+            }
+
+            .bg-warning-soft {
+                background: rgba(255, 193, 7, 0.15);
+            }
+
+            .bg-info-soft {
+                background: rgba(0, 188, 212, 0.15);
+            }
+
+            .bg-success-soft {
+                background: rgba(76, 175, 80, 0.15);
+            }
+
+            .kpi-info h4 {
+                margin: 0;
+                font-size: 1.8rem;
+                font-weight: bold;
+                color: var(--text);
+            }
+
+            .kpi-info p {
+                margin: 0;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            }
+
+            .charts-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+            }
+
+            .chart-card {
+                background: var(--surface);
+                padding: 20px;
+                border-radius: 15px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                min-height: 300px;
+            }
+
+            .chart-card h5 {
+                margin-bottom: 20px;
+                color: var(--text-muted);
+                font-size: 1rem;
+            }
+
+            .chart-wrapper {
+                position: relative;
+                height: 300px;
+                width: 100%;
+            }
+        </style>
+
         <!-- AI Management Section -->
         <div class="admin-card mb-5" data-aos="fade-up">
             <div class="card-header-premium mb-4">

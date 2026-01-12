@@ -155,13 +155,14 @@ class ContactModel:
         """Get all contact messages"""
         return self.table.all()
     
-    def create(self, name, phone, message, user_id=None):
+    def create(self, name, phone, message, user_id=None, service=None):
         """Create new contact message"""
         contact_data = {
             'name': name,
             'phone': phone,
             'message': message,
             'user_id': user_id,
+            'service': service,
             'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         return self.table.insert(contact_data)

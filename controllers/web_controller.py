@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import current_user
-from models import ContactModel
+from models import ContactModel, SecurityLogModel
 
 contact_model = ContactModel()
+security_log_model = SecurityLogModel()
 
 web_bp = Blueprint('web', __name__)
 
@@ -82,6 +83,10 @@ def service_detail(service_id):
     service = SERVICES_DATA.get(service_id)
     if not service:
         return render_template('404.html'), 404
+        
+    # Log this view for analytics
+    security_log_model.create('Service View', f'User viewed service: {service["title"]}', severity="info")
+    
     return render_template('service_detail.html', service=service)
 
 @web_bp.route('/about')

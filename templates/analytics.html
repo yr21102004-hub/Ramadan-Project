@@ -1,0 +1,293 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="section-padding admin-section-bg">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-light btn-sm mb-3">
+                    <i class="fas fa-arrow-right me-2"></i> العودة للوحة التحكم
+                </a>
+                <h2 class="section-title mb-0">إحصائيات الموقع (Analytics)</h2>
+                <p class="text-muted mt-2">تحليل شامل لأداء الموقع وتفاعل المستخدمين</p>
+            </div>
+        </div>
+
+        <div class="divider mb-5"></div>
+
+        <!-- Analytics Dashboard -->
+        <div class="analytics-section mb-5" data-aos="fade-up">
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon bg-primary-soft"><i class="fas fa-users text-primary"></i></div>
+                    <div class="kpi-info">
+                        <h4>{{ analytics.total_users }}</h4>
+                        <p>إجمالي المستخدمين المسجلين</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon bg-warning-soft"><i class="fas fa-clipboard-list text-warning"></i></div>
+                    <div class="kpi-info">
+                        <h4>{{ analytics.total_requests }}</h4>
+                        <p>إجمالي طلبات المعاينة</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    {% set rate = analytics.conversion_rate %}
+                    {% set rate_color = 'text-success' if rate >= 50 else 'text-info' if rate >= 20 else 'text-danger'
+                    %}
+                    {% set bg_color = 'bg-success-soft' if rate >= 50 else 'bg-info-soft' if rate >= 20 else
+                    'bg-danger-soft' %}
+                    <div class="kpi-icon {{ bg_color }}"><i class="fas fa-percentage {{ rate_color }}"></i></div>
+                    <div class="kpi-info">
+                        <h4 class="{{ rate_color }}">{{ rate }}%</h4>
+                        <p>نسبة الطلب للعملاء</p>
+                    </div>
+                </div>
+                <!-- Top Visitor KPI -->
+                <div class="kpi-card">
+                    <div class="kpi-icon bg-success-soft"><i class="fas fa-crown text-success"></i></div>
+                    <div class="kpi-info">
+                        <h4>{{ analytics.top_all_visitors_labels[0] if analytics.top_all_visitors_labels else '-' }}
+                        </h4>
+                        <p>الأكثر زيارة (تسجيل دخول)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid 0 (Original - Restored) -->
+            <div class="charts-grid mt-4">
+                <div class="chart-card">
+                    <h5><i class="fas fa-comments text-gold me-2"></i> أكثر المستخدمين تفاعلاً مع AI (Top 5)</h5>
+                    <div class="chart-wrapper">
+                        <canvas id="aiChart"></canvas>
+                        {% if not analytics.top_ai_labels %}
+                        <div class="text-center text-muted"
+                            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            لا توجد بيانات
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h5><i class="fas fa-history text-gold me-2"></i> أكثر المستخدمين زيارة (كل الأوقات)</h5>
+                    <div class="chart-wrapper">
+                        <canvas id="allTimeVisitorsChart"></canvas>
+                        {% if not analytics.top_all_visitors_labels %}
+                        <div class="text-center text-muted"
+                            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            لا توجد بيانات
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid 1 (Visitors Today) -->
+            <div class="charts-grid mt-4">
+                <div class="chart-card">
+                    <h5><i class="fas fa-users text-gold me-2"></i> مستخدمين زاروا الموقع أكثر من مرتين اليوم</h5>
+                    <div class="chart-wrapper">
+                        <canvas id="chatChart"></canvas>
+                        {% if not analytics.heavy_visitors_labels %}
+                        <div class="text-center text-muted"
+                            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            لا توجد بيانات
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h5><i class="fas fa-user-check text-gold me-2"></i> مستخدمين زاروا الموقع مرة واحدة اليوم</h5>
+                    <div class="chart-wrapper">
+                        <canvas id="loginChart"></canvas>
+                        {% if not analytics.daily_visitors_labels %}
+                        <div class="text-center text-muted"
+                            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            لا توجد بيانات
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid 2 (Services) -->
+            <div class="charts-grid mt-4">
+                <div class="chart-card">
+                    <h5><i class="fas fa-clipboard-list text-gold me-2"></i> أكثر الخدمات طلباً (من الرسائل)</h5>
+                    <div class="chart-wrapper">
+                        <canvas id="servicesReqChart"></canvas>
+                        {% if not analytics.top_services_req_labels %}
+                        <div class="text-center text-muted"
+                            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            لا توجد بيانات
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h5><i class="fas fa-eye text-gold me-2"></i> أكثر الخدمات مشاهدة (زيارات الصفحات)</h5>
+                    <div class="chart-wrapper">
+                        <canvas id="servicesViewChart"></canvas>
+                        {% if not analytics.top_services_view_labels %}
+                        <div class="text-center text-muted"
+                            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            لا توجد بيانات
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Charts Contexts
+        var ctxAi = document.getElementById('aiChart');
+        var ctxAllTime = document.getElementById('allTimeVisitorsChart');
+        var ctxChat = document.getElementById('chatChart');
+        var ctxLogin = document.getElementById('loginChart');
+        var ctxServicesReq = document.getElementById('servicesReqChart');
+        var ctxServicesView = document.getElementById('servicesViewChart');
+
+        // Dynamic Colors
+        function getColors(count) {
+            var colors = ['#4caf50', '#2196f3', '#f44336', '#ffc107', '#9c27b0', '#00bcd4', '#e91e63'];
+            var result = [];
+            for (var i = 0; i < count; i++) result.push(colors[i % colors.length]);
+            return result;
+        }
+
+        // Chart Options
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            devicePixelRatio: 3,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: '#ccc',
+                        font: { family: 'Cairo', size: 12 },
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                }
+            },
+            layout: { padding: 10 }
+        };
+
+        // 1. Top AI Chat Users (Original)
+        if (ctxAi) {
+            new Chart(ctxAi, {
+                type: 'doughnut',
+                data: {
+                    labels: {{ analytics.top_ai_labels | tojson }},
+        datasets: [{
+            data: {{ analytics.top_ai_values | tojson }},
+        backgroundColor: getColors({{ analytics.top_ai_values | length }}),
+        borderWidth: 0,
+        hoverOffset: 10
+                    }]
+                },
+        options: commonOptions
+            });
+        }
+
+    // 2. All Time Visitors (Original)
+    if (ctxAllTime) {
+        new Chart(ctxAllTime, {
+            type: 'doughnut',
+            data: {
+                labels: {{ analytics.top_all_visitors_labels | tojson }},
+    datasets: [{
+        data: {{ analytics.top_all_visitors_values | tojson }},
+        backgroundColor: getColors({{ analytics.top_all_visitors_values | length }}),
+        borderWidth: 0,
+        hoverOffset: 10
+                    }]
+                },
+    options: commonOptions
+            });
+        }
+
+    // 3. Heavy Visitors (Today)
+    if (ctxChat) {
+        new Chart(ctxChat, {
+            type: 'doughnut',
+            data: {
+                labels: {{ analytics.heavy_visitors_labels | tojson }},
+    datasets: [{
+        data: {{ analytics.heavy_visitors_values | tojson }},
+        backgroundColor: getColors({{ analytics.heavy_visitors_values | length }}),
+        borderWidth: 0,
+        hoverOffset: 10
+                    }]
+                },
+    options: commonOptions
+            });
+        }
+
+    // 4. Daily Visitors (Today)
+    if (ctxLogin) {
+        new Chart(ctxLogin, {
+            type: 'doughnut',
+            data: {
+                labels: {{ analytics.daily_visitors_labels | tojson }},
+    datasets: [{
+        data: {{ analytics.daily_visitors_values | tojson }},
+        backgroundColor: getColors({{ analytics.daily_visitors_values | length }}),
+        borderWidth: 0,
+        hoverOffset: 10
+                    }]
+                },
+    options: commonOptions
+            });
+        }
+
+    // 5. Top Requested Services
+    if (ctxServicesReq) {
+        new Chart(ctxServicesReq, {
+            type: 'doughnut',
+            data: {
+                labels: {{ analytics.top_services_req_labels | tojson }},
+    datasets: [{
+        data: {{ analytics.top_services_req_values | tojson }},
+        backgroundColor: getColors({{ analytics.top_services_req_values | length }}),
+        borderWidth: 0,
+        hoverOffset: 10
+                    }]
+                },
+    options: commonOptions
+            });
+        }
+
+    // 6. Top Viewed Services
+    if (ctxServicesView) {
+        new Chart(ctxServicesView, {
+            type: 'doughnut',
+            data: {
+                labels: {{ analytics.top_services_view_labels | tojson }},
+    datasets: [{
+        data: {{ analytics.top_services_view_values | tojson }},
+        backgroundColor: getColors({{ analytics.top_services_view_values | length }}),
+        borderWidth: 0,
+        hoverOffset: 10
+                    }]
+                },
+    options: commonOptions
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -78,6 +78,121 @@ def admin_dashboard():
                            chats=chats, unanswered=unanswered, security_logs=sec_logs[:50],
                            payments=payments, chats_by_user=chats_by_user, get_context=get_context)
 
+@admin_bp.route('/admin/analytics')
+@login_required
+def analytics_dashboard():
+    if current_user.role != 'admin':
+        return "Access Denied", 403
+        
+    users = user_model.get_all()
+    messages = contact_model.get_all()
+    chats = chat_model.get_all()
+    sec_logs = security_log_model.get_all()
+    
+    # Analytics Logic
+    from collections import Counter
+    
+    # 1. Totals
+    total_users_count = len(users)
+    total_requests_count = len(messages)
+    conversion_rate = round((total_requests_count / total_users_count * 100), 1) if total_users_count > 0 else 0
+    
+    # 2. Top AI Chat Users (Original Chart)
+    chat_users_list = [c.get('user_name', 'Unknown') for c in chats if c.get('user_name')]
+    top_ai_data = Counter(chat_users_list).most_common(5)
+    analy_ai_labels = [x[0] for x in top_ai_data]
+    analy_ai_values = [x[1] for x in top_ai_data]
+
+    # 3. Top Visitors (All Time - Original Chart)
+    all_login_events = [l for l in sec_logs if 'Login' in l.get('event', '') and 'Success' in l.get('event', '')]
+    all_visitors_list = []
+    for l in all_login_events:
+        details = l.get('details', '')
+        if 'User ' in details:
+            try:
+                username = details.split('User ')[1].split(' ')[0]
+                all_visitors_list.append(username)
+            except: pass
+    top_all_visitors_data = Counter(all_visitors_list).most_common(5)
+    analy_all_visitors_labels = [x[0] for x in top_all_visitors_data]
+    analy_all_visitors_values = [x[1] for x in top_all_visitors_data]
+
+    # 4. Daily & Heavy Visitors (Today)
+    from datetime import datetime
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    today_login_events = [l for l in sec_logs 
+                          if 'Login' in l.get('event', '') 
+                          and 'Success' in l.get('event', '')
+                          and l.get('timestamp', '').startswith(today_str)]
+    today_visitors_list = []
+    for l in today_login_events:
+        details = l.get('details', '')
+        if 'User ' in details:
+            try:
+                username = details.split('User ')[1].split(' ')[0]
+                today_visitors_list.append(username)
+            except: pass
+            
+    today_visitor_counts = Counter(today_visitors_list)
+    
+    # Heavy Visitors (> 2 visits today)
+    heavy_data = {k: v for k, v in today_visitor_counts.items() if v > 2}
+    analy_heavy_labels = list(heavy_data.keys())
+    analy_heavy_values = list(heavy_data.values())
+    
+    # Daily Visitors (Exactly 1 visit today)
+    daily_data = {k: v for k, v in today_visitor_counts.items() if v == 1}
+    analy_daily_labels = list(daily_data.keys())
+    analy_daily_values = list(daily_data.values()) 
+    
+    # 5. Top Requested Services
+    service_counts = Counter([m.get('service', 'general') for m in messages])
+    service_map = {
+        'modern-paints': 'دهانات حديثة',
+        'gypsum-board': 'جبس بورد',
+        'integrated-finishing': 'تشطيب متكامل',
+        'putty-finishing': 'تأسيس ومعجون',
+        'wallpaper': 'ورق حائط',
+        'renovation': 'تجديد وترميم',
+        'general': 'استفسار عام'
+    }
+    top_services_req_data = service_counts.most_common(5)
+    top_services_req_labels = [service_map.get(x[0], x[0]) for x in top_services_req_data]
+    top_services_req_values = [x[1] for x in top_services_req_data]
+    
+    # 6. Most Viewed Services
+    service_views = []
+    for l in sec_logs:
+        if l.get('event') == 'Service View':
+            details = l.get('details', '')
+            if 'User viewed service: ' in details:
+                svc_title = details.split('User viewed service: ')[1]
+                service_views.append(svc_title)
+    top_services_view_data = Counter(service_views).most_common(5)
+    top_services_view_labels = [x[0] for x in top_services_view_data]
+    top_services_view_values = [x[1] for x in top_services_view_data]
+
+    return render_template('analytics.html', analytics={
+                               'total_users': total_users_count,
+                               'total_requests': total_requests_count,
+                               'conversion_rate': conversion_rate,
+                               
+                               'top_ai_labels': analy_ai_labels,
+                               'top_ai_values': analy_ai_values,
+                               'top_all_visitors_labels': analy_all_visitors_labels,
+                               'top_all_visitors_values': analy_all_visitors_values,
+                               
+                               'heavy_visitors_labels': analy_heavy_labels,
+                               'heavy_visitors_values': analy_heavy_values,
+                               'daily_visitors_labels': analy_daily_labels,
+                               'daily_visitors_values': analy_daily_values,
+                               
+                               'top_services_req_labels': top_services_req_labels,
+                               'top_services_req_values': top_services_req_values,
+                               'top_services_view_labels': top_services_view_labels,
+                               'top_services_view_values': top_services_view_values
+                           })
+
 @admin_bp.route('/admin/add_user', methods=['POST'])
 @login_required
 def add_user():
