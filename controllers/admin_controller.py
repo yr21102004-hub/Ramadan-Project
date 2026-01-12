@@ -9,7 +9,7 @@ import qrcode
 import pyotp
 from werkzeug.utils import secure_filename
 from flask_bcrypt import Bcrypt
-from models import UserModel, ChatModel, PaymentModel, SecurityLogModel, UnansweredQuestionsModel, LearnedAnswersModel, Database
+from models import UserModel, ChatModel, PaymentModel, SecurityLogModel, UnansweredQuestionsModel, LearnedAnswersModel, ContactModel, Database
 
 admin_bp = Blueprint('admin', __name__)
 bcrypt = Bcrypt()
@@ -21,6 +21,7 @@ payment_model = PaymentModel()
 security_log_model = SecurityLogModel()
 unanswered_model = UnansweredQuestionsModel()
 learned_model = LearnedAnswersModel()
+contact_model = ContactModel()
 db = Database()
 
 @admin_bp.route('/admin')
@@ -30,7 +31,7 @@ def admin_dashboard():
         return "Access Denied", 403
     
     users = user_model.get_all()
-    messages = db.contacts.all()
+    messages = contact_model.get_all()
     chats = chat_model.get_all()
     unanswered = unanswered_model.get_all()
     sec_logs = security_log_model.get_all()
@@ -133,8 +134,25 @@ def answer_question():
     if current_user.role != 'admin': return "Access Denied", 403
     question = request.form.get('question')
     answer = request.form.get('answer')
-    unanswered_model.update_response(question, answer)
-    flash("تم حفظ الإجابة بنجاح! سيقوم الذكاء الاصطناعي باستخدامها مستقبلاً.")
+    
+    if not answer:
+        flash("يرجى كتابة إجابة قبل الحفظ.")
+        return redirect(url_for('admin.admin_dashboard'))
+
+    # Add to learned answers immediately and delete from pending
+    learned_model.create(question=question, answer=answer)
+    unanswered_model.delete(question)
+    
+    flash("تم حفظ الإجابة وإضافتها لقاعدة المعرفة، وتم إزالة السؤال من القائمة.")
+    return redirect(url_for('admin.admin_dashboard'))
+
+@admin_bp.route('/admin/delete_message', methods=['POST'])
+@login_required
+def delete_message():
+    if current_user.role != 'admin': return "Access Denied", 403
+    doc_id = request.form.get('doc_id')
+    contact_model.delete(doc_id)
+    flash("تم حذف الرسالة بنجاح.")
     return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/admin/delete_answered_question', methods=['POST'])

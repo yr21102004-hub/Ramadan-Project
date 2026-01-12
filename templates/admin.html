@@ -132,6 +132,17 @@
                                 <td class="msg-content">{{ msg.message[:60] }}{% if msg.message|length > 60 %}...{%
                                     endif %}</td>
                                 <td class="text-muted small text-nowrap">{{ msg.created_at[:10] }}</td>
+                                <td class="text-center">
+                                    <form action="{{ url_for('admin.delete_message') }}" method="POST"
+                                        class="d-inline-block">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="doc_id" value="{{ msg.doc_id }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('هل أنت متأكد من حذف هذه الرسالة؟')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

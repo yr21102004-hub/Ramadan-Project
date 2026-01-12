@@ -170,6 +170,10 @@ class ContactModel:
         """Get messages by user ID"""
         return self.table.search(self.query.user_id == user_id)
 
+    def delete(self, doc_id):
+        """Delete contact message by ID"""
+        return self.table.remove(doc_ids=[int(doc_id)])
+
 
 class LearnedAnswersModel:
     """Learned Answers Model - stores Q&A pairs for AI learning"""
