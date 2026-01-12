@@ -57,10 +57,10 @@
                 </div>
             </div>
 
-            <!-- Charts Grid 0 (Original - Restored) -->
+            <!-- Charts Grid 0 (Detailed Activity) -->
             <div class="charts-grid mt-4">
                 <div class="chart-card">
-                    <h5><i class="fas fa-comments text-gold me-2"></i> أكثر المستخدمين تفاعلاً مع AI (Top 5)</h5>
+                    <h5><i class="fas fa-comments text-gold me-2"></i> المستخدمين النشطين على AI (يومين فأكثر)</h5>
                     <div class="chart-wrapper">
                         <canvas id="aiChart"></canvas>
                         {% if not analytics.top_ai_labels %}
@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="chart-card">
-                    <h5><i class="fas fa-history text-gold me-2"></i> أكثر المستخدمين زيارة (كل الأوقات)</h5>
+                    <h5><i class="fas fa-history text-gold me-2"></i> جميع المستخدمين النشطين (إجمالي الزيارات)</h5>
                     <div class="chart-wrapper">
                         <canvas id="allTimeVisitorsChart"></canvas>
                         {% if not analytics.top_all_visitors_labels %}

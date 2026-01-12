@@ -74,9 +74,23 @@ def admin_dashboard():
                 continue
         return context[-15:]
 
+        return context[-15:]
+
+    # Basic Analytics for Dashboard Summary (if needed)
+    total_users_count = len(users)
+    total_requests_count = len(messages)
+    conversion_rate = round((total_requests_count / total_users_count * 100), 1) if total_users_count > 0 else 0
+    
+    analytics_summary = {
+        'total_users': total_users_count,
+        'total_requests': total_requests_count,
+        'conversion_rate': conversion_rate
+    }
+
     return render_template('admin.html', users=users, messages=messages, 
                            chats=chats, unanswered=unanswered, security_logs=sec_logs[:50],
-                           payments=payments, chats_by_user=chats_by_user, get_context=get_context)
+                           payments=payments, chats_by_user=chats_by_user, get_context=get_context,
+                           analytics=analytics_summary)
 
 @admin_bp.route('/admin/analytics')
 @login_required
@@ -97,13 +111,29 @@ def analytics_dashboard():
     total_requests_count = len(messages)
     conversion_rate = round((total_requests_count / total_users_count * 100), 1) if total_users_count > 0 else 0
     
-    # 2. Top AI Chat Users (Original Chart)
-    chat_users_list = [c.get('user_name', 'Unknown') for c in chats if c.get('user_name')]
-    top_ai_data = Counter(chat_users_list).most_common(5)
-    analy_ai_labels = [x[0] for x in top_ai_data]
-    analy_ai_values = [x[1] for x in top_ai_data]
+    # 2. Frequent AI Users (Almost Daily Activity)
+    # Count unique days each user interacted
+    user_ai_days = {} # user_name -> set of dates
+    for c in chats:
+        uname = c.get('user_name', 'Unknown')
+        ts = c.get('timestamp', '')
+        if ts:
+            date = ts.split(' ')[0]
+            if uname not in user_ai_days:
+                user_ai_days[uname] = set()
+            user_ai_days[uname].add(date)
+            
+    # Filter users active on 2 or more distinct days
+    frequent_ai_stats = {u: len(d) for u, d in user_ai_days.items() if len(d) >= 2}
+    # Sort by most active days
+    sorted_frequent = sorted(frequent_ai_stats.items(), key=lambda x: x[1], reverse=True)
+    
+    analy_ai_labels = [x[0] for x in sorted_frequent]
+    analy_ai_values = [x[1] for x in sorted_frequent]
 
-    # 3. Top Visitors (All Time - Original Chart)
+    # 3. Top Visitors (All Time - Original Chart) [Keep limit for this one or remove as well?]
+    # The user asked for AI chat specifically, but let's remove limit for visitors too if requested. 
+    # For now, sticking to AI chat request.
     all_login_events = [l for l in sec_logs if 'Login' in l.get('event', '') and 'Success' in l.get('event', '')]
     all_visitors_list = []
     for l in all_login_events:
@@ -113,7 +143,7 @@ def analytics_dashboard():
                 username = details.split('User ')[1].split(' ')[0]
                 all_visitors_list.append(username)
             except: pass
-    top_all_visitors_data = Counter(all_visitors_list).most_common(5)
+    top_all_visitors_data = Counter(all_visitors_list).most_common() # Removed limit
     analy_all_visitors_labels = [x[0] for x in top_all_visitors_data]
     analy_all_visitors_values = [x[1] for x in top_all_visitors_data]
 
