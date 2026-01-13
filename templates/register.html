@@ -50,11 +50,45 @@
                     </div>
                 </div>
 
-                <div class="form-group" data-aos="fade-up" data-aos-delay="350">
-                    <label>وصف المشروع (اختياري)</label>
-                    <textarea name="project_description"
-                        placeholder="اكتب وصفاً مختصراً لمشروعك (مثال: شقة 150 متر، تشطيب كامل...)"
-                        style="min-height: 80px;"></textarea>
+                <div class="form-group mb-4" data-aos="fade-up" data-aos-delay="50">
+                    <label class="d-block mb-3">نوع الحساب</label>
+                    <div class="role-selector">
+                        <input type="radio" name="role" value="user" id="role_user" class="role-radio" checked>
+                        <label for="role_user" class="role-label">
+                            <i class="fas fa-user-tie mb-2"></i>
+                            <span>عميل (مشروع)</span>
+                        </label>
+
+                        <input type="radio" name="role" value="worker" id="role_worker" class="role-radio">
+                        <label for="role_worker" class="role-label" id="label_worker">
+                            <i class="fas fa-tools mb-2"></i>
+                            <span>صنايعي (عمل)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="user_fields">
+                    <div class="form-group" data-aos="fade-up" data-aos-delay="350">
+                        <label>وصف المشروع (اختياري)</label>
+                        <textarea name="project_description"
+                            placeholder="اكتب وصفاً مختصراً لمشروعك (مثال: شقة 150 متر، تشطيب كامل...)"
+                            style="min-height: 80px;"></textarea>
+                    </div>
+                </div>
+
+                <div id="worker_fields" style="display: none;">
+                    <div class="form-group" data-aos="fade-up" data-aos-delay="350">
+                        <label>التخصص (الصنعة)</label>
+                        <select name="specialization" class="form-select-premium">
+                            <option value="painter">نقاش / دهانات</option>
+                            <option value="assistant">مساعد / عامل</option>
+                            <option value="other">تخصص آخر</option>
+                        </select>
+                    </div>
+                    <div class="form-group" data-aos="fade-up" data-aos-delay="360">
+                        <label>سنوات الخبرة</label>
+                        <input type="number" name="experience_years" placeholder="0" min="0">
+                    </div>
                 </div>
 
                 <div class="form-group" data-aos="fade-up" data-aos-delay="400">
@@ -94,6 +128,21 @@
             fileName.textContent = 'اختر صورة';
         }
     }
+
+    // Role Toggle Logic
+    document.querySelectorAll('input[name="role"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const userFields = document.getElementById('user_fields');
+            const workerFields = document.getElementById('worker_fields');
+            if (e.target.value === 'worker') {
+                userFields.style.display = 'none';
+                workerFields.style.display = 'block';
+            } else {
+                userFields.style.display = 'block';
+                workerFields.style.display = 'none';
+            }
+        });
+    });
 </script>
 
 <style>
@@ -120,6 +169,58 @@
 
     .file-upload-label i {
         font-size: 1.2rem;
+    }
+
+    /* Role Selector Styling */
+    .role-selector {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .role-radio {
+        display: none;
+    }
+
+    .role-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 2px solid rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: 0.3s;
+        color: #888;
+    }
+
+    .role-label i {
+        font-size: 1.8rem;
+    }
+
+    .role-radio:checked+.role-label {
+        border-color: var(--gold);
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--gold);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.1);
+    }
+
+    .form-select-premium {
+        width: 100%;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-sm);
+        color: white;
+        outline: none;
+    }
+
+    .form-select-premium option {
+        background: #111;
+        color: white;
     }
 </style>
 {% endblock %}

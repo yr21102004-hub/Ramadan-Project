@@ -92,6 +92,102 @@ def admin_dashboard():
                            payments=payments, chats_by_user=chats_by_user, get_context=get_context,
                            analytics=analytics_summary)
 
+@admin_bp.route('/admin/users')
+@login_required
+def admin_users():
+    if current_user.role != 'admin':
+        return "Access Denied", 403
+    
+    # Get only users with role='user' or no role (default to user)
+    all_users = user_model.get_all()
+    users = [u for u in all_users if u.get('role', 'user') == 'user']
+    
+    return render_template('admin_users.html', users=users)
+
+@admin_bp.route('/admin/workers')
+@login_required
+def admin_workers():
+    if current_user.role != 'admin':
+        return "Access Denied", 403
+    
+    # Get only users with role='worker'
+    all_users = user_model.get_all()
+    workers = [u for u in all_users if u.get('role') == 'worker']
+    
+    return render_template('admin_workers.html', workers=workers)
+
+@admin_bp.route('/admin/add_worker', methods=['POST'])
+@login_required
+def add_worker():
+    if current_user.role != 'admin':
+        return "Access Denied", 403
+        
+    username = request.form.get('username')
+    full_name = request.form.get('full_name')
+    phone = request.form.get('phone')
+    email = request.form.get('email', '')
+    specialization = request.form.get('specialization')
+    experience_years = request.form.get('experience_years', 0)
+    status = request.form.get('status', 'active')
+    
+    profile_image_path = None
+    if 'profile_image' in request.files:
+        file = request.files['profile_image']
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            file_extension = filename.rsplit('.', 1)[1].lower() if '.' in filename else 'jpg'
+            unique_filename = f"{username}_{timestamp}.{file_extension}"
+            
+            upload_folder = os.path.join('static', 'user_images')
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+            file_path = os.path.join(upload_folder, unique_filename)
+            file.save(file_path)
+            profile_image_path = f"user_images/{unique_filename}"
+    
+    password = bcrypt.generate_password_hash(username).decode('utf-8') 
+
+    if user_model.get_by_username(username):
+        flash('اسم المستخدم موجود بالفعل', 'error')
+        return redirect(url_for('admin.admin_workers'))
+
+    user_model.create({
+        'username': username,
+        'password': password,
+        'full_name': full_name,
+        'email': email,
+        'phone': phone,
+        'profile_image': profile_image_path,
+        'specialization': specialization,
+        'experience_years': int(experience_years),
+        'status': status,
+        'role': 'worker'
+    })
+    
+    flash(f"تم إضافة العامل {full_name} بنجاح.", 'success')
+    return redirect(url_for('admin.admin_workers'))
+
+@admin_bp.route('/admin/update_worker', methods=['POST'])
+@login_required
+def update_worker():
+    if current_user.role != 'admin':
+        return "Access Denied", 403
+    
+    username = request.form.get('username')
+    specialization = request.form.get('specialization')
+    experience_years = request.form.get('experience_years')
+    status = request.form.get('status')
+    
+    user_model.update(username, {
+        'specialization': specialization,
+        'experience_years': int(experience_years),
+        'status': status
+    })
+    
+    flash(f"تم تحديث بيانات العامل بنجاح.", 'success')
+    return redirect(url_for('admin.admin_workers'))
+
 @admin_bp.route('/admin/analytics')
 @login_required
 def analytics_dashboard():

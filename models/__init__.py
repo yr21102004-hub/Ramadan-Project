@@ -8,9 +8,9 @@ from .database import (
     PaymentModel,
     SecurityLogModel,
     LearnedAnswersModel,
-    LearnedAnswersModel,
     UnansweredQuestionsModel,
-    ContactModel
+    ContactModel,
+    SubscriptionModel
 )
 
 __all__ = [
@@ -21,5 +21,6 @@ __all__ = [
     'SecurityLogModel',
     'LearnedAnswersModel',
     'UnansweredQuestionsModel',
-    'ContactModel'
+    'ContactModel',
+    'SubscriptionModel'
 ]

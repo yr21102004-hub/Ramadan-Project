@@ -52,12 +52,15 @@ def register():
             
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         
-        # First user is admin
+        # First user is admin, otherwise use selected role
         all_users = user_model.get_all()
-        role = 'admin' if len(all_users) == 0 else 'user'
+        if len(all_users) == 0:
+            role = 'admin'
+        else:
+            role = request.form.get('role', 'user')
             
         # Create user
-        user_model.create({
+        user_data = {
             'username': username,
             'password': hashed_password,
             'full_name': full_name,
@@ -65,10 +68,23 @@ def register():
             'phone': phone,
             'role': role,
             'profile_image': profile_image_path,
-            'project_location': 'غير محدد',
-            'project_description': project_description,
-            'project_percentage': 0
-        })
+            'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        if role == 'worker':
+            user_data.update({
+                'specialization': request.form.get('specialization'),
+                'experience_years': request.form.get('experience_years', 0),
+                'status': 'available' # Default status for workers
+            })
+        else:
+            user_data.update({
+                'project_location': 'غير محدد',
+                'project_description': project_description,
+                'project_percentage': 0
+            })
+            
+        user_model.create(user_data)
         
         # Notify admins
         notify_admins('new_user', {
@@ -94,6 +110,22 @@ def profile(username):
     if not user_data:
         return "User not found", 404
         
+    # If worker, render worker dashboard
+    if user_data.get('role') == 'worker':
+        worker_obj = {
+            'full_name': user_data.get('full_name'),
+            'username': user_data.get('username'),
+            'email': user_data.get('email', 'لا يوجد'),
+            'phone': user_data.get('phone'),
+            'profile_image': user_data.get('profile_image'),
+            'specialization': user_data.get('specialization'),
+            'experience_years': user_data.get('experience_years'),
+            'status': user_data.get('status', 'available'),
+            'created_at': user_data.get('created_at')
+        }
+        return render_template('worker_dashboard.html', worker=worker_obj)
+
+    # Standard User Dashboard logic
     user_obj = {
         'full_name': user_data.get('full_name'),
         'username': user_data.get('username'),

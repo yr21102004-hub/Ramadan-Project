@@ -1,271 +1,309 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<section class="section-padding"
-    style="margin-top: 80px; min-height: 100vh; background: radial-gradient(circle at top left, rgba(212, 175, 55, 0.05), transparent);">
-    <div class="container-fluid px-lg-5">
-        <div class="row">
-            <!-- Sidebar: User Info -->
-            <div class="col-lg-4" data-aos="fade-left">
-                <div class="premium-card glass mb-4" style="position: sticky; top: 100px;">
-                    <div style="text-align: center; margin-bottom: 25px;">
-                        <div class="profile-image-container mb-3">
-                            {% if user.profile_image %}
-                            <img src="{{ url_for('static', filename=user.profile_image) }}" alt="{{ user.full_name }}"
-                                class="profile-image-large">
-                            {% else %}
-                            <img src="{{ url_for('static', filename='default_avatar.png') }}" alt="Default Avatar"
-                                class="profile-image-large">
-                            {% endif %}
-                            <div class="profile-image-badge">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-white mb-1">{{ user.full_name }}</h3>
-                        <p class="text-gold small mb-0"><i class="fas fa-map-marker-alt me-1"></i> {{
-                            user.project_location }}</p>
+<section class="dashboard-wrapper" style="margin-top: 80px; min-height: 100vh; padding: 40px 0; background: #0a0a0a;">
+    <div class="container">
+        <!-- Dashboard Header / Welcome -->
+        <div class="row mb-5 align-items-center" data-aos="fade-down">
+            <div class="col-md-8">
+                <h1 class="welcome-text text-white mb-2">أهلاً بك، <span class="text-gold">{{ user.full_name }}</span>
+                    👋</h1>
+                <p class="text-muted-dynamic">يسعدنا متابعة تقدم مشروعك في <span class="text-white">{{
+                        user.project_location }}</span></p>
+            </div>
+            <div class="col-md-4 text-md-start">
+                <div class="date-badge glass">
+                    <i class="fas fa-calendar-day me-2"></i> {{ user.created_at[:10] }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Cards -->
+        <div class="row mb-5 g-4" data-aos="fade-up">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card glass h-100">
+                    <div class="stat-icon bg-gold-gradient">
+                        <i class="fas fa-percentage"></i>
                     </div>
-
-                    <div class="divider mb-4"></div>
-
-                    <div class="user-quick-info">
-                        <div class="info-row">
-                            <i class="fas fa-user-circle"></i>
-                            <span>{{ user.username }}</span>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-envelope"></i>
-                            <span>{{ user.email }}</span>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-phone"></i>
-                            <span style="direction: ltr;">{{ user.phone }}</span>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>عضو منذ: {{ user.created_at }}</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <h5 class="text-white small mb-3">وصف المشروع</h5>
-                        <p class="text-muted-dynamic small" style="white-space: pre-line;">{{ user.project_description
-                            }}</p>
-                    </div>
-
-                    <div class="mt-4 pt-4 border-top border-dim text-center">
-                        {% if current_user.role == 'admin' %}
-                        <a href="{{ url_for('admin') }}" class="btn btn-outline btn-sm w-100 mb-2">العودة للوحة
-                            التحكم</a>
-                        {% endif %}
-                        <a href="{{ url_for('logout') }}" class="text-danger small text-decoration-none"><i
-                                class="fas fa-sign-out-alt me-1"></i> تسجيل الخروج</a>
+                    <div class="stat-info">
+                        <h3>{{ user.project_percentage }}%</h3>
+                        <p>نسبة الإنجاز</p>
                     </div>
                 </div>
             </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card glass h-100">
+                    <div class="stat-icon bg-blue-gradient">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ requests|length }}</h3>
+                        <p>طلبات المعاينة</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card glass h-100">
+                    <div class="stat-icon bg-green-gradient">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ payments|length }}</h3>
+                        <p>عمليات الدفع</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card glass h-100">
+                    <div class="stat-icon bg-purple-gradient">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ chats|length }}</h3>
+                        <p>محادثات AI</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <!-- Content Area: Tabs -->
-            <div class="col-lg-8" data-aos="fade-right">
+        <div class="row g-4">
+            <!-- Main Content Area (Left side in LTR, Right in RTL) -->
+            <div class="col-lg-8" data-aos="fade-left">
                 <!-- Navigation Tabs -->
-                <div class="glass mb-4"
-                    style="padding: 10px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05);">
-                    <ul class="nav nav-pills nav-justified custom-tabs" id="userTabs" role="tablist">
+                <div class="glass-tabs-container mb-4">
+                    <ul class="nav nav-pills custom-modern-tabs" id="dashboardTabs" role="tablist">
                         <li class="nav-item">
-                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#progress"
-                                type="button">الإنجاز</button>
+                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-progress">
+                                <i class="fas fa-stream me-2"></i> حالة المشروع
+                            </button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#requests"
-                                type="button">الطلبات</button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-requests">
+                                <i class="fas fa-concierge-bell me-2"></i> الطلبات
+                            </button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#finance"
-                                type="button">المدفوعات</button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-finance">
+                                <i class="fas fa-wallet me-2"></i> المادية
+                            </button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#ai_chat" type="button">ذكاء
-                                RMG</button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-ai">
+                                <i class="fas fa-brain me-2"></i> أرشيف الذكاء
+                            </button>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Tab Content -->
-                <div class="tab-content" id="userTabsContent">
+                <!-- Tab Panes -->
+                <div class="tab-content" id="dashboardTabsContent">
                     <!-- Progress Tab -->
-                    <div class="tab-pane fade show active" id="progress">
-                        <div class="premium-card glass mb-4">
-                            <h4 class="text-gold mb-4"><i class="fas fa-chart-line me-2"></i> حالة تنفيذ المشروع</h4>
-                            <div class="progress-detailed p-4 rounded" style="background: rgba(0,0,0,0.2);">
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span class="text-white">نسبة الإنجاز الكلية</span>
-                                    <span class="text-gold fw-bold">{{ user.project_percentage }}%</span>
+                    <div class="tab-pane fade show active" id="tab-progress">
+                        <div class="main-card glass p-4 mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="text-white mb-0">المخطط الزمني للتنفيذ</h4>
+                                <span class="badge bg-gold text-dark px-3 py-2">مستوى الإنجاز: {{
+                                    user.project_percentage }}%</span>
+                            </div>
+
+                            <div class="modern-progress-wrapper mb-5">
+                                <div class="progress"
+                                    style="height: 12px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                                    <div class="progress-bar progress-bar-animated bg-gold-gradient"
+                                        style="width: {{ user.project_percentage or 0 }}%"></div>
                                 </div>
-                                <div class="progress-premium mb-4">
-                                    <div class="progress-bar" style="width: {{ user.project_percentage }}%"></div>
+                            </div>
+
+                            <div class="timeline-steps row text-center">
+                                <div class="col-4 step-item {% if user.project_percentage >= 20 %}completed{% endif %}">
+                                    <div class="step-icon"><i class="fas fa-clipboard-check"></i></div>
+                                    <p>المعاينة والرفع</p>
                                 </div>
-                                <div class="row text-center mt-4">
-                                    <div class="col-4">
-                                        <div class="status-box {% if user.project_percentage > 0 %}active{% endif %}">
-                                            <i class="fas fa-file-contract"></i>
-                                            <p>المعاينة</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="status-box {% if user.project_percentage > 30 %}active{% endif %}">
-                                            <i class="fas fa-hammer"></i>
-                                            <p>التنفيذ</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div
-                                            class="status-box {% if user.project_percentage == 100 %}active{% endif %}">
-                                            <i class="fas fa-home"></i>
-                                            <p>التسليم</p>
-                                        </div>
-                                    </div>
+                                <div class="col-4 step-item {% if user.project_percentage >= 60 %}active{% endif %}">
+                                    <div class="step-icon"><i class="fas fa-tools"></i></div>
+                                    <p>التأسيس والدهان</p>
+                                </div>
+                                <div
+                                    class="col-4 step-item {% if user.project_percentage == 100 %}completed{% endif %}">
+                                    <div class="step-icon"><i class="fas fa-flag-checkered"></i></div>
+                                    <p>التسليم النهائي</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="main-card glass p-4">
+                            <h5 class="text-gold mb-3"><i class="fas fa-info-circle me-2"></i> ملخص المواصفات</h5>
+                            <div class="specs-grid">
+                                <div class="spec-inline">
+                                    <span class="label">الموقع:</span>
+                                    <span class="value">{{ user.project_location }}</span>
+                                </div>
+                                <div class="spec-block mt-3">
+                                    <span class="label d-block mb-2">وصف المشروع والطلبات الخاصة:</span>
+                                    <div class="description-box">{{ user.project_description }}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Requests Tab -->
-                    <div class="tab-pane fade" id="requests">
-                        <div class="premium-card glass">
-                            <h4 class="text-gold mb-4"><i class="fas fa-concierge-bell me-2"></i> طلبات المعاينة
-                                والاستفسارات</h4>
+                    <div class="tab-pane fade" id="tab-requests">
+                        <div class="main-card glass p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="text-white mb-0">سجل الطلبات</h4>
+                                <a href="{{ url_for('web.contact') }}" class="btn btn-gold btn-sm"><i
+                                        class="fas fa-plus me-1"></i> طلب جديد</a>
+                            </div>
                             {% if requests %}
-                            <div class="table-responsive">
-                                <table class="table premium-table-v2">
-                                    <thead>
-                                        <tr>
-                                            <th>الخدمة</th>
-                                            <th>التاريخ</th>
-                                            <th>الرسالة</th>
-                                            <th>الحالة</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for req in requests %}
-                                        <tr>
-                                            <td><span class="badge-service">{{ req.service or 'عام' }}</span></td>
-                                            <td class="small">{{ req.created_at }}</td>
-                                            <td class="msg-cell">{{ req.message }}</td>
-                                            <td><span class="badge-status-pending text-info">قيد المراجعة</span></td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                            <div class="requests-list">
+                                {% for req in requests %}
+                                <div class="request-item-card glass mb-3">
+                                    <div class="d-flex justify-content-between align-items-center p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="req-icon me-3"><i class="fas fa-paper-plane"></i></div>
+                                            <div>
+                                                <h6 class="text-white mb-1">{{ req.service or 'استشارة عامة' }}</h6>
+                                                <small class="text-muted">{{ req.created_at }}</small>
+                                            </div>
+                                        </div>
+                                        <span class="status-badge pending">تحت المراجعة</span>
+                                    </div>
+                                    <div class="p-3 pt-0 border-top border-dim">
+                                        <p class="mb-0 small text-muted-dynamic">{{ req.message }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
                             </div>
                             {% else %}
-                            <div class="text-center py-5">
-                                <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
-                                <p class="text-muted-dynamic">لا توجد طلبات مسجلة حالياً</p>
+                            <div class="empty-placeholder py-5">
+                                <i class="fas fa-folder-open mb-3 opacity-25" style="font-size: 3rem;"></i>
+                                <p>لا توجد طلبات سابقة</p>
                             </div>
                             {% endif %}
                         </div>
                     </div>
 
                     <!-- Finance Tab -->
-                    <div class="tab-pane fade" id="finance">
-                        <div class="premium-card glass mb-4">
-                            <h4 class="text-gold mb-4"><i class="fas fa-credit-card me-2"></i> الاشتراكات النشطة</h4>
+                    <div class="tab-pane fade" id="tab-finance">
+                        <div class="main-card glass p-4 mb-4">
+                            <h5 class="text-gold mb-3">الاشتراكات والخدمات</h5>
                             {% if subscriptions %}
                             {% for sub in subscriptions %}
-                            <div
-                                class="subscription-item glass mb-3 p-3 d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white mb-1">{{ sub.plan_name }}</h6>
-                                    <small class="text-muted">نهاية الاشتراك: {{ sub.expiry_date }}</small>
-                                </div>
-                                <span class="badge bg-success">نشط</span>
+                            <div class="sub-row d-flex justify-content-between align-items-center mb-2 p-2 rounded"
+                                style="background: rgba(255,255,255,0.02);">
+                                <span>{{ sub.plan_name }}</span>
+                                <span class="text-success small">صالح حتى: {{ sub.expiry_date }}</span>
                             </div>
                             {% endfor %}
                             {% else %}
-                            <p class="text-muted-dynamic small text-center py-3">لا توجد اشتراكات مدفوعة حالياً</p>
+                            <p class="text-muted small">لا توجد باقات مفعلة حالياً</p>
                             {% endif %}
                         </div>
 
-                        <div class="premium-card glass">
-                            <h4 class="text-gold mb-4"><i class="fas fa-history me-2"></i> سجل عمليات الدفع</h4>
+                        <div class="main-card glass p-4">
+                            <h5 class="text-white mb-4">سجل التحويلات المالية</h5>
                             {% if payments %}
                             <div class="table-responsive">
-                                <table class="table premium-table-v2">
+                                <table class="table modern-table">
                                     <thead>
                                         <tr>
-                                            <th>المبلغ</th>
+                                            <th>القيمة</th>
                                             <th>الوسيلة</th>
-                                            <th>المعرف</th>
+                                            <th>التاريخ</th>
                                             <th>الحالة</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for p in payments %}
                                         <tr>
-                                            <td class="fw-bold text-white">{{ p.amount }} ج.م</td>
+                                            <td class="text-gold fw-bold">{{ p.amount }} ج.م</td>
                                             <td>{{ p.method }}</td>
-                                            <td class="small">{{ p.transaction_id }}</td>
-                                            <td>
-                                                {% if 'success' in p.status %}
-                                                <span class="text-success small">مكتمل</span>
-                                                {% else %}
-                                                <span class="text-warning small">معلق</span>
-                                                {% endif %}
-                                            </td>
+                                            <td class="small">{{ p.timestamp[:10] }}</td>
+                                            <td><i class="fas fa-check-circle text-success me-1"></i> مراجعة</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
                             {% else %}
-                            <p class="text-muted-dynamic small text-center py-3">لم يتم العثور على عمليات دفع سابقة</p>
+                            <p class="text-center text-muted py-4">لم يتم تسجيل عمليات دفع</p>
                             {% endif %}
                         </div>
                     </div>
 
-                    <!-- AI Chat Tab -->
-                    <div class="tab-pane fade" id="ai_chat">
-                        <div class="premium-card glass">
-                            <h4 class="text-gold mb-4"><i class="fas fa-robot me-2"></i> أرشيف المحادثات مع الذكاء
-                                الاصطناعي</h4>
+                    <!-- AI Tab -->
+                    <div class="tab-pane fade" id="tab-ai">
+                        <div class="main-card glass p-4">
+                            <h5 class="text-blue mb-4"><i class="fas fa-robot me-2"></i> ذكاء RMG - المحادثات</h5>
 
-                            <!-- Unanswered / Pending -->
                             {% if unanswered %}
-                            <div class="mb-5">
-                                <h6 class="text-white small mb-3">أسئلة ينتظر الرد عليها من الإدارة</h6>
-                                {% for item in unanswered %}
-                                <div class="glass p-3 mb-2 rounded border-start border-gold">
-                                    <p class="mb-1 text-white small">"{{ item.question }}"</p>
-                                    <span class="text-muted small" style="font-size: 0.7rem;">{{ item.timestamp
-                                        }}</span>
+                            <div class="alert-box mb-4">
+                                <h6 class="small fw-bold mb-2"><i class="fas fa-clock me-1"></i> بانتظار رد الإدارة:
+                                </h6>
+                                {% for u in unanswered %}
+                                <div class="pending-question mb-2 p-2 rounded" style="background: rgba(0,0,0,0.2);">
+                                    <span class="small">"{{ u.question }}"</span>
                                 </div>
                                 {% endfor %}
                             </div>
                             {% endif %}
 
-                            <!-- Chat History -->
-                            {% if chats %}
-                            <div class="chat-history-list" style="max-height: 500px; overflow-y: auto;">
-                                {% for chat in chats %}
-                                <div class="chat-entry mb-4 p-3 rounded"
-                                    style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span class="text-gold fw-bold small">أنت:</span>
-                                        <span class="text-muted" style="font-size: 0.7rem;">{{ chat.timestamp }}</span>
-                                    </div>
-                                    <p class="text-white small mb-3">{{ chat.message }}</p>
-                                    <div class="divider mb-2"></div>
-                                    <span class="text-primary fw-bold small">AI:</span>
-                                    <p class="text-muted-dynamic small mb-0">{{ chat.response }}</p>
+                            <div class="chat-archive">
+                                {% if chats %}
+                                {% for chat in chats[:10] %}
+                                <div class="chat-thread mb-3">
+                                    <div class="user-bubble">{{ chat.message }}</div>
+                                    <div class="bot-bubble">{{ chat.response }}</div>
                                 </div>
                                 {% endfor %}
+                                {% else %}
+                                <p class="text-center text-muted">لا يوجد أرشيف للدردشة</p>
+                                {% endif %}
                             </div>
-                            {% else %}
-                            <div class="text-center py-5">
-                                <i class="fas fa-comment-slash fa-3x mb-3 text-muted"></i>
-                                <p class="text-muted-dynamic">لا يوجد سجل محادثات متاح</p>
-                            </div>
-                            {% endif %}
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar: User Details (Right side in LTR, Left in RTL) -->
+            <div class="col-lg-4" data-aos="fade-right">
+                <div class="sidebar-card glass p-4 text-center mb-4 sticky-top" style="top: 100px;">
+                    <div class="profile-avatar-container mb-3">
+                        {% if user.profile_image %}
+                        <img src="{{ url_for('static', filename=user.profile_image) }}" alt="User Image">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='default_avatar.png') }}" alt="Default">
+                        {% endif %}
+                    </div>
+                    <h4 class="text-white mb-1">{{ user.full_name }}</h4>
+                    <span class="role-badge mb-4">عميل مخصص</span>
+
+                    <div class="sidebar-info-rows text-md-start mt-4">
+                        <div class="info-row-item">
+                            <span class="label">اسم المستخدم:</span>
+                            <span class="value">{{ user.username }}</span>
+                        </div>
+                        <div class="info-row-item">
+                            <span class="label">رقم الهاتف:</span>
+                            <span class="value" style="direction: ltr;">{{ user.phone }}</span>
+                        </div>
+                        <div class="info-row-item">
+                            <span class="label">البريد:</span>
+                            <span class="value">{{ user.email or 'N/A' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="divider my-4"></div>
+
+                    <div class="sidebar-actions d-grid gap-2">
+                        {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-gold mb-2">
+                            <i class="fas fa-shield-alt me-1"></i> لوحة الإدارة
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-1"></i> تسجيل الخروج
+                        </a>
                     </div>
                 </div>
             </div>
@@ -274,146 +312,278 @@
 </section>
 
 <style>
-    /* Sidebar and Image */
-    .profile-image-container {
-        position: relative;
-        width: 150px;
-        height: 150px;
-        margin: 0 auto;
-        border-radius: 50%;
-        padding: 3px;
-        background: linear-gradient(135deg, var(--gold), var(--primary));
-        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+    /* Global Layout Fixes */
+    .dashboard-wrapper {
+        text-align: right;
+        direction: rtl;
     }
 
-    .profile-image-large {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid #111;
+    /* Stat Cards */
+    .stat-card {
+        padding: 25px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: 0.3s;
+        border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
-    .profile-image-badge {
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        background: #4CAF50;
-        color: white;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(212, 175, 55, 0.3);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid #111;
-        font-size: 0.8rem;
+        font-size: 1.5rem;
+        color: #000;
     }
 
-    .info-row {
+    .bg-gold-gradient {
+        background: linear-gradient(135deg, #FFD700, #D4AF37);
+        color: #000 !important;
+    }
+
+    .bg-blue-gradient {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: #fff !important;
+    }
+
+    .bg-green-gradient {
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+        color: #fff !important;
+    }
+
+    .bg-purple-gradient {
+        background: linear-gradient(135deg, #6f42c1, #563d7c);
+        color: #fff !important;
+    }
+
+    .stat-info h3 {
+        margin: 0;
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 800;
+    }
+
+    .stat-info p {
+        margin: 0;
+        color: #888;
+        font-size: 0.85rem;
+    }
+
+    /* Tabs Navigation */
+    .glass-tabs-container {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 15px;
+        padding: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .custom-modern-tabs {
+        border: none;
+        gap: 10px;
+    }
+
+    .custom-modern-tabs .nav-link {
+        color: #888;
+        background: transparent;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: 0.3s;
+        border: 1px solid transparent;
+    }
+
+    .custom-modern-tabs .nav-link.active {
+        background: rgba(212, 175, 55, 0.1) !important;
+        color: var(--gold) !important;
+        border-color: rgba(212, 175, 55, 0.2) !important;
+    }
+
+    /* Main Content Cards */
+    .main-card {
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Timeline Steps */
+    .step-item {
+        position: relative;
+    }
+
+    .step-icon {
+        width: 45px;
+        height: 45px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        margin: 0 auto 10px;
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 15px;
-        font-size: 0.9rem;
-        color: #ccc;
-    }
-
-    .info-row i {
-        color: var(--gold);
-        min-width: 20px;
-    }
-
-    /* Tabs Styling */
-    .custom-tabs .nav-link {
-        color: #aaa;
-        border-radius: 10px;
+        justify-content: center;
+        color: #555;
         transition: 0.3s;
-        font-weight: 500;
     }
 
-    .custom-tabs .nav-link.active {
-        background: var(--gold) !important;
-        color: #111 !important;
-        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    .step-item.completed .step-icon {
+        background: #4CAF50;
+        color: #fff;
     }
 
-    /* Progress Section */
-    .status-box {
-        opacity: 0.3;
-        transition: 0.5s;
+    .step-item.active .step-icon {
+        background: var(--gold);
+        color: #000;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
     }
 
-    .status-box.active {
-        opacity: 1;
+    .step-item p {
+        font-size: 0.8rem;
+        color: #777;
+    }
+
+    /* Requests Layout */
+    .request-item-card {
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .req-icon {
         color: var(--gold);
-        transform: scale(1.1);
-    }
-
-    .status-box i {
-        font-size: 1.5rem;
-        margin-bottom: 8px;
-    }
-
-    .status-box p {
-        font-size: 0.75rem;
-        margin-bottom: 0;
-    }
-
-    .progress-premium {
-        background: rgba(255, 255, 255, 0.05);
-        height: 8px;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .progress-bar {
-        background: linear-gradient(90deg, var(--primary), var(--gold));
-        height: 100%;
-        box-shadow: 0 0 15px var(--gold);
-    }
-
-    /* Table Styling */
-    .premium-table-v2 {
-        color: #ccc;
-    }
-
-    .premium-table-v2 thead th {
-        border: none;
-        color: var(--gold);
-        font-size: 0.85rem;
-        padding: 15px;
-    }
-
-    .premium-table-v2 tbody td {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 15px;
-        vertical-align: middle;
-    }
-
-    .msg-cell {
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .badge-service {
         background: rgba(212, 175, 55, 0.1);
-        color: var(--gold);
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
         padding: 4px 10px;
         border-radius: 20px;
+    }
+
+    .status-badge.pending {
+        background: rgba(33, 150, 243, 0.15);
+        color: #2196f3;
+    }
+
+    /* Chat Bubbles */
+    .chat-thread {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .user-bubble {
+        align-self: flex-start;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 10px 15px;
+        border-radius: 15px 15px 15px 0;
+        font-size: 0.9rem;
+        color: #fff;
+    }
+
+    .bot-bubble {
+        align-self: flex-end;
+        background: rgba(33, 150, 243, 0.1);
+        padding: 10px 15px;
+        border-radius: 15px 15px 0 15px;
+        font-size: 0.9rem;
+        color: #ddd;
+        border: 1px solid rgba(33, 150, 243, 0.1);
+    }
+
+    /* Sidebar Avatar */
+    .profile-avatar-container {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+        border-radius: 50%;
+        border: 3px solid var(--gold);
+        overflow: hidden;
+    }
+
+    .profile-avatar-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .role-badge {
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--gold);
         font-size: 0.75rem;
+        padding: 5px 15px;
+        border-radius: 20px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
     }
 
-    .border-dim {
-        border-color: rgba(255, 255, 255, 0.05) !important;
+    .info-row-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 0.9rem;
     }
 
-    /* Responsive adjustments */
+    .info-row-item .label {
+        color: #888;
+    }
+
+    .info-row-item .value {
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .description-box {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        color: #aaa;
+        line-height: 1.6;
+        font-size: 0.9rem;
+        border-right: 3px solid var(--gold);
+    }
+
+    /* Buttons */
+    .btn-gold {
+        background: var(--gold);
+        color: #000;
+        font-weight: 700;
+        border-radius: 10px;
+    }
+
+    .btn-outline-gold {
+        border: 1px solid var(--gold);
+        color: var(--gold);
+        transition: 0.3s;
+    }
+
+    .btn-outline-gold:hover {
+        background: var(--gold);
+        color: #000;
+    }
+
     @media (max-width: 991px) {
-        .premium-card {
-            margin-top: 20px !important;
+        .dashboard-wrapper {
+            padding: 20px 10px;
+        }
+
+        .sidebar-card {
+            position: static !important;
+            margin-bottom: 30px;
+        }
+
+        .col-md-4 {
+            text-align: center !important;
+            margin-top: 15px;
         }
     }
 </style>
