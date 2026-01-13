@@ -6,35 +6,36 @@
     <div class="container" data-aos="fade-up">
         <div class="premium-card glass" style="max-width: 450px; margin: 0 auto; padding: 50px; text-align: center;">
             <div class="icon-pulse mb-4">
-                <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--primary);"></i>
+                <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--gold);"></i>
             </div>
 
-            <h2 class="mb-2">تحقق الأمان</h2>
-            <p class="text-muted mb-5">أدخل الرمز المكون من 6 أرقام من هاتفك</p>
+            <h2 class="mb-2 text-gold">تحقق الأمان</h2>
+            <p class="text-muted-dynamic mb-5">أدخل الرمز المكون من 6 أرقام المرسل إلى هاتفك</p>
 
             {% with messages = get_flashed_messages() %}
             {% if messages %}
             {% for message in messages %}
             <div class="alert-premium mb-4">
-                <i class="fas fa-exclamation-circle me-2"></i> {{ message }}
+                <i class="fas fa-sms me-2"></i> {{ message }}
             </div>
             {% endfor %}
             {% endif %}
             {% endwith %}
 
-            <form action="{{ url_for('verify_2fa') }}" method="POST" id="verifyForm">
+            <form action="{{ url_for('auth.verify_2fa') }}" method="POST" id="verifyForm">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-group mb-4">
                     <input type="text" name="code" id="otpCode" required placeholder="000 000" maxlength="6" autofocus
                         class="otp-input-premium">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block w-100 py-3 mb-4">
-                    <i class="fas fa-sign-in-alt me-2"></i> تأكيد الهوية والدخول
+                    تأكيد الهوية والدخول <i class="fas fa-sign-in-alt ms-2"></i>
                 </button>
             </form>
 
             <div class="mt-4 pt-4 border-top border-dim">
-                <a href="{{ url_for('logout') }}" class="text-muted small text-decoration-none hover-danger transition">
+                <a href="{{ url_for('auth.logout') }}"
+                    class="text-muted small text-decoration-none hover-danger transition">
                     <i class="fas fa-times me-1"></i> إلغاء وتسجيل الخروج
                 </a>
             </div>
@@ -43,13 +44,11 @@
 </section>
 
 <script>
-    // Only allow numbers and handle formatting
     const otpInput = document.getElementById('otpCode');
     otpInput.addEventListener('input', function (e) {
         this.value = this.value.replace(/[^0-9]/g, '');
     });
 
-    // Auto-submit when 6 digits are reached
     otpInput.addEventListener('keyup', function (e) {
         if (this.value.length === 6) {
             document.getElementById('verifyForm').submit();
@@ -87,24 +86,24 @@
         background: rgba(0, 0, 0, 0.3);
         border: 2px solid rgba(212, 175, 55, 0.2);
         border-radius: 12px;
-        color: var(--primary);
+        color: var(--gold);
         width: 100%;
         outline: none;
         transition: 0.3s;
     }
 
     .otp-input-premium:focus {
-        border-color: var(--primary);
+        border-color: var(--gold);
         background: rgba(0, 0, 0, 0.4);
         box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
     }
 
     .alert-premium {
-        background: rgba(244, 67, 54, 0.1);
-        color: #F44336;
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--gold);
         padding: 12px;
         border-radius: 8px;
-        border: 1px solid rgba(244, 67, 54, 0.2);
+        border: 1px solid rgba(212, 175, 55, 0.2);
         font-size: 0.9rem;
     }
 
@@ -114,10 +113,6 @@
 
     .hover-danger:hover {
         color: #F44336 !important;
-    }
-
-    .w-100 {
-        width: 100%;
     }
 </style>
 {% endblock %}

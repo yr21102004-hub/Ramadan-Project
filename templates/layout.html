@@ -171,25 +171,27 @@
             easing: 'ease-out-back'
         });
 
-        // Preloader
-        window.addEventListener('load', () => {
+        // Preloader Logic
+        const hidePreloader = () => {
             const preloader = document.getElementById('preloader');
-            preloader.style.opacity = '0';
-            preloader.style.visibility = 'hidden';
+            if (preloader && preloader.style.visibility !== 'hidden') {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
 
-            // Show Welcome Modal after preloader
-            setTimeout(() => {
-                const modal = document.getElementById('islamic-welcome-modal');
-                // Check if already shown in this session
-                if (!sessionStorage.getItem('welcomeShown')) {
-                    modal.classList.add('active');
-                    sessionStorage.setItem('welcomeShown', 'true');
+                // Show Welcome Modal after preloader
+                setTimeout(() => {
+                    const modal = document.getElementById('islamic-welcome-modal');
+                    if (modal && !sessionStorage.getItem('welcomeShown')) {
+                        modal.classList.add('active');
+                        sessionStorage.setItem('welcomeShown', 'true');
+                    }
+                }, 500);
+            }
+        };
 
-                    // Optional: Auto-play audio on first welcome (often blocked by browser policy without interaction)
-                    // We will rely on user clicking the logo as requested.
-                }
-            }, 500);
-        });
+        window.addEventListener('load', hidePreloader);
+        // Fallback: hide preloader after 3 seconds anyway
+        setTimeout(hidePreloader, 3000);
 
 
 

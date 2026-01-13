@@ -128,10 +128,10 @@ def analytics_dashboard():
         analy_ai_values = [x[1] for x in sorted_frequent]
 
         # 3. Top Visitors (All Time)
-        all_login_events = [l for l in sec_logs if 'Login' in l.get('event', '') and 'Success' in l.get('event', '')]
+        all_login_events = [l for l in sec_logs if 'Login' in str(l.get('event', '')) and 'Success' in str(l.get('event', ''))]
         all_visitors_list = []
         for l in all_login_events:
-            details = l.get('details', '')
+            details = str(l.get('details', ''))
             if 'User ' in details:
                 try:
                     username = details.split('User ')[1].split(' ')[0]
@@ -143,10 +143,10 @@ def analytics_dashboard():
 
         # 4. Daily & Heavy Visitors
         today_str = datetime.now().strftime("%Y-%m-%d")
-        today_login_events = [l for l in sec_logs if 'Login' in l.get('event', '') and 'Success' in l.get('event', '') and l.get('timestamp', '').startswith(today_str)]
+        today_login_events = [l for l in sec_logs if 'Login' in str(l.get('event', '')) and 'Success' in str(l.get('event', '')) and str(l.get('timestamp', '')).startswith(today_str)]
         today_visitors_list = []
         for l in today_login_events:
-            details = l.get('details', '')
+            details = str(l.get('details', ''))
             if 'User ' in details:
                 try:
                     username = details.split('User ')[1].split(' ')[0]
@@ -161,8 +161,9 @@ def analytics_dashboard():
         analy_daily_values = list(daily_data.values()) 
 
         # 5. Top Requested Services
-        service_counts = Counter([m.get('service', 'general') for m in messages])
-        service_map = {'modern-paints':'دهانات حديثة','gypsum-board':'جبس بورد','integrated-finishing':'تشطيب متكامل','putty-finishing':'تأسيس ومعجون','wallpaper':'ورق حائط','renovation':'تجديد وترميم','general':'استفسار عام'}
+        service_counts = Counter([str(m.get('service', 'general')) for m in messages])
+        service_map = {'modern-paints':'دهانات حديثة','gypsum-board':'جبس بورد','integrated-finishing':'تشطيب متكامل',
+                      'putty-finishing':'تأسيس ومعجون','wallpaper':'ورق حائط','renovation':'تجديد وترميم','general':'استفسار عام'}
         top_services_req_data = service_counts.most_common(5)
         top_services_req_labels = [service_map.get(x[0], x[0]) for x in top_services_req_data]
         top_services_req_values = [x[1] for x in top_services_req_data]
@@ -170,11 +171,13 @@ def analytics_dashboard():
         # 6. Most Viewed Services
         service_views = []
         for l in sec_logs:
-            if l.get('event') == 'Service View':
-                details = l.get('details', '')
+            if str(l.get('event')) == 'Service View':
+                details = str(l.get('details', ''))
                 if 'User viewed service: ' in details:
-                    svc_title = details.split('User viewed service: ')[1]
-                    service_views.append(svc_title)
+                    try:
+                        svc_title = details.split('User viewed service: ')[1]
+                        service_views.append(svc_title)
+                    except: pass
         top_services_view_data = Counter(service_views).most_common(5)
         top_services_view_labels = [x[0] for x in top_services_view_data]
         top_services_view_values = [x[1] for x in top_services_view_data]
@@ -182,7 +185,7 @@ def analytics_dashboard():
         # 7. Peak Hours
         hour_counts = Counter()
         for l in sec_logs:
-            ts = l.get('timestamp', '')
+            ts = str(l.get('timestamp', ''))
             if ts and ' ' in ts:
                 try:
                     hour = ts.split(' ')[1].split(':')[0]
@@ -197,16 +200,16 @@ def analytics_dashboard():
         unanswered_msgs = len(unanswered)
         answered_msgs = max(0, total_ai_msgs - unanswered_msgs)
         ai_efficiency = {
-            'labels': ['تم الرد', 'بدون إجابة'],
-            'values': [answered_msgs, unanswered_msgs]
+            'names': ['تم الرد', 'بدون إجابة'],
+            'counts': [answered_msgs, unanswered_msgs]
         }
 
         # 9. Page Popularity
         page_views = []
         for l in sec_logs:
-            event = l.get('event', '')
+            event = str(l.get('event', ''))
             if 'View' in event or 'Page' in event:
-                details = l.get('details', '')
+                details = str(l.get('details', ''))
                 if 'page: ' in details.lower():
                     parts = details.lower().split('page: ')
                     if len(parts) > 1:
@@ -232,8 +235,11 @@ def analytics_dashboard():
             'ai_efficiency': ai_efficiency, 'page_pop_labels': page_pop_labels, 'page_pop_values': page_pop_values
         })
     except Exception as e:
+        import traceback
+        with open('analytics_error.log', 'w', encoding='utf-8') as f:
+            f.write(traceback.format_exc())
         print(f"ANALYTICS ERROR: {str(e)}")
-        flash(f"حدث خطأ أثناء تحميل الإحصائيات: {str(e)}")
+        flash(f"حدث خطأ أثناء تحميل الإحصائيات. تم تسجيل الخطأ للفحص.")
         return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/admin/add_user', methods=['POST'])
@@ -387,6 +393,15 @@ def toggle_2fa():
         user_model.update(current_user.username, {'two_factor_enabled': False})
         flash('تم تعطيل المصادقة الثنائية')
     return redirect(url_for('admin.admin_dashboard'))
+@admin_bp.route('/admin/security/clear', methods=['POST'])
+@login_required
+def clear_security_logs():
+    if current_user.role != 'admin': return "Access Denied", 403
+    security_log_model.truncate()
+    security_log_model.create("Logs Cleared", f"Admin {current_user.username} cleared all security logs", severity="info")
+    flash("تم مسح سجلات المراقبة الأمنية بنجاح، وبدء التسجيل من جديد.")
+    return redirect(url_for('admin.admin_dashboard'))
+
 @admin_bp.route('/admin/security/audit')
 @login_required
 def security_audit():
@@ -460,4 +475,8 @@ def security_audit():
         'color': 'success'
     })
 
-    return render_template('admin_security.html', checks=checks)
+    logs = security_log_model.get_all()
+    logs.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+    recent_logs = logs[:10]
+
+    return render_template('admin_security.html', checks=checks, logs=recent_logs)

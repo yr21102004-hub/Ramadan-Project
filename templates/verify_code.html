@@ -1,23 +1,85 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<section class="section-padding" style="margin-top: 80px;">
-    <div class="container">
-        <div class="contact-form" style="max-width: 500px; margin: 0 auto;">
-            <h3 class="text-center text-gold">تأكيد الهوية</h3>
-            <p class="text-center text-muted-dynamic">أدخل الكود الذي تم إرسالة إلى رقم الواتس آب الخاص بك</p>
-
-            <form action="{{ url_for('verify_code') }}" method="POST">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="username" value="{{ username }}">
-                <div class="form-group">
-                    <label>كود التحقق</label>
-                    <input type="text" name="code" required placeholder="xxxxxx"
-                        style="text-align: center; letter-spacing: 5px; font-size: 1.2rem;">
+<section class="section-padding"
+    style="margin-top: 80px; min-height: 85vh; display: flex; align-items: center; background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.05), transparent);">
+    <div class="container" data-aos="zoom-in">
+        <div class="premium-card glass" style="max-width: 450px; margin: 0 auto; padding: 40px;">
+            <div class="text-center mb-4">
+                <div class="icon-pulse mb-3" style="display: inline-block;">
+                    <i class="fas fa-key" style="font-size: 3rem; color: var(--gold);"></i>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">تأكيد</button>
+                <h3 class="text-gold">تأكيد الهوية</h3>
+                <p class="text-muted-dynamic">أدخل الكود المكون من 6 أرقام المرسل إلى هاتفك</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert-premium mb-4">
+                <i class="fas fa-info-circle me-2"></i> {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('auth.verify_code') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-group mb-4">
+                    <input type="text" name="code" required placeholder="000 000" maxlength="6"
+                        style="text-align: center; letter-spacing: 8px; font-size: 2rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(212,175,55,0.2); border-radius: 12px; color: var(--gold); padding: 15px; width: 100%;">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block w-100 py-3 mb-4">
+                    تأكيد الكود <i class="fas fa-arrow-left ms-2"></i>
+                </button>
             </form>
+
+            <div class="text-center mt-3">
+                <a href="{{ url_for('auth.forgot_password') }}"
+                    class="text-muted small text-decoration-none hover-gold transition">
+                    لم يصلك الكود؟ إعادة إرسال
+                </a>
+            </div>
         </div>
     </div>
 </section>
+
+<style>
+    .icon-pulse {
+        animation: pulse-gold 2s infinite;
+    }
+
+    @keyframes pulse-gold {
+        0% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 0 rgba(212, 175, 55, 0.4));
+        }
+
+        70% {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.2));
+        }
+
+        100% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 0 rgba(212, 175, 55, 0));
+        }
+    }
+
+    .alert-premium {
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--gold);
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .hover-gold:hover {
+        color: var(--gold) !important;
+    }
+</style>
 {% endblock %}

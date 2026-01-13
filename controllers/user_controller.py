@@ -4,14 +4,17 @@ from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import os
-import os
-from models import UserModel, ContactModel
+from models import UserModel, ContactModel, PaymentModel, ChatModel, UnansweredQuestionsModel, SubscriptionModel
 from websockets import notify_admins, broadcast_percentage_update
 
 user_bp = Blueprint('user', __name__)
 bcrypt = Bcrypt()
 user_model = UserModel()
 contact_model = ContactModel()
+payment_model = PaymentModel()
+chat_model = ChatModel()
+unanswered_model = UnansweredQuestionsModel()
+subscription_model = SubscriptionModel()
 
 @user_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -103,11 +106,32 @@ def profile(username):
         'created_at': user_data.get('created_at')
     }
     
-    # Fetch user's previous requests
-    requests = contact_model.get_by_user(username)
-    requests.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+    # Fetch user's previous requests (Inquiries/Inspections)
+    user_requests = contact_model.get_by_user(username)
+    user_requests.sort(key=lambda x: x.get('created_at', ''), reverse=True)
     
-    return render_template('user_dashboard.html', user=user_obj, requests=requests)
+    # Fetch user's payments
+    user_payments = payment_model.get_by_user(username)
+    user_payments.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+    
+    # Fetch user's chat history
+    user_chats = chat_model.get_by_user(username)
+    user_chats.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+    
+    # Fetch user's unanswered questions (Pending AI questions)
+    user_unanswered = unanswered_model.get_by_user(username)
+    user_unanswered.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+    
+    # Fetch user's subscriptions
+    user_subscriptions = subscription_model.get_by_user(username)
+    
+    return render_template('user_dashboard.html', 
+                           user=user_obj, 
+                           requests=user_requests,
+                           payments=user_payments,
+                           chats=user_chats,
+                           unanswered=user_unanswered,
+                           subscriptions=user_subscriptions)
 
 
 @user_bp.route('/admin/update_project_percentage', methods=['POST'])

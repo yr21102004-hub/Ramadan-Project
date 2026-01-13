@@ -112,13 +112,14 @@ def contact_api():
         name = data.get('name')
         phone = data.get('phone')
         message = data.get('message')
+        service = data.get('service', 'عام')
         
         if not name or not phone or not message:
             return jsonify({'error': 'Missing required fields'}), 400
         
         user_id = current_user.username if current_user.is_authenticated else None
         
-        contact_model.create(name, phone, message, user_id)
+        contact_model.create(name, phone, message, user_id, service)
         return jsonify({'message': 'Success'}), 200
     except Exception as e:
         print(f"Error saving contact: {e}")

@@ -351,9 +351,9 @@
         new Chart(ctxEfficiency, {
             type: 'doughnut',
             data: {
-                labels: {{ analytics.ai_efficiency.labels | tojson }},
+                labels: {{ analytics.ai_efficiency.names | tojson }},
     datasets: [{
-        data: {{ analytics.ai_efficiency.values | tojson }},
+        data: {{ analytics.ai_efficiency.counts | tojson }},
         backgroundColor: ['#4caf50', '#f44336'],
         borderWidth: 0
                     }]

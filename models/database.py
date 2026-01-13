@@ -41,6 +41,10 @@ class Database:
         return self.db.table('payments')
     
     @property
+    def subscriptions(self):
+        return self.db.table('subscriptions')
+    
+    @property
     def learned_answers(self):
         return self.db.table('learned_answers')
 
@@ -119,6 +123,29 @@ class PaymentModel:
         payment_data['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return self.table.insert(payment_data)
 
+    def get_by_user(self, username):
+        """Get payments by username"""
+        return self.table.search(self.query.username == username)
+
+
+class SubscriptionModel:
+    """Subscription Model"""
+    
+    def __init__(self):
+        self.db = Database()
+        self.table = self.db.subscriptions
+        self.query = Query()
+    
+    def get_all(self):
+        return self.table.all()
+    
+    def get_by_user(self, username):
+        return self.table.search(self.query.username == username)
+    
+    def create(self, data):
+        data['created_at'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return self.table.insert(data)
+
 
 class SecurityLogModel:
     """Security Log Model"""
@@ -141,6 +168,10 @@ class SecurityLogModel:
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         return self.table.insert(log_data)
+
+    def truncate(self):
+        """Clear all security logs"""
+        return self.table.truncate()
 
 
 class ContactModel:
@@ -225,6 +256,10 @@ class UnansweredQuestionsModel:
     def get_by_question(self, question):
         """Get question by text"""
         return self.table.get(self.query.question == question)
+        
+    def get_by_user(self, user_id):
+        """Get unanswered by user ID"""
+        return self.table.search(self.query.user_id == user_id)
         
     def create(self, question, user_id):
         """Create new unanswered question"""

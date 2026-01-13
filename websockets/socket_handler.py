@@ -39,7 +39,7 @@ def register_events():
     
     @socketio.on('join_admin')
     @authenticated_only
-    def handle_join_admin(data):
+    def handle_join_admin(data=None):
         """Admin joins admin room for real-time updates"""
         join_room('admin_room')
         emit('joined_admin', {'status': 'success'})

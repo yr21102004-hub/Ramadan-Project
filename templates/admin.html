@@ -443,7 +443,13 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="font-weight-bold">{{ user.full_name }}</div>
+                                    <div class="font-weight-bold">
+                                        <a href="{{ url_for('user.profile', username=user.username) }}"
+                                            class="text-white text-decoration-none hover-gold">
+                                            {{ user.full_name }} <i class="fas fa-external-link-alt ms-1"
+                                                style="font-size: 0.7rem;"></i>
+                                        </a>
+                                    </div>
                                     <div class="text-muted small">{{ user.project_location }}</div>
                                     {% if user.email %}
                                     <div class="text-muted small"><i class="fas fa-envelope"
