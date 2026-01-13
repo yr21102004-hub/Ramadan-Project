@@ -15,9 +15,14 @@
                 <h2 class="section-title mb-0">طلبات المعاينة الواردة</h2>
                 <p class="text-muted mt-2">إدارة طلبات المعاينة الجديدة والسابقة</p>
             </div>
-            <button class="btn btn-outline-gold" data-bs-toggle="modal" data-bs-target="#locationSettingsModal">
-                <i class="fas fa-cog me-2"></i> إعدادات الموقع
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#instructionsModal">
+                    <i class="fas fa-exclamation-triangle me-2"></i> تعليمات العمل
+                </button>
+                <button class="btn btn-outline-gold" data-bs-toggle="modal" data-bs-target="#locationSettingsModal">
+                    <i class="fas fa-cog me-2"></i> إعدادات الموقع
+                </button>
+            </div>
         </div>
 
         <!-- Pending Requests -->
@@ -56,12 +61,15 @@
                         <div id="map-{{ req.doc_id }}" class="mini-map mt-3"></div>
                         <script>
                             document.addEventListener('DOMContentLoaded', function () {
-                                var map = L.map('map-{{ req.doc_id }}', {
-                                    attributionControl: false,
-                                    zoomControl: false
-                                }).setView([{{ req.user_latitude }}, {{ req.user_longitude }}], 13);
+                                var lat = {{ req.user_latitude | default (30.0444)
+                            }};
+                            var lng = {{ req.user_longitude | default (31.2357) }};
+                            var map = L.map('map-{{ req.doc_id }}', {
+                                attributionControl: false,
+                                zoomControl: false
+                            }).setView([lat, lng], 13);
                             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-                            L.marker([{{ req.user_latitude }}, {{ req.user_longitude }}]).addTo(map);
+                            L.marker([lat, lng]).addTo(map);
                             });
                         </script>
 
@@ -120,7 +128,7 @@
             </div>
             {% endfor %}
         </div>
-        (٪ set others = others | rejectattr("status", "equalto", "accepted") | list %)
+        {% set others = others | rejectattr("status", "equalto", "accepted") | list %}
         {% endif %}
 
         <!-- History -->
@@ -176,6 +184,164 @@
         {% endif %}
     </div>
 </section>
+
+
+<!-- Instructions Modal -->
+<div class="modal fade" id="instructionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-modal text-end" style="direction: rtl;">
+            <div class="modal-header bg-danger text-white border-bottom-0">
+                <h5 class="modal-title fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> تعليمات صارمة للصنايعي
+                </h5>
+                <button type="button" class="btn-close btn-close-white m-0" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <!-- Golden Rule -->
+                <div class="alert alert-danger border-0 d-flex align-items-center mb-4">
+                    <i class="fas fa-hand-paper fa-3x me-3"></i>
+                    <div>
+                        <h5 class="fw-bold mb-1">⚠️ القاعدة الذهبية: ممنوع الشغل بدون إدارة</h5>
+                        <p class="mb-0 small">
+                            ممنوع نهائياً لأي صنايعي أو مساعد يشتغل في أي مكان بدون وجود الإدارة أو تكليف مباشر.<br>
+                            <strong>(❌ مفيش شغل لوحدك - ❌ مفيش دخول موقع بدون إذن - ❌ مفيش اتفاق مباشر)</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- Allowed Cases -->
+                    <!-- Approved Supervision Forms -->
+                    <div class="col-12">
+                        <div class="glass p-3 rounded border border-info">
+                            <h6 class="text-info mb-3"><i class="fas fa-eye me-2"></i> أشكال الإشراف المعتمدة (✔️)</h6>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="bg-dark p-2 rounded h-100 border border-secondary">
+                                        <div class="fw-bold text-white mb-2 border-bottom border-secondary pb-1 small">
+                                            1️⃣ مدير في الموقع �‍💼</div>
+                                        <ul class="list-unstyled text-white-50 small mb-0" style="font-size: 0.8rem;">
+                                            <li>للشغل الكبير أو الحساس.</li>
+                                            <li>أو مع صنايعي جديد.</li>
+                                            <li class="text-warning">تنفذ التعليمات فوراً.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="bg-dark p-2 rounded h-100 border border-success">
+                                        <div class="fw-bold text-success mb-2 border-bottom border-success pb-1 small">
+                                            2️⃣ إشراف عن بُعد 📱</div>
+                                        <ul class="list-unstyled text-white-50 small mb-0" style="font-size: 0.8rem;">
+                                            <li><i class="fas fa-satellite-dish me-1"></i> <strong>معتمد كلياً.</strong>
+                                            </li>
+                                            <li>يتطلب: صور بداية/نهاية + GPS.</li>
+                                            <li>أي تعديل -> تسجيل صوتي.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="bg-dark p-2 rounded h-100 border border-secondary">
+                                        <div class="fw-bold text-white mb-2 border-bottom border-secondary pb-1 small">
+                                            3️⃣ مشرف موقع 🧑‍�</div>
+                                        <ul class="list-unstyled text-white-50 small mb-0" style="font-size: 0.8rem;">
+                                            <li>بديل للمدير في الشغل الكبير.</li>
+                                            <li>له نفس الصلاحيات.</li>
+                                            <li>التزام تام بتوجيهاته.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Practical Application -->
+                            <div class="mt-3 p-2 bg-black rounded">
+                                <h6 class="text-gold small mb-2"><i class="fas fa-cogs me-1"></i> التطبيق العملي في
+                                    النظام 🛠️</h6>
+                                <div class="d-flex justify-content-between text-white-50 small text-center">
+                                    <div><span class="text-white">قبل الشغل:</span><br>فتح السيستم + تحديد صنايعية</div>
+                                    <i class="fas fa-arrow-left mt-2"></i>
+                                    <div><span class="text-white">أثناء الشغل:</span><br>متابعة (موقع/عن بُعد)</div>
+                                    <i class="fas fa-arrow-left mt-2"></i>
+                                    <div><span class="text-white">بعد الشغل:</span><br>قفل + يومية + تحويل</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enforcement Mechanism -->
+                    <div class="col-md-6">
+                        <div class="glass p-3 rounded border border-warning h-100">
+                            <h6 class="text-warning mb-3"><i class="fas fa-fingerprint me-2"></i> آلية تنفيذ المنع (🔐)
+                            </h6>
+                            <ul class="list-unstyled text-white-50 small mb-0">
+                                <li class="mb-2"><strong>1. إذن دخول موقع:</strong> 📍 لن يقبل النظام أي تقرير أو حضور
+                                    إلا بإذن فعال من الإدارة.</li>
+                                <li class="mb-2"><strong>2. GPS إجباري:</strong> 📡 لازم تسجيل (Check-in) و (Check-out)
+                                    وإلا الشغل غير محسوب.</li>
+                                <li><strong>3. زر "بدء الشغل":</strong> 🔘 مقفول دايمًا، بيفتح بس لما الإدارة تفعله ليك.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Role of Manager -->
+                    <div class="col-md-6">
+                        <div class="glass p-3 rounded border border-gold h-100">
+                            <h6 class="text-gold mb-3"><i class="fas fa-crown me-2"></i> دور المدير (👑)</h6>
+                            <ul class="list-unstyled text-white-50 small mb-0">
+                                <li class="mb-2"><i class="fas fa-unlock me-2"></i> هو اللي بيفتح الشغل (System)</li>
+                                <li class="mb-2"><i class="fas fa-users-cog me-2"></i> هو اللي بيحدد الصنايعية
+                                    والمساعدين</li>
+                                <li class="mb-2"><i class="fas fa-hourglass-half me-2"></i> هو اللي بيراقب الوقت ويقفل
+                                    الشغل</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Penalties Table -->
+                <div class="table-responsive rounded border border-danger mb-4">
+                    <table class="table table-dark table-sm mb-0 text-center small align-middle">
+                        <thead>
+                            <tr>
+                                <th class="text-danger py-2"><i class="fas fa-exclamation-triangle"></i> المخالفة</th>
+                                <th class="text-danger py-2">الإجراء العقابي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>شغل بدون إذن</td>
+                                <td class="text-warning">إيقاف فوري للحساب</td>
+                            </tr>
+                            <tr>
+                                <td>اتفاق مع عميل</td>
+                                <td class="text-danger fw-bold">حظر نهائي</td>
+                            </tr>
+                            <tr>
+                                <td>استلام فلوس</td>
+                                <td class="text-danger fw-bold">حظر + بلاغ للشرطة</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer Message -->
+                <div class="alert alert-dark border-gold text-center mb-0 p-3">
+                    <h6 class="text-gold fw-bold mb-2">⚠️ الخلاصة: ممنوع الشغل بدون تكليف مباشر</h6>
+                    <p class="text-white small mb-3">أي مخالفة = إيقاف فوري | أي استفسار تواصل فوراً</p>
+                    <a href="tel:01099155572" class="btn btn-gold fw-bold px-4 rounded-pill">
+                        <i class="fas fa-phone me-2"></i> 01099155572
+                    </a>
+                </div>
+            </div>
+
+            <div class="modal-footer justify-content-center border-top-0">
+                <button type="button" class="btn btn-outline-light px-4 rounded-pill" data-bs-dismiss="modal">فهمت
+                    التعليمات</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Reject Modal -->
 <div class="modal fade" id="rejectModal" tabindex="-1">
