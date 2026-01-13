@@ -27,6 +27,7 @@ def send_sms_otp(phone, code):
     return True
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def login():
     if request.method == 'POST':
         username = request.form.get('username').strip()

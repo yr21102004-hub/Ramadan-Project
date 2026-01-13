@@ -19,7 +19,7 @@
             {% endif %}
             {% endwith %}
 
-            <form action="{{ url_for('login') }}" method="POST">
+            <form action="{{ url_for('auth.login') }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-group" data-aos="fade-up" data-aos-delay="100">
                     <label>اسم المستخدم</label>
@@ -34,10 +34,11 @@
 
             <div style="margin-top: 30px; text-align: center; font-size: 0.95rem;">
                 <span class="text-muted-dynamic">ليس لديك حساب؟</span>
-                <a href="{{ url_for('register') }}" class="text-gold" style="font-weight: 600; margin-right: 5px;">سجل
+                <a href="{{ url_for('user.register') }}" class="text-gold"
+                    style="font-weight: 600; margin-right: 5px;">سجل
                     الآن</a>
                 <div style="margin-top: 20px;">
-                    <a href="{{ url_for('forgot_password') }}" class="text-muted-dynamic"
+                    <a href="{{ url_for('auth.forgot_password') }}" class="text-muted-dynamic"
                         style="font-size: 0.85rem; transition: var(--transition-fast);">نسيت كلمة المرور؟</a>
                 </div>
             </div>
