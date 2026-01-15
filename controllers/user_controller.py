@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import current_user, login_required
 from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
@@ -140,6 +140,7 @@ def profile(username):
             'project_location': user_data.get('project_location', 'غير محدد'),
             'project_description': user_data.get('project_description', 'لا يوجد وصف'),
             'project_percentage': user_data.get('project_percentage', 0),
+            'chat_memory_enabled': user_data.get('chat_memory_enabled', 1),
             'created_at': user_data.get('created_at')
         }
         
@@ -190,7 +191,8 @@ def profile(username):
 def update_percentage():
     """Update user project percentage"""
     if not current_user.is_authenticated or current_user.role != 'admin':
-        return "Access Denied", 403
+        flash('عذراً، هذه العملية مخصصة للإدارة فقط.', 'warning')
+        return redirect(url_for('index'))
         
     username = request.form.get('username')
     percentage = request.form.get('percentage')
@@ -215,7 +217,8 @@ def update_percentage():
 def delete(username):
     """Delete user"""
     if not current_user.is_authenticated or current_user.role != 'admin':
-        return "Access Denied", 403
+        flash('عذراً، هذه العملية مخصصة للإدارة فقط.', 'warning')
+        return redirect(url_for('index'))
 
     user_model.delete(username)
     flash(f"تم حذف المستخدم {username} بنجاح.")
@@ -267,7 +270,36 @@ def submit_project_rating():
         flash("التقييم يجب أن يكون بين 1 و 5 نجوم.", 'error')
         return redirect(url_for('user.profile', username=current_user.username))
         
-    result = rating_model.add_project_rating(current_user.username, rating, comment)
-    
     flash(result['message'], 'success' if result['success'] else 'error')
     return redirect(url_for('user.profile', username=current_user.username))
+
+@user_bp.route('/user/clear_chat', methods=['POST'])
+@login_required
+def clear_chat():
+    """Clear user chat history (Soft Delete)"""
+    try:
+        chat_model.soft_delete_all(current_user.username)
+        return jsonify({'success': True, 'message': 'تم مسح سجل المحادثة بنجاح.'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@user_bp.route('/user/toggle_memory', methods=['POST'])
+@login_required
+def toggle_memory():
+    """Toggle chat memory setting"""
+    try:
+        data = request.json
+        enabled = data.get('enabled', True)
+        
+        # Update user setting
+        # SQLite stores booleans as 1/0
+        user_model.update(current_user.username, {'chat_memory_enabled': 1 if enabled else 0})
+        
+        # If disabled (closing memory), HARD DELETE existing chats so admin cannot see them either
+        if not enabled:
+            chat_model.hard_delete_all(current_user.username)
+            
+        msg = "تم تفعيل ذاكرة المحادثة." if enabled else "تم تعطيل الذاكرة وحذف جميع المحادثات نهائياً."
+        return jsonify({'success': True, 'message': msg})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

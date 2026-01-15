@@ -28,10 +28,10 @@ inspection_model = InspectionRequestModel()
 db = Database()
 
 @admin_bp.route('/admin')
-@login_required
 def admin_dashboard():
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
+        return redirect(url_for('index'))
     
     users = user_model.get_all()
     messages = contact_model.get_all()
@@ -124,10 +124,10 @@ def admin_dashboard():
                            analytics=analytics_summary)
 
 @admin_bp.route('/admin/users')
-@login_required
 def admin_users():
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
+        return redirect(url_for('index'))
     
     # Get only users with role='user' or no role (default to user)
     all_users = user_model.get_all()
@@ -202,10 +202,10 @@ def admin_users():
 
 
 @admin_bp.route('/admin/analytics')
-@login_required
 def analytics_dashboard():
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
+        return redirect(url_for('index'))
     
     try:
         users = user_model.get_all()
@@ -352,10 +352,10 @@ def analytics_dashboard():
         return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/admin/add_user', methods=['POST'])
-@login_required
 def add_user():
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
+        return redirect(url_for('index'))
         
     username = request.form.get('username')
     full_name = request.form.get('full_name')
@@ -402,9 +402,8 @@ def add_user():
     return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/admin/answer_question', methods=['POST'])
-@login_required
 def answer_question():
-    if current_user.role != 'admin': return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     question = request.form.get('question')
     answer = request.form.get('answer')
     
@@ -420,11 +419,10 @@ def answer_question():
     return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/admin/answer_unanswered_question', methods=['POST'])
-@login_required
 def answer_unanswered_question():
     """Answer an unanswered question from user dashboard"""
-    if current_user.role != 'admin': 
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin': 
+        return redirect(url_for('index'))
     
     question_id = request.form.get('question_id')
     question_text = request.form.get('question_text')
@@ -448,18 +446,16 @@ def answer_unanswered_question():
     return redirect(request.referrer or url_for('user.profile', username=user_id))
 
 @admin_bp.route('/admin/delete_message', methods=['POST'])
-@login_required
 def delete_message():
-    if current_user.role != 'admin': return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     doc_id = request.form.get('doc_id')
     contact_model.delete(doc_id)
     flash("تم حذف الرسالة بنجاح.")
     return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/admin/delete_answered_question', methods=['POST'])
-@login_required
 def delete_answered_question():
-    if current_user.role != 'admin': return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     question = request.form.get('question')
     question_record = unanswered_model.get_by_question(question)
     
@@ -472,59 +468,74 @@ def delete_answered_question():
         flash("تم حذف السؤال نهائياً.")
     return redirect(url_for('admin.admin_dashboard'))
 
+@admin_bp.route('/admin/delete_all_unanswered', methods=['POST'])
+def delete_all_unanswered_questions():
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
+    unanswered_model.delete_all()
+    flash("تم حذف جميع الأسئلة المعلقة بنجاح.")
+    return redirect(url_for('admin.admin_unanswered_questions'))
+
 @admin_bp.route('/admin/learned_answers')
-@login_required
 def learned_answers():
-    if current_user.role != 'admin': return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     learned = learned_model.get_all()
     learned.sort(key=lambda x: x.get('learned_at', ''), reverse=True)
     return render_template('admin_learned.html', learned=learned)
 
 @admin_bp.route('/admin/chats')
-@login_required
 def view_chats():
-    if current_user.role != 'admin': return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     chats = chat_model.get_all()
     return render_template('admin_chats.html', chats=chats)
 
 @admin_bp.route('/admin/unanswered')
-@login_required
 def admin_unanswered_questions():
-    """View all unanswered questions"""
-    if current_user.role != 'admin': return "Access Denied", 403
-    unanswered = unanswered_model.get_all()
-    unanswered.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
-    
-    # Context logic reusing existing code structure if needed or simplified in template
-    # For now, passing just the list. The context fetching can be added if needed or done dynamically.
-    # To keep it powerful, let's fetch chats to allow context lookup if we want.
-    chats = chat_model.get_all()
-    chats_by_user = {}
-    for c in chats:
-        uid = c.get('user_id', 'unknown')
-        if uid not in chats_by_user: chats_by_user[uid] = []
-        chats_by_user[uid].append(c)
-    
-    def get_context(uid, q_time_str):
-        full_history = chats_by_user.get(uid, [])
-        if not full_history: return []
-        return full_history[-5:] # Simple context
+    try:
+        if not current_user.is_authenticated or current_user.role != 'admin':
+            flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
+            return redirect(url_for('index'))
+        unanswered = unanswered_model.get_all()
+        if not unanswered:
+            unanswered = []
+        else:
+            unanswered.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+        
+        # Pre-fetch chats
+        chats = chat_model.get_all() or []
+        chats_by_user = {}
+        for c in chats:
+            uid = c.get('user_id', 'unknown')
+            if uid not in chats_by_user: chats_by_user[uid] = []
+            chats_by_user[uid].append(c)
+        
+        # Attach context to each question object
+        # We need to modify the dictionaries. Since get_all returns dicts, we can modify them.
+        for q in unanswered:
+            uid = q.get('user_id')
+            if uid and uid in chats_by_user:
+                history = chats_by_user[uid]
+                history.sort(key=lambda x: x.get('timestamp', ''))
+                q['context'] = history[-5:] # Last 5 messages
+            else:
+                q['context'] = []
 
-    return render_template('admin_unanswered.html', unanswered=unanswered, get_context=get_context)
+        return render_template('admin_unanswered.html', unanswered=unanswered)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return f"<h3>Error loading Unanswered Questions:</h3><p>{str(e)}</p><pre>{traceback.format_exc()}</pre>", 500
 
 @admin_bp.route('/admin/messages')
-@login_required
 def admin_messages():
     """View all contact messages"""
-    if current_user.role != 'admin': return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     messages = contact_model.get_all()
     messages.sort(key=lambda x: x.get('created_at', ''), reverse=True)
     return render_template('admin_messages.html', messages=messages)
 
 @admin_bp.route('/admin/backup')
-@login_required
 def manual_backup():
-    if current_user.role != 'admin': return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
         if not os.path.exists('backups'): os.makedirs('backups')
@@ -538,8 +549,8 @@ def manual_backup():
         return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/admin/setup_2fa')
-@login_required
 def setup_2fa():
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     if not current_user.two_factor_secret:
         secret = pyotp.random_base32()
         user_model.update(current_user.username, {'two_factor_secret': secret})
@@ -554,8 +565,8 @@ def setup_2fa():
     return render_template('setup_2fa.html', qr_code=qr_b64, secret=secret)
 
 @admin_bp.route('/admin/toggle_2fa', methods=['POST'])
-@login_required
 def toggle_2fa():
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     action = request.form.get('action')
     if action == 'enable':
         user_model.update(current_user.username, {'two_factor_enabled': True})
@@ -565,18 +576,18 @@ def toggle_2fa():
         flash('تم تعطيل المصادقة الثنائية')
     return redirect(url_for('admin.admin_dashboard'))
 @admin_bp.route('/admin/security/clear', methods=['POST'])
-@login_required
 def clear_security_logs():
-    if current_user.role != 'admin': return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     security_log_model.truncate()
     security_log_model.create("Logs Cleared", f"Admin {current_user.username} cleared all security logs", severity="info")
     flash("تم مسح سجلات المراقبة الأمنية بنجاح، وبدء التسجيل من جديد.")
     return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/admin/security/audit')
-@login_required
 def security_audit():
-    if current_user.role != 'admin': return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin': 
+        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
+        return redirect(url_for('index'))
     
     # Auto Backup Check and List Fetching
     backup_dir = 'backups'
@@ -686,11 +697,11 @@ def security_audit():
 
 
 @admin_bp.route('/admin/complaints')
-@login_required
 def admin_complaints():
     """View and manage complaints"""
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
+        return redirect(url_for('index'))
     
     # Get all complaints
     all_complaints = complaint_model.get_all()
@@ -714,11 +725,10 @@ def admin_complaints():
 
 
 @admin_bp.route('/admin/complaint/<int:complaint_id>/update', methods=['POST'])
-@login_required
 def update_complaint_status(complaint_id):
     """Update complaint status"""
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        return redirect(url_for('index'))
     
     status = request.form.get('status')
     admin_notes = request.form.get('admin_notes', '')
@@ -731,11 +741,11 @@ def update_complaint_status(complaint_id):
 
 
 @admin_bp.route('/admin/inspections')
-@login_required
 def admin_inspections():
     """View and manage inspections"""
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
+        return redirect(url_for('index'))
     
     # Get all requests
     all_requests = inspection_model.get_all()
@@ -754,11 +764,10 @@ def admin_inspections():
 
 
 @admin_bp.route('/admin/inspection/<request_id>/assign', methods=['POST'])
-@login_required
 def assign_inspection(request_id):
     """Assign admin to inspection"""
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        return redirect(url_for('index'))
     
     # Always assign to admin since workers are removed
     inspection_model.assign_admin_visit(request_id)
@@ -768,10 +777,9 @@ def assign_inspection(request_id):
 
 
 @admin_bp.route('/admin/inspection/<request_id>/details')
-@login_required
 def inspection_details(request_id):
     """Get inspection details"""
-    if current_user.role != 'admin':
+    if not current_user.is_authenticated or current_user.role != 'admin':
         return jsonify({'error': 'Unauthorized'}), 403
         
     req = inspection_model.get_request_by_id(request_id)
@@ -785,11 +793,10 @@ def inspection_details(request_id):
 
 
 @admin_bp.route('/admin/inspection/<request_id>/approve', methods=['POST'])
-@login_required
 def approve_inspection_report(request_id):
     """Admin: Approve or Reject Inspection Report"""
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        return redirect(url_for('index'))
         
     decision = request.form.get('decision')
     admin_notes = request.form.get('admin_notes', '')
@@ -807,11 +814,11 @@ def approve_inspection_report(request_id):
 
 
 @admin_bp.route('/admin/transfers')
-@login_required
 def admin_transfers():
     """Admin: Transfers List"""
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
+        return redirect(url_for('index'))
         
     payments = payment_model.get_all()
     # Sort by timestamp desc
@@ -823,28 +830,25 @@ def admin_transfers():
     return render_template('admin_transfers.html', payments=payments, total_confirmed=confirmed_total)
 
 @admin_bp.route('/admin/payment/confirm/<doc_id>', methods=['POST'])
-@login_required
 def confirm_payment(doc_id):
     """Admin: Confirm a payment"""
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        return redirect(url_for('index'))
         
     payment_model.update_status(doc_id, 'Confirmed')
     flash('تم تأكيد التحويل بنجاح', 'success')
     return redirect(url_for('admin.admin_transfers'))
 
 @admin_bp.route('/admin/backup/download/<filename>')
-@login_required
 def download_backup_file(filename):
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        return redirect(url_for('index'))
     return send_file(os.path.join('backups', filename), as_attachment=True)
 
 @admin_bp.route('/admin/backup/delete/<filename>', methods=['POST'])
-@login_required
 def delete_backup_file(filename):
-    if current_user.role != 'admin':
-        return "Access Denied", 403
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        return redirect(url_for('index'))
     try:
         os.remove(os.path.join('backups', filename))
         flash('تم حذف النسخة الاحتياطية بنجاح')

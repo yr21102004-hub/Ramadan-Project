@@ -1,7 +1,7 @@
 import re
 import difflib
 
-from models import Database, LearnedAnswersModel, UnansweredQuestionsModel, ChatModel
+from models import Database, LearnedAnswersModel, UnansweredQuestionsModel, ChatModel, UserModel
 from datetime import datetime
 
 class AIService:
@@ -14,6 +14,7 @@ class AIService:
         self.learned_model = LearnedAnswersModel()
         self.unanswered_model = UnansweredQuestionsModel()
         self.chat_model = ChatModel()
+        self.user_model = UserModel()
         self._learned_cache = None
         
         # Static Knowledge Base (Data Structure: List of Dictionaries)
@@ -55,7 +56,20 @@ class AIService:
             },
             {
                 "keywords_ar": [
-                    "انت", "انتو", "مين", "من", "منو", "مين انت", "من انت", "انت مين",
+                    "رمضان", "جبر", "الحاج رمضان", "حاج رمضان", "أبو محمد", "ابو محمد",
+                    "صاحب الموقع", "صاحب الشركة", "المدير", "مؤسس", "المؤسس", "مين هو رمضان",
+                    "من هو رمضان", "مين صاحب", "من صاحب", "مدير الموقع", "rmg", "ار ام جي", "آر إم جي"
+                ],
+                "keywords_en": [
+                    "ramadan", "gabr", "haj ramadan", "mr ramadan", "owner", "founder", "manager",
+                    "who is ramadan", "who is the owner", "director", "rmg", "who is rmg", "who are rmg"
+                ],
+                "response_ar": "نحن فريق RMG (رمضان محمد جبر) للدهانات والديكورات الحديثة. 🎨\nنقوم بتنفيذ كافة أعمال الدهانات والتشطيبات المتكاملة بأعلى جودة.\n\nمن خدماتنا:\n• دهانات حديثة وكلاسيكية\n• ديكورات الجبس بورد\n• معالجة مشاكل الحوائط (رطوبة وشروخ)\n\nننصحك بتصفح الموقع لرؤية مشاريعنا وسابقة أعمالنا المتميزة! 🏗️",
+                "response_en": "We are the RMG (Ramadan Mohamed Gabr) team for modern paints and decor. 🎨\nWe execute all types of paints and integrated finishes with the highest quality.\n\nOur services include:\n• Modern and Classic Paints\n• Gypsum Board Decor\n• Wall Treatments (Humidity & Cracks)\n\nWe advise you to browse the website to see our projects and distinguished previous work! 🏗️"
+            },
+            {
+                "keywords_ar": [
+                    "انت", "انتو", "مين انت", "من انت", "انت مين",
                     "عرفني", "عرف نفسك", "عرفنا", "قولي مين انت", "اعرفك", "تعريف",
                     "بوت", "روبوت", "مساعد", "مساعد ذكي", "ذكاء", "اصطناعي", "شات بوت", "chatbot",
                     "الذكاء الاصطناعي", "ai", "مين بيكلمني", "بتكلم مين", "انت ايه", "وظيفتك ايه"
@@ -362,9 +376,10 @@ class AIService:
                     "problem", "issue", "i have a problem", "there is a problem",
                     "trouble", "error", "bug", "wrong", "help me"
                 ],
-                "response_ar": "قل لي ما هي المشكلة بالتحديد؟ 🤔 هل هي:\n1) تقشّر الدهان؟\n2) تشققات الدهان 🧱\n3) ظهور فقاعات 🫧\n4) تغيّر اللون أو بهتانه 🎨\n5) بقع الرطوبة والعفن 💧\n6) آثار الفرشاة أو الرولة 🖌️\n7) شفافية الدهان\n\nاكتب لي تفاصيل أكتر وهساعدك فوراً!",
-                "response_en": "Tell me, what is the problem exactly? 🤔 Is it:\n1) Peeling paint?\n2) Cracks? 🧱\n3) Bubbles? 🫧\n4) Discoloration? 🎨\n5) Humidity & Mold? 💧\n6) Brush marks? 🖌️\n7) Transparency?\n\nPlease provide more details so I can help you!"
-            }
+                "response_ar": "قل لي ما هي المشكلة بالتحديد؟ 🤔 هل هي:\n1) تقشّر الدهان؟\n2) تشققات الدهان 🧱\n3) ظهور فقاعات 🫧\n4) تغيّر اللون أو بهتانه 🎨\n5) بقع الرطوبة والعفن 💧\n6) آثار الفرشاة أو الرولة 🖌️\n7) شفافية الدهان\n\nاكتب لي رقم المشكلة (1-7) أو وصف بسيط، وهساعدك فوراً!",
+                "response_en": "Tell me, what is the problem exactly? 🤔 Is it:\n1) Peeling paint?\n2) Cracks? 🧱\n3) Bubbles? 🫧\n4) Discoloration? 🎨\n5) Humidity & Mold? 💧\n6) Brush marks? 🖌️\n7) Transparency?\n\nType the problem number (1-7) or a simple description, and I'll help you immediately!"
+            },
+
         ]
 
     def normalize_text(self, text: str) -> str:
@@ -549,13 +564,22 @@ class AIService:
             self.unanswered_model.create(message, user_id)
             response_text = "عذراً، هذا السؤال جديد عليّ ولم أتمكن من فهمه جيداً. 🤖\nيرجى ترك رقم هاتفك هنا للتواصل معك من قبل مدير الموقع والإجابة على استفسارك بدقة."
         
-        # Log Chat
-        self.chat_model.create({
-            'user_id': user_id,
-            'user_name': user_name,
-            'message': message,
-            'response': response_text,
-            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        })
+        # Log Chat (Only if Memory is Enabled)
+        should_save = True
+        if user_id and user_id != 'anonymous':
+            user_data = self.user_model.get_by_username(user_id)
+            if user_data:
+                # Default to 1 (True) if key doesn't exist
+                if user_data.get('chat_memory_enabled', 1) == 0:
+                    should_save = False
+        
+        if should_save:
+            self.chat_model.create({
+                'user_id': user_id,
+                'user_name': user_name,
+                'message': message,
+                'response': response_text,
+                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
         
         return response_text

@@ -52,9 +52,21 @@ class Database:
                 user_name TEXT,
                 message TEXT,
                 response TEXT,
-                timestamp TEXT
+                timestamp TEXT,
+                is_deleted_by_user INTEGER DEFAULT 0
             )
         ''')
+        
+        # Check and migrate columns if they don't exist (Migration Shim)
+        try:
+            cursor.execute("SELECT is_deleted_by_user FROM chat_logs LIMIT 1")
+        except sqlite3.OperationalError:
+            cursor.execute("ALTER TABLE chat_logs ADD COLUMN is_deleted_by_user INTEGER DEFAULT 0")
+
+        try:
+            cursor.execute("SELECT chat_memory_enabled FROM users LIMIT 1")
+        except sqlite3.OperationalError:
+            cursor.execute("ALTER TABLE users ADD COLUMN chat_memory_enabled BOOLEAN DEFAULT 1")
         
         # 3. Contacts Table
         cursor.execute('''
@@ -137,7 +149,7 @@ class Database:
                 created_at TEXT
             )
         ''')
-
+        
         # 10. Complaints Table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS complaints (
@@ -330,13 +342,15 @@ class ChatModel(SQLiteModel):
     
     def get_all(self):
         conn = self.db_mgr.get_connection()
+        # Admin gets everything, maybe indicate usage later
         rows = conn.execute(f"SELECT * FROM {self.table} ORDER BY timestamp DESC").fetchall()
         conn.close()
         return [self._dict_from_row(r) for r in rows]
     
     def get_by_user(self, user_id):
         conn = self.db_mgr.get_connection()
-        rows = conn.execute(f"SELECT * FROM {self.table} WHERE user_id = ? ORDER BY timestamp DESC", (user_id,)).fetchall()
+        # Only show not-deleted-by-user
+        rows = conn.execute(f"SELECT * FROM {self.table} WHERE user_id = ? AND is_deleted_by_user = 0 ORDER BY timestamp DESC", (user_id,)).fetchall()
         conn.close()
         return [self._dict_from_row(r) for r in rows]
     
@@ -351,6 +365,20 @@ class ChatModel(SQLiteModel):
         
         conn = self.db_mgr.get_connection()
         conn.execute(sql, list(filtered_data.values()))
+        conn.commit()
+        conn.close()
+    
+    def soft_delete_all(self, user_id):
+        """Hides chats from user but keeps them for admin"""
+        conn = self.db_mgr.get_connection()
+        conn.execute(f"UPDATE {self.table} SET is_deleted_by_user = 1 WHERE user_id = ?", (user_id,))
+        conn.commit()
+        conn.close()
+
+    def hard_delete_all(self, user_id):
+        """Permanently deletes chats (for privacy mode)"""
+        conn = self.db_mgr.get_connection()
+        conn.execute(f"DELETE FROM {self.table} WHERE user_id = ?", (user_id,))
         conn.commit()
         conn.close()
 
@@ -504,6 +532,22 @@ class UnansweredQuestionsModel(SQLiteModel):
         rows = conn.execute(f"SELECT * FROM {self.table} WHERE user_id = ?", (user_id,)).fetchall()
         conn.close()
         return [self._dict_from_row(r) for r in rows]
+
+    def get_by_question(self, question):
+        """Get unanswered question by text"""
+        conn = self.db_mgr.get_connection()
+        try:
+            row = conn.execute(f"SELECT * FROM {self.table} WHERE question = ?", (question.lower().strip(),)).fetchone()
+            return self._dict_from_row(row)
+        finally:
+            conn.close()
+
+    def delete_all(self):
+        """Delete all unanswered questions"""
+        conn = self.db_mgr.get_connection()
+        conn.execute(f"DELETE FROM {self.table}")
+        conn.commit()
+        conn.close()
 
 class ComplaintModel(SQLiteModel):
     def __init__(self):

@@ -124,8 +124,11 @@
                             <div class="modern-progress-wrapper mb-5">
                                 <div class="progress"
                                     style="height: 12px; background: rgba(255,255,255,0.05); border-radius: 10px;">
-                                    <div class="progress-bar progress-bar-animated bg-gold-gradient"
-                                        style="width: {{ user.project_percentage|default(0)|int }}%;"></div>
+                                    <div class="progress-bar progress-bar-animated bg-gold-gradient" role="progressbar"
+                                        style="width: {{ user.project_percentage|default(0)|int }}%;"
+                                        aria-valuenow="{{ user.project_percentage|default(0)|int }}" aria-valuemin="0"
+                                        aria-valuemax="100">
+                                    </div>
                                 </div>
                             </div>
 
@@ -353,6 +356,42 @@
                             {% endif %}
 
                             <div class="chat-archive">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="text-white mb-0">سجل المحادثات السابقة</h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                            id="chatOptions" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-cog"></i> خيارات
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark p-3 shadow-premium"
+                                            aria-labelledby="chatOptions" style="min-width: 280px;">
+                                            <li>
+                                                <div class="form-check form-switch px-0">
+                                                    <input class="form-check-input float-end ms-2" type="checkbox"
+                                                        id="memoryToggle" onchange="toggleMemory(this)" {% if
+                                                        user.chat_memory_enabled !=0 %}checked{% endif %}>
+                                                    <label class="form-check-label text-white small" for="memoryToggle"
+                                                        style="margin-right: 45px;">ذاكرة المحادثة (تلقائي)</label>
+                                                </div>
+                                                <div class="text-muted small mt-2 pe-1"
+                                                    style="font-size: 0.7rem; line-height: 1.4;">
+                                                    <i class="fas fa-info-circle me-1"></i> عند التعطيل، يتم حذف
+                                                    المحادثات نهائياً (من عندك ومن الإدارة) ولن يتم حفظ المحادثات
+                                                    الجديدة.
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider border-secondary opacity-25">
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-warning rounded small" href="#"
+                                                    onclick="clearChatHistory()">
+                                                    <i class="fas fa-trash me-2"></i> مسح السجل (من عندي فقط)
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                                 {% if chats %}
                                 {% for chat in chats[:10] %}
                                 <div class="chat-thread mb-3">
@@ -919,6 +958,63 @@
             if (window.innerWidth < 992) {
                 document.querySelector('.glass-tabs-container').scrollIntoView({ behavior: 'smooth' });
             }
+        }
+    }
+
+    async function clearChatHistory() {
+        if (!confirm("هل أنت متأكد من مسح سجل المحادثة؟\n(ملاحظة: سيظل السجل محفوظاً لدى الإدارة للأغراض التنظيمية)")) return;
+
+        try {
+            const response = await fetch("{{ url_for('user.clear_chat') }}", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': "{{ csrf_token() }}"
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert("حدث خطأ: " + (data.message || data.error));
+            }
+        } catch (e) {
+            console.error(e);
+            alert("حدث خطأ في الاتصال");
+        }
+    }
+
+    async function toggleMemory(checkbox) {
+        const enabled = checkbox.checked;
+        const msg = enabled ? "هل تريد تفعيل ذاكرة المحادثة؟ سيتم حفظ المحادثات الجديدة." : "تحذير هام!\nتعطيل الذاكرة سيؤدي لـ:\n1. حذف جميع المحادثات السابقة نهائياً (من عندك ومن الإدارة).\n2. عدم حفظ أي محادثات مستقبلية.\n\nهل أنت متأكد؟";
+
+        if (!confirm(msg)) {
+            checkbox.checked = !enabled; // Revert
+            return;
+        }
+
+        try {
+            const response = await fetch("{{ url_for('user.toggle_memory') }}", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ enabled: enabled })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert("حدث خطأ: " + (data.message || data.error));
+                checkbox.checked = !enabled;
+            }
+        } catch (e) {
+            console.error(e);
+            alert("حدث خطأ في الاتصال");
+            checkbox.checked = !enabled;
         }
     }
 </script>

@@ -1063,16 +1063,17 @@ footer {
     border-radius: 15px;
     line-height: 1.4;
     font-size: 0.95rem;
+    white-space: pre-wrap;
 }
 
-.bot-message {
+.message.bot {
     background: var(--surface-light);
     color: var(--text);
     align-self: flex-start;
     border-top-right-radius: 2px;
 }
 
-.user-message {
+.message.user {
     background: var(--primary);
     color: black;
     align-self: flex-end;
