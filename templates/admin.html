@@ -22,7 +22,7 @@
         <!-- Quick Stats -->
         <div class="row mb-5 g-4" data-aos="fade-up">
             <div class="col-lg-3 col-md-6">
-                <div class="stat-card glass h-100">
+                <a href="{{ url_for('admin.admin_users') }}" class="stat-card glass h-100 text-decoration-none">
                     <div class="stat-icon bg-primary-gradient">
                         <i class="fas fa-users"></i>
                     </div>
@@ -30,18 +30,29 @@
                         <h3>{{ analytics.total_users }}</h3>
                         <p>إجمالي المستخدمين</p>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="stat-card glass h-100">
+                <a href="{{ url_for('admin.admin_messages') }}" class="stat-card glass h-100 text-decoration-none">
                     <div class="stat-icon bg-warning-gradient">
-                        <i class="fas fa-clipboard-list"></i>
+                        <i class="fas fa-envelope"></i>
                     </div>
                     <div class="stat-info">
                         <h3>{{ analytics.total_requests }}</h3>
+                        <p>رسائل التواصل</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <a href="{{ url_for('admin.admin_inspections') }}" class="stat-card glass h-100 text-decoration-none">
+                    <div class="stat-icon bg-purple-gradient">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ analytics.total_inspections }}</h3>
                         <p>طلبات المعاينة</p>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-lg-3 col-md-6">
                 <a href="{{ url_for('admin.admin_transfers') }}" class="stat-card glass h-100 text-decoration-none">
@@ -55,7 +66,8 @@
                 </a>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="stat-card glass h-100">
+                <a href="{{ url_for('admin.admin_unanswered_questions') }}"
+                    class="stat-card glass h-100 text-decoration-none">
                     <div class="stat-icon bg-danger-gradient">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
@@ -63,7 +75,7 @@
                         <h3>{{ unanswered|length }}</h3>
                         <p>أسئلة بانتظار الرد</p>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
@@ -94,7 +106,7 @@
 
             <!-- Messages Card -->
             <div class="col-lg-4 col-md-6">
-                <a href="#messagesSection" class="nav-card glass">
+                <a href="{{ url_for('admin.admin_messages') }}" class="nav-card glass">
                     <div class="nav-card-icon bg-green-gradient">
                         <i class="fas fa-envelope"></i>
                     </div>
@@ -145,145 +157,6 @@
             </div>
         </div>
 
-        <div class="divider my-5"></div>
-
-        <!-- Messages Section -->
-        <div id="messagesSection" class="mb-5" data-aos="fade-up">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="text-gold"><i class="fas fa-envelope me-2"></i> رسائل التواصل</h3>
-            </div>
-
-            {% if messages %}
-            <div class="table-responsive">
-                <table class="table modern-table">
-                    <thead>
-                        <tr>
-                            <th>الاسم</th>
-                            <th>الهاتف</th>
-                            <th>الخدمة</th>
-                            <th>الرسالة</th>
-                            <th>التاريخ</th>
-                            <th>إجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for msg in messages[:10] %}
-                        <tr>
-                            <td>{{ msg.name }}</td>
-                            <td dir="ltr">{{ msg.phone }}</td>
-                            <td>{{ msg.service or 'عام' }}</td>
-                            <td class="text-truncate" style="max-width: 200px;">{{ msg.message }}</td>
-                            <td class="small">{{ msg.created_at[:10] }}</td>
-                            <td>
-                                <form method="POST" action="{{ url_for('admin.delete_message') }}"
-                                    style="display: inline;">
-                                    <input type="hidden" name="doc_id" value="{{ msg.doc_id }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
-                <p>لا توجد رسائل</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Unanswered Questions Section -->
-        {% if unanswered %}
-        <div class="mb-5" data-aos="fade-up">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="text-gold"><i class="fas fa-question-circle me-2"></i> أسئلة بانتظار الرد</h3>
-                <span class="badge bg-danger">{{ unanswered|length }}</span>
-            </div>
-
-            {% for q in unanswered[:5] %}
-            <div class="question-card glass mb-3">
-                <div class="question-header">
-                    <strong>{{ q.user_id }}</strong>
-                    <span class="small text-muted">{{ q.timestamp }}</span>
-                </div>
-                <div class="question-body">
-                    <p class="mb-2"><strong>السؤال:</strong> {{ q.question }}</p>
-
-                    <!-- Show context -->
-                    {% set context = get_context(q.user_id, q.timestamp) %}
-                    {% if context %}
-                    <details class="mb-3">
-                        <summary class="text-info small" style="cursor: pointer;">
-                            <i class="fas fa-history me-1"></i> عرض السياق ({{ context|length }} رسالة)
-                        </summary>
-                        <div class="context-box mt-2">
-                            {% for c in context %}
-                            <div class="context-item">
-                                <small class="text-muted">{{ c.timestamp }}</small>
-                                <div class="user-msg">{{ c.message }}</div>
-                                <div class="bot-msg">{{ c.response }}</div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </details>
-                    {% endif %}
-
-                    <form method="POST" action="{{ url_for('admin.answer_question') }}">
-                        <input type="hidden" name="question" value="{{ q.question }}">
-                        <div class="mb-2">
-                            <textarea name="answer" class="form-control" rows="2" placeholder="اكتب الإجابة هنا..."
-                                required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-sm btn-gold">
-                            <i class="fas fa-check me-1"></i> حفظ الإجابة
-                        </button>
-                    </form>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        <!-- Payments Section -->
-        <div class="mb-5" data-aos="fade-up">
-            <h3 class="text-gold mb-4"><i class="fas fa-money-bill-wave me-2"></i> عمليات الدفع الأخيرة</h3>
-
-            {% if payments %}
-            <div class="table-responsive">
-                <table class="table modern-table">
-                    <thead>
-                        <tr>
-                            <th>المستخدم</th>
-                            <th>المبلغ</th>
-                            <th>الوسيلة</th>
-                            <th>التاريخ</th>
-                            <th>الحالة</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in payments[:10] %}
-                        <tr>
-                            <td>{{ p.username }}</td>
-                            <td class="text-gold fw-bold">{{ p.amount }} ج.م</td>
-                            <td>{{ p.method }}</td>
-                            <td class="small">{{ p.timestamp[:10] }}</td>
-                            <td><span class="badge bg-success">{{ p.status or 'قيد المراجعة' }}</span></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-wallet fa-3x mb-3 opacity-25"></i>
-                <p>لا توجد عمليات دفع</p>
-            </div>
-            {% endif %}
-        </div>
 
     </div>
 </section>
@@ -373,7 +246,8 @@
 
     .stat-info p {
         margin: 0;
-        color: #888;
+        color: #ccc;
+        /* Lighter Gray for better visibility */
         font-size: 0.9rem;
     }
 
@@ -414,7 +288,8 @@
     }
 
     .nav-card p {
-        color: #888;
+        color: #ccc;
+        /* Lighter Gray */
         margin-bottom: 15px;
         font-size: 0.9rem;
     }
@@ -429,28 +304,45 @@
         border: 1px solid rgba(212, 175, 55, 0.2);
     }
 
+    .nav-card-badge {
+        display: inline-block;
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--gold);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
     /* Tables */
     .modern-table {
-        background: rgba(255, 255, 255, 0.02);
+        background: #2d2d2d;
+        /* Dark Gray Background as requested */
         border-radius: 15px;
         overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
     .modern-table thead {
-        background: rgba(212, 175, 55, 0.1);
+        background: rgba(0, 0, 0, 0.2);
     }
 
     .modern-table th {
-        color: var(--gold);
-        font-weight: 600;
-        padding: 15px;
+        color: #D4AF37;
+        /* Gold color for headers */
+        font-weight: 700;
+        padding: 18px 15px;
         border: none;
+        white-space: nowrap;
     }
 
     .modern-table td {
-        color: #ddd;
+        color: #ffffff;
+        /* Clear White text */
         padding: 15px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        vertical-align: middle;
+        font-size: 0.95rem;
     }
 
     .modern-table tbody tr:hover {

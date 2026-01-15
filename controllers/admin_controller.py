@@ -101,11 +101,21 @@ def admin_dashboard():
     confirmed_payments = [p for p in payments_list if str(p.get('status', '')).lower() == 'confirmed']
     total_revenue = sum(float(p.get('amount', 0)) for p in confirmed_payments)
     
+    # Inspection Analytics
+    inspections_list = inspection_model.get_all()
+
     analytics_summary = {
         'total_users': total_users_count,
-        'total_requests': total_requests_count,
+        'total_requests': total_requests_count, # Messages
+        'total_inspections': len(inspections_list), # Actual Inspections
         'conversion_rate': conversion_rate,
-        'total_revenue': total_revenue
+        'total_revenue': total_revenue,
+        'active_users': len([u for u in users if u.get('project_percentage', 0) > 0]),
+        'completed_projects': len([u for u in users if u.get('project_percentage', 0) == 100]),
+        'ongoing_projects': len([u for u in users if 0 < u.get('project_percentage', 0) < 100]),
+        'not_started': len([u for u in users if u.get('project_percentage', 0) == 0]),
+        'total_payments': len(payments_list),
+        'pending_questions': len(unanswered)
     }
 
     return render_template('admin.html', users=users, messages=messages, 
@@ -476,6 +486,40 @@ def view_chats():
     if current_user.role != 'admin': return "Access Denied", 403
     chats = chat_model.get_all()
     return render_template('admin_chats.html', chats=chats)
+
+@admin_bp.route('/admin/unanswered')
+@login_required
+def admin_unanswered_questions():
+    """View all unanswered questions"""
+    if current_user.role != 'admin': return "Access Denied", 403
+    unanswered = unanswered_model.get_all()
+    unanswered.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+    
+    # Context logic reusing existing code structure if needed or simplified in template
+    # For now, passing just the list. The context fetching can be added if needed or done dynamically.
+    # To keep it powerful, let's fetch chats to allow context lookup if we want.
+    chats = chat_model.get_all()
+    chats_by_user = {}
+    for c in chats:
+        uid = c.get('user_id', 'unknown')
+        if uid not in chats_by_user: chats_by_user[uid] = []
+        chats_by_user[uid].append(c)
+    
+    def get_context(uid, q_time_str):
+        full_history = chats_by_user.get(uid, [])
+        if not full_history: return []
+        return full_history[-5:] # Simple context
+
+    return render_template('admin_unanswered.html', unanswered=unanswered, get_context=get_context)
+
+@admin_bp.route('/admin/messages')
+@login_required
+def admin_messages():
+    """View all contact messages"""
+    if current_user.role != 'admin': return "Access Denied", 403
+    messages = contact_model.get_all()
+    messages.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+    return render_template('admin_messages.html', messages=messages)
 
 @admin_bp.route('/admin/backup')
 @login_required

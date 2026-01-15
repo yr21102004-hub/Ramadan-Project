@@ -638,28 +638,34 @@
 
     /* Tables */
     .modern-table {
-        background: rgba(255, 255, 255, 0.02);
+        background: #2d2d2d;
+        /* Dark Gray Background */
         border-radius: 15px;
         overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
     .modern-table thead {
-        background: rgba(212, 175, 55, 0.1);
+        background: rgba(0, 0, 0, 0.2);
     }
 
     .modern-table th {
-        color: var(--gold);
-        font-weight: 600;
-        padding: 15px;
+        color: #D4AF37;
+        /* Gold color for headers */
+        font-weight: 700;
+        padding: 18px 15px;
         border: none;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+        white-space: nowrap;
     }
 
     .modern-table td {
-        color: #ddd;
+        color: #ffffff;
+        /* Clear White text */
         padding: 15px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
         vertical-align: middle;
+        font-size: 0.95rem;
     }
 
     .modern-table tbody tr:hover {

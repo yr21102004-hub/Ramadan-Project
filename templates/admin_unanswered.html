@@ -1,0 +1,186 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="section-padding admin-section-bg">
+    <div class="container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-down">
+            <div>
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-light btn-sm mb-3">
+                    <i class="fas fa-arrow-right me-2"></i> العودة للوحة التحكم
+                </a>
+                <h2 class="section-title mb-0">أسئلة بانتظار الرد</h2>
+                <p class="text-muted mt-2">قائمة بجميع الأسئلة التي لم يتمكن الذكاء الاصطناعي من الإجابة عليها</p>
+            </div>
+            <div>
+                <span class="badge bg-danger fs-6">{{ unanswered|length }} أسئلة معلقة</span>
+            </div>
+        </div>
+
+        {% if unanswered %}
+        <div class="row g-4">
+            {% for q in unanswered %}
+            <div class="col-lg-6" data-aos="fade-up">
+                <div class="question-card glass h-100 d-flex flex-column">
+                    <div class="question-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="text-gold"><i class="fas fa-user me-2"></i> {{ q.user_id }}</strong>
+                        </div>
+                        <span class="small text-muted">{{ q.timestamp }}</span>
+                    </div>
+
+                    <div class="question-body flex-grow-1">
+                        <div class="p-3 rounded mb-3"
+                            style="background: rgba(0,0,0,0.3); border-right: 3px solid #dc3545;">
+                            <strong class="text-danger d-block mb-2">السؤال:</strong>
+                            <p class="mb-0 text-white">{{ q.question }}</p>
+                        </div>
+
+                        <!-- Context -->
+                        {% set context = get_context(q.user_id, q.timestamp) %}
+                        {% if context %}
+                        <div class="accordion mb-3" id="accordion-{{ loop.index }}">
+                            <div class="accordion-item bg-transparent border-0">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed bg-transparent text-info shadow-none p-0"
+                                        type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-{{ loop.index }}">
+                                        <small><i class="fas fa-history me-1"></i> عرض سياق المحادثة الأخيرة</small>
+                                    </button>
+                                </h2>
+                                <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse"
+                                    data-bs-parent="#accordion-{{ loop.index }}">
+                                    <div class="accordion-body p-2 mt-2"
+                                        style="background: rgba(255,255,255,0.05); border-radius: 8px;">
+                                        {% for c in context %}
+                                        <div class="mb-2 pb-2 border-bottom border-secondary">
+                                            <div class="d-flex justify-content-between small text-muted mb-1">
+                                                <span>{{ c.timestamp }}</span>
+                                            </div>
+                                            <div class="mb-1">
+                                                <span class="text-info small">المستخدم:</span>
+                                                <span class="text-white small">{{ c.message }}</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-success small">AI:</span>
+                                                <span class="text-white small">{{ c.response }}</span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <form method="POST" action="{{ url_for('admin.answer_question') }}" class="mt-auto">
+                            <input type="hidden" name="question" value="{{ q.question }}">
+                            <div class="mb-2">
+                                <label class="form-label text-gold small">الرد المقترح (سيتم حفظه لتدريب الـ
+                                    AI):</label>
+                                <textarea name="answer" class="form-control glass-input" rows="3"
+                                    placeholder="اكتب الإجابة هنا..." required></textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-gold flex-grow-1">
+                                    <i class="fas fa-check me-1"></i> حفظ وإرسال
+                                </button>
+                                <button type="submit" form="delete-form-{{ loop.index }}"
+                                    class="btn btn-sm btn-outline-danger" title="حذف السؤال">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </form>
+                        <form id="delete-form-{{ loop.index }}" method="POST"
+                            action="{{ url_for('admin.delete_answered_question') }}" style="display: none;">
+                            <input type="hidden" name="question" value="{{ q.question }}">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state glass rounded p-5">
+            <i class="fas fa-check-circle fa-4x mb-3 text-success"></i>
+            <h3 class="text-white">رائع!</h3>
+            <p class="text-muted">لا توجد أسئلة معلقة، لقد قمت بالرد على الجميع.</p>
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-light mt-3">العودة للرئيسية</a>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+<style>
+    .admin-section-bg {
+        background: #0a0a0a;
+        min-height: 100vh;
+        padding-top: 100px;
+        direction: rtl;
+    }
+
+    .glass {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .question-card {
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: 0.3s;
+        background: #2d2d2d;
+    }
+
+    .question-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border-color: rgba(212, 175, 55, 0.3);
+    }
+
+    .question-header {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+
+    .glass-input:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--gold);
+        color: #fff;
+        box-shadow: none;
+    }
+
+    .btn-gold {
+        background: var(--gold);
+        color: #000;
+        font-weight: 700;
+        border: none;
+    }
+
+    .btn-gold:hover {
+        background: #FFD700;
+        color: #000;
+    }
+
+    /* Accordion Customization */
+    .accordion-button::after {
+        filter: invert(1);
+        transform: scale(0.7);
+    }
+
+    .accordion-button:not(.collapsed) {
+        color: var(--gold);
+        background: transparent;
+        box-shadow: none;
+    }
+</style>
+{% endblock %}

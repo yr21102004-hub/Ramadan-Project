@@ -76,7 +76,7 @@
 
             {% if requests %}
             <div class="table-responsive">
-                <table class="table text-white align-middle">
+                <table class="table modern-table">
                     <thead>
                         <tr>
                             <th>الحالة</th>
@@ -396,6 +396,39 @@
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: #fff;
+    }
+
+    /* Modern Table Styles (Unified) */
+    .modern-table {
+        background: #2d2d2d;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .modern-table thead {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .modern-table th {
+        color: #D4AF37;
+        font-weight: 700;
+        padding: 18px 15px;
+        border: none;
+        white-space: nowrap;
+        font-size: 0.95rem;
+    }
+
+    .modern-table td {
+        color: #ffffff;
+        padding: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        vertical-align: middle;
+        font-size: 0.95rem;
+    }
+
+    .modern-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.05);
     }
 </style>
 
