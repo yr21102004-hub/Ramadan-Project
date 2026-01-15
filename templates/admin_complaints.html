@@ -83,7 +83,9 @@
                                     <span class="text-gold">{{ complaint.worker_id }}</span>
                                 </h5>
                                 <p class="text-muted small mb-0">
-                                    من: {{ complaint.user_id }} |
+                                    من: <a href="{{ url_for('user.profile', username=complaint.user_id) }}"
+                                        target="_blank" class="text-gold text-decoration-none">{{ complaint.user_id }}
+                                        <i class="fas fa-external-link-alt small ms-1"></i></a> |
                                     {{ complaint.created_at }}
                                 </p>
                             </div>
@@ -175,9 +177,15 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">ملاحظات الأدمن</label>
+                                        <label class="form-label">ملاحظات داخلية (للأدمن فقط)</label>
                                         <textarea name="admin_notes" class="form-control"
-                                            rows="3">{{ complaint.admin_notes }}</textarea>
+                                            rows="2">{{ complaint.admin_notes }}</textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label text-gold">رد الإدارة على العميل</label>
+                                        <textarea name="admin_response" class="form-control" rows="4"
+                                            placeholder="اكتب الرد الرسمي هنا سيظهر للعميل في لوحة التحكم...">{{ complaint.admin_response or '' }}</textarea>
                                     </div>
                                 </div>
                                 <div class="modal-footer">

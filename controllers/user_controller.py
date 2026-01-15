@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import current_user
+from flask_login import current_user, login_required
 from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import os
-from models import UserModel, ContactModel, PaymentModel, ChatModel, UnansweredQuestionsModel, SubscriptionModel
+from models import UserModel, ContactModel, PaymentModel, ChatModel, UnansweredQuestionsModel, SubscriptionModel, ComplaintModel
 from websockets import notify_admins, broadcast_percentage_update
 
 user_bp = Blueprint('user', __name__)
@@ -15,6 +15,7 @@ payment_model = PaymentModel()
 chat_model = ChatModel()
 unanswered_model = UnansweredQuestionsModel()
 subscription_model = SubscriptionModel()
+complaint_model = ComplaintModel()
 
 @user_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -156,6 +157,10 @@ def profile(username):
     
     # Fetch user's subscriptions
     user_subscriptions = subscription_model.get_by_user(username)
+
+    # Fetch user's complaints
+    user_complaints = complaint_model.get_by_user(username)
+    user_complaints.sort(key=lambda x: x.get('created_at', ''), reverse=True)
     
     return render_template('user_dashboard.html', 
                            user=user_obj, 
@@ -163,7 +168,8 @@ def profile(username):
                            payments=user_payments,
                            chats=user_chats,
                            unanswered=user_unanswered,
-                           subscriptions=user_subscriptions)
+                           subscriptions=user_subscriptions,
+                           complaints=user_complaints)
 
 
 @user_bp.route('/admin/update_project_percentage', methods=['POST'])
@@ -200,3 +206,27 @@ def delete(username):
     user_model.delete(username)
     flash(f"تم حذف المستخدم {username} بنجاح.")
     return redirect(url_for('admin.admin_dashboard'))
+
+@user_bp.route('/user/submit_complaint', methods=['POST'])
+@login_required
+def submit_complaint():
+    """Submit a new complaint"""
+    subject = request.form.get('subject')
+    message = request.form.get('message')
+    phone = request.form.get('phone')
+    email = request.form.get('email')
+    
+    if not subject or not message:
+        flash('يرجى ملء موضوع وتفاصيل الشكوى.')
+        return redirect(url_for('user.profile', username=current_user.username))
+        
+    complaint_model.create(
+        username=current_user.username,
+        subject=subject,
+        message=message,
+        phone=phone,
+        email=email
+    )
+    
+    flash('تم تسجيل شكواك بنجاح. سيتم مراجعتها من قبل الإدارة والرد عليك هنا.', 'success')
+    return redirect(url_for('user.profile', username=current_user.username))

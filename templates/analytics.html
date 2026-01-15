@@ -243,6 +243,10 @@
             return result;
         }
 
+        // Global Defaults for Dark Mode
+        Chart.defaults.color = '#e0e0e0';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+
         // Chart Options
         const commonOptions = {
             responsive: true,
@@ -267,6 +271,7 @@
                                     return {
                                         text: `${label} (${percentage})`,
                                         fillStyle: data.datasets[0].backgroundColor[i],
+                                        fontColor: '#e0e0e0', // Force Light Color
                                         hidden: isNaN(data.datasets[0].data[i]) || chart.getDatasetMeta(0).data[i].hidden,
                                         index: i
                                     };

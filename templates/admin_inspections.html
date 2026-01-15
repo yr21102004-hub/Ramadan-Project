@@ -400,18 +400,23 @@
 
     /* Modern Table Styles (Unified) */
     .modern-table {
-        background: #2d2d2d;
+        background: #2d2d2d !important;
+        color: #ffffff !important;
         border-radius: 15px;
         overflow: hidden;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
     .modern-table thead {
-        background: rgba(0, 0, 0, 0.2);
+        background: rgba(0, 0, 0, 0.2) !important;
     }
 
     .modern-table th {
-        color: #D4AF37;
+        color: #D4AF37 !important;
+        background: transparent !important;
         font-weight: 700;
         padding: 18px 15px;
         border: none;
@@ -420,7 +425,8 @@
     }
 
     .modern-table td {
-        color: #ffffff;
+        color: #e0e0e0 !important;
+        background: transparent !important;
         padding: 15px;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         vertical-align: middle;
@@ -428,7 +434,7 @@
     }
 
     .modern-table tbody tr:hover {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.05) !important;
     }
 </style>
 

@@ -578,6 +578,40 @@ def clear_security_logs():
 def security_audit():
     if current_user.role != 'admin': return "Access Denied", 403
     
+    # Auto Backup Check and List Fetching
+    backup_dir = 'backups'
+    if not os.path.exists(backup_dir): os.makedirs(backup_dir)
+    
+    backup_files = []
+    for f in os.listdir(backup_dir):
+        if f.endswith('.sqlite'):
+            path = os.path.join(backup_dir, f)
+            stat = os.stat(path)
+            backup_files.append({
+                'name': f,
+                'size': f"{stat.st_size / (1024*1024):.2f} MB",
+                'date': datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+            })
+    backup_files.sort(key=lambda x: x['date'], reverse=True)
+    
+    # Auto Backup Logic (Every 3 Months i.e., 90 days)
+    if not backup_files or (datetime.now() - datetime.strptime(backup_files[0]['date'], "%Y-%m-%d %H:%M:%S")).days >= 90:
+         try:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+            new_file = f'backups/auto_backup_{timestamp}.sqlite'
+            shutil.copy2('ramadan_company.db', new_file)
+            security_log_model.create("Auto Backup", "System performed scheduled 3-month backup", severity="info")
+            # Refresh list
+            path = new_file
+            stat = os.stat(path)
+            backup_files.insert(0, {
+                'name': os.path.basename(new_file),
+                'size': f"{stat.st_size / (1024*1024):.2f} MB",
+                'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+         except Exception as e:
+            print(f"Auto backup error: {e}")
+
     from flask import current_app
     
     # Perform checks
@@ -604,7 +638,6 @@ def security_audit():
     })
     
     # 3. Security Headers
-    # We added them in app.after_request, so assuming they are active
     checks.append({
         'name': 'رؤوس الأمان (HSTS, CSP, X-Frame)',
         'status': 'نشط',
@@ -614,16 +647,15 @@ def security_audit():
     })
     
     # 4. Database Backups
-    backup_exists = os.path.exists('backups') and len(os.listdir('backups')) > 0
     checks.append({
         'name': 'النسخ الاحتياطي',
-        'status': 'موجود' if backup_exists else 'غير موجود',
-        'desc': f"يوجد {len(os.listdir('backups')) if backup_exists else 0} نسخة احتياطية محفوظة.",
+        'status': 'موجود' if backup_files else 'غير موجود',
+        'desc': f"يوجد {len(backup_files)} نسخة احتياطية محفوظة (تلقائي كل 3 شهور).",
         'icon': 'fa-database',
-        'color': 'success' if backup_exists else 'warning'
+        'color': 'success' if backup_files else 'warning'
     })
     
-    # 5. Admin Passwords (Check for defaults - very simple)
+    # 5. Admin Passwords
     admin_user = user_model.get_by_username('admin')
     weak_pwd = False
     if admin_user and bcrypt.check_password_hash(admin_user['password'], 'admin'):
@@ -632,14 +664,14 @@ def security_audit():
     checks.append({
         'name': 'قوة كلمة مرور المسؤول',
         'status': 'ضعيف' if weak_pwd else 'قوي',
-        'desc': 'كلمة المرور الحالية للمسؤول آمنة وصعبة التخمين.' if not weak_pwd else 'تحذير: كلمة المرور الافتراضية "admin" ما زالت مستخدمة!',
+        'desc': 'كلمة المرور آمنة.' if not weak_pwd else 'تحذير: كلمة المرور الافتراضية مستخدمة!',
         'icon': 'fa-key',
         'color': 'danger' if weak_pwd else 'success'
     })
 
     # 6. Rate Limiting
     checks.append({
-        'name': 'تحديد معدل الطلبات (Rate Limiting)',
+        'name': 'تحديد معدل الطلبات',
         'status': 'مفعل',
         'desc': 'حماية الموقع من هجمات Brute Force و DDoS.',
         'icon': 'fa-tachometer-alt',
@@ -650,7 +682,7 @@ def security_audit():
     logs.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
     recent_logs = logs[:10]
 
-    return render_template('admin_security.html', checks=checks, logs=recent_logs)
+    return render_template('admin_security.html', checks=checks, logs=recent_logs, backups=backup_files)
 
 
 @admin_bp.route('/admin/complaints')
@@ -690,10 +722,11 @@ def update_complaint_status(complaint_id):
     
     status = request.form.get('status')
     admin_notes = request.form.get('admin_notes', '')
+    admin_response = request.form.get('admin_response', '')
     
-    complaint_model.update_status(complaint_id, status, admin_notes)
+    complaint_model.update_status(complaint_id, status, admin_notes, admin_response)
     
-    flash('تم تحديث حالة الشكوى بنجاح', 'success')
+    flash('تم تحديث حالة الشكوى وحفظ الرد بنجاح', 'success')
     return redirect(url_for('admin.admin_complaints'))
 
 
@@ -799,3 +832,22 @@ def confirm_payment(doc_id):
     payment_model.update_status(doc_id, 'Confirmed')
     flash('تم تأكيد التحويل بنجاح', 'success')
     return redirect(url_for('admin.admin_transfers'))
+
+@admin_bp.route('/admin/backup/download/<filename>')
+@login_required
+def download_backup_file(filename):
+    if current_user.role != 'admin':
+        return "Access Denied", 403
+    return send_file(os.path.join('backups', filename), as_attachment=True)
+
+@admin_bp.route('/admin/backup/delete/<filename>', methods=['POST'])
+@login_required
+def delete_backup_file(filename):
+    if current_user.role != 'admin':
+        return "Access Denied", 403
+    try:
+        os.remove(os.path.join('backups', filename))
+        flash('تم حذف النسخة الاحتياطية بنجاح')
+    except Exception as e:
+        flash(f'حدث خطأ أثناء الحذف: {e}')
+    return redirect(url_for('admin.security_audit'))

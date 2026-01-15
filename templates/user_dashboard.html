@@ -92,6 +92,11 @@
                                 <i class="fas fa-brain me-2"></i> أرشيف الذكاء
                             </button>
                         </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-complaints">
+                                <i class="fas fa-exclamation-triangle me-2"></i> الشكاوى
+                            </button>
+                        </li>
                         {% if current_user.role == 'admin' %}
                         <li class="nav-item">
                             <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-unanswered">
@@ -270,6 +275,60 @@
                                 <p class="text-center text-muted">لا يوجد أرشيف للدردشة</p>
                                 {% endif %}
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Complaints Tab -->
+                    <div class="tab-pane fade" id="tab-complaints">
+                        <div class="main-card glass p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="text-gold mb-0"><i class="fas fa-exclamation-triangle me-2"></i> سجل الشكاوى
+                                    والمتابعة</h5>
+                                <button class="btn btn-sm btn-gold" data-bs-toggle="modal"
+                                    data-bs-target="#complaintModal">
+                                    <i class="fas fa-plus me-1"></i> شكوى جديدة
+                                </button>
+                            </div>
+
+                            {% if complaints %}
+                            <div class="complaints-list">
+                                {% for complaint in complaints %}
+                                <div class="glass mb-3 p-3"
+                                    style="border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="text-white mb-0">{{ complaint.subject }}</h6>
+                                        {% set status_class = 'warning' if complaint.status == 'قيد المراجعة' else
+                                        'success' if complaint.status == 'تم الحل' else 'danger' %}
+                                        <span class="badge bg-{{ status_class }}">{{ complaint.status }}</span>
+                                    </div>
+                                    <p class="text-muted small mb-2">{{ complaint.created_at[:10] }}</p>
+
+                                    <div class="p-3 mb-3 rounded" style="background: rgba(255,255,255,0.05);">
+                                        <small class="text-muted d-block mb-1">الشكوى:</small>
+                                        <p class="text-white mb-0">{{ complaint.message }} ({{ complaint.description or
+                                            '' }})</p>
+                                    </div>
+
+                                    {% if complaint.admin_response %}
+                                    <div class="p-3 rounded border border-gold"
+                                        style="background: rgba(212, 175, 55, 0.1);">
+                                        <small class="text-gold d-block mb-1"><i class="fas fa-user-shield me-1"></i> رد
+                                            الإدارة:</small>
+                                        <p class="text-white mb-0">{{ complaint.admin_response }}</p>
+                                    </div>
+                                    {% elif complaint.status == 'قيد المراجعة' %}
+                                    <p class="text-info small mb-0"><i class="fas fa-clock me-1"></i> جاري مراجعة الشكوى
+                                        من قبل الإدارة...</p>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-check-circle fa-3x text-success mb-3 opacity-50"></i>
+                                <p class="text-muted">لا توجد شكاوى مسجلة.</p>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -712,6 +771,56 @@
         }
     }
 </style>
+
+<!-- Complaint Modal -->
+<div class="modal fade" id="complaintModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content glass-modal">
+            <div class="modal-header">
+                <h5 class="modal-title text-gold">تقديم شكوى جديدة</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('user.submit_complaint') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <p class="text-white small mb-3">نحن نأسف لأي إزعاج. يرجى وصف المشكلة بدقة وسنقوم بالرد في أقرب وقت.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">موضوع الشكوى</label>
+                        <input type="text" name="subject" class="form-control" required
+                            placeholder="مثال: تأخير في التسليم">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">تفاصيل الشكوى</label>
+                        <textarea name="message" class="form-control" rows="4" required
+                            placeholder="اشرح المشكلة بالتفصيل..."></textarea>
+                    </div>
+
+                    <hr class="border-gold opacity-25">
+                    <p class="text-gold small mb-2"><i class="fas fa-phone-alt me-1"></i> بيانات تواصل إضافية (اختياري)
+                    </p>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">رقم الهاتف</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="للتواصل السريع">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">البريد الإلكتروني</label>
+                            <input type="email" name="email" class="form-control" placeholder="للمراسلة">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-gold">إرسال الشكوى</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
     function switchTab(tabId) {

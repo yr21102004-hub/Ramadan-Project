@@ -63,7 +63,7 @@
                 </form>
             </div>
             <div class="table-responsive">
-                <table class="table table-dark table-hover mb-0">
+                <table class="table modern-table mb-0">
                     <thead>
                         <tr>
                             <th>التوقيت</th>
@@ -94,6 +94,60 @@
             </div>
         </div>
 
+        <!-- Backups List -->
+        <div class="admin-card rounded-4 overflow-hidden mt-4" data-aos="fade-up">
+            <div
+                class="card-header bg-dark-soft p-4 border-bottom border-gold-soft d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-save me-2 text-gold"></i> النسخ الاحتياطي (Backups)</h5>
+                    <small class="text-muted d-block mt-1">يتم النسخ تلقائياً كل 3 أشهر، ويمكنك إنشاء نسخة يدوية
+                        الآن.</small>
+                </div>
+                <form action="{{ url_for('admin.manual_backup') }}" method="POST">
+                    <button type="submit" class="btn btn-gold btn-sm"><i class="fas fa-plus me-1"></i> نسخة يدوية
+                        جديدة</button>
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table modern-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>اسم الملف</th>
+                            <th>تاريخ الإنشاء</th>
+                            <th>الحجم</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if backups %}
+                        {% for backup in backups %}
+                        <tr class="border-gold-soft">
+                            <td style="direction: ltr; text-align: right;"><i
+                                    class="fas fa-database text-info me-2"></i>{{ backup.name }}</td>
+                            <td>{{ backup.date }}</td>
+                            <td style="direction: ltr;">{{ backup.size }}</td>
+                            <td>
+                                <a href="{{ url_for('admin.download_backup_file', filename=backup.name) }}"
+                                    class="btn btn-sm btn-outline-info" title="تحميل"><i
+                                        class="fas fa-download"></i></a>
+                                <form action="{{ url_for('admin.delete_backup_file', filename=backup.name) }}"
+                                    method="POST" class="d-inline"
+                                    onsubmit="return confirm('هل أنت متأكد من حذف هذه النسخة؟')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف"><i
+                                            class="fas fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted p-4">لا توجد نسخ احتياطية محفوظة.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -146,6 +200,45 @@
 
     .text-primary {
         color: #0d6efd !important;
+    }
+
+    /* Modern Table Styles (Unified) */
+    .modern-table {
+        background: #2d2d2d !important;
+        color: #ffffff !important;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .modern-table thead {
+        background: rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .modern-table th {
+        color: #D4AF37 !important;
+        background: transparent !important;
+        font-weight: 700;
+        padding: 18px 15px;
+        border: none;
+        white-space: nowrap;
+        font-size: 0.95rem;
+    }
+
+    .modern-table td {
+        color: #e0e0e0 !important;
+        background: transparent !important;
+        padding: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        vertical-align: middle;
+        font-size: 0.95rem;
+    }
+
+    .modern-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03) !important;
     }
 </style>
 {% endblock %}

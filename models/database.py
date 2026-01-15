@@ -205,7 +205,7 @@ class Database:
     def ratings(self): return GenericSQLiteModel('ratings')
     
     @property
-    def complaints(self): return GenericSQLiteModel('complaints')
+    def complaints(self): return ComplaintModel()
     
     @property
     def inspection_requests(self): return GenericSQLiteModel('inspection_requests')
@@ -504,6 +504,41 @@ class UnansweredQuestionsModel(SQLiteModel):
         rows = conn.execute(f"SELECT * FROM {self.table} WHERE user_id = ?", (user_id,)).fetchall()
         conn.close()
         return [self._dict_from_row(r) for r in rows]
+
+class ComplaintModel(SQLiteModel):
+    def __init__(self):
+        super().__init__('complaints')
+    
+    def get_all(self):
+        conn = self.db_mgr.get_connection()
+        rows = conn.execute(f"SELECT * FROM {self.table} ORDER BY created_at DESC").fetchall()
+        conn.close()
+        return [self._dict_from_row(r) for r in rows]
+
+    def get_by_user(self, username):
+        conn = self.db_mgr.get_connection()
+        rows = conn.execute(f"SELECT * FROM {self.table} WHERE username = ? ORDER BY created_at DESC", (username,)).fetchall()
+        conn.close()
+        return [self._dict_from_row(r) for r in rows]
+        
+    def create(self, username, subject, message, phone=None, email=None):
+        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn = self.db_mgr.get_connection()
+        conn.execute(f"INSERT INTO {self.table} (username, subject, message, contact_phone, contact_email, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                     (username, subject, message, phone, email, created_at))
+        conn.commit()
+        conn.close()
+
+    def update_status(self, doc_id, status, admin_notes, admin_response=None):
+        conn = self.db_mgr.get_connection()
+        if admin_response:
+             conn.execute(f"UPDATE {self.table} SET status = ?, admin_notes = ?, admin_response = ? WHERE id = ?", 
+                          (status, admin_notes, admin_response, doc_id))
+        else:
+             conn.execute(f"UPDATE {self.table} SET status = ?, admin_notes = ? WHERE id = ?", 
+                          (status, admin_notes, doc_id))
+        conn.commit()
+        conn.close()
 
 class SubscriptionModel(SQLiteModel):
     def __init__(self):

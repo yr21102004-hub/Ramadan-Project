@@ -10,10 +10,10 @@ from .database import (
     LearnedAnswersModel,
     UnansweredQuestionsModel,
     ContactModel,
-    SubscriptionModel
+    SubscriptionModel,
+    ComplaintModel
 )
 from .rating_model import RatingModel
-from .complaint_model import ComplaintModel
 from .inspection_model import InspectionRequestModel
 
 __all__ = [

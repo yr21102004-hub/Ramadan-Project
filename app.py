@@ -46,13 +46,16 @@ app.config.update(
 # Initialize extensions (CSRF initialized but disabled in config to avoid template errors)
 bcrypt = Bcrypt(app)
 csrf = CSRFProtect(app) 
-# limiter = Limiter(
-#     get_remote_address,
-#     app=app,
-#     default_limits=[Config.RATELIMIT_DEFAULT],
-#     storage_uri=Config.RATELIMIT_STORAGE_URL,
-# )
-app.config['WTF_CSRF_ENABLED'] = False
+# Rate Limiting Configuration
+limiter = Limiter(
+    key_func=get_remote_address,
+    app=app,
+    default_limits=["2000 per day", "500 per hour"],
+    storage_uri="memory://"
+)
+
+# CSRF is enabled by default via CSRFProtect(app) above.
+# We removed the line that disabled it.
 
 # Initialize WebSocket
 socketio = init_socketio(app)
@@ -85,11 +88,14 @@ def page_not_found(e):
 def internal_server_error(e):
     return "<h1>500 Internal Server Error</h1><p>Please try again.</p>", 500
 
-# Security Headers Middleware (SIMPLIFIED FOR TESTING)
+# Security Headers Middleware
 @app.after_request
 def add_security_headers(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     return response
 
 # ============================================

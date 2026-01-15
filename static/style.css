@@ -10,8 +10,8 @@
     --surface-light: #1E1E1E;
     --surface-glass: rgba(18, 18, 18, 0.75);
 
-    --text: #F5F5F7;
-    --text-muted: #A1A1A6;
+    --text: #FFFFFF;
+    --text-muted: rgba(255, 255, 255, 0.75);
     --text-gold: #D4AF37;
 
     --font-main: 'Cairo', sans-serif;
