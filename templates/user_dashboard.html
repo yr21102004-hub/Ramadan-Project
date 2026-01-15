@@ -92,6 +92,16 @@
                                 <i class="fas fa-brain me-2"></i> أرشيف الذكاء
                             </button>
                         </li>
+                        {% if current_user.role == 'admin' %}
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-unanswered">
+                                <i class="fas fa-question-circle me-2"></i> أسئلة بدون رد
+                                {% if unanswered|length > 0 %}
+                                <span class="badge bg-danger ms-1">{{ unanswered|length }}</span>
+                                {% endif %}
+                            </button>
+                        </li>
+                        {% endif %}
                     </ul>
                 </div>
 
@@ -262,6 +272,91 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Unanswered Questions Tab (Admin Only) -->
+                    {% if current_user.role == 'admin' %}
+                    <div class="tab-pane fade" id="tab-unanswered">
+                        <div class="main-card glass p-4">
+                            <h5 class="text-blue mb-4"><i class="fas fa-question-circle me-2"></i> أسئلة بحاجة للرد</h5>
+
+                            {% if unanswered and unanswered|length > 0 %}
+                            <div class="unanswered-questions-list">
+                                {% for question in unanswered %}
+                                <div class="unanswered-item glass p-3 mb-3" id="unanswered-{{ loop.index }}">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <span class="badge bg-warning text-dark"><i class="fas fa-user me-1"></i> {{
+                                                question.user_id }}</span>
+                                            <span class="badge bg-secondary ms-2"><i class="fas fa-clock me-1"></i> {{
+                                                question.timestamp }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Chat Context (Last 2 messages before unanswered question) -->
+                                    {% set user_chats_filtered = chats|selectattr('user_id', 'equalto',
+                                    question.user_id)|list %}
+                                    {% if user_chats_filtered|length > 0 %}
+                                    <div class="chat-context mb-3 p-2"
+                                        style="background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                        <small class="text-muted d-block mb-2"><i class="fas fa-history me-1"></i> سياق
+                                            المحادثة:</small>
+                                        {% set question_index =
+                                        user_chats_filtered|map(attribute='message')|list|index(question.question) if
+                                        question.question in user_chats_filtered|map(attribute='message')|list else -1
+                                        %}
+                                        {% if question_index > 0 %}
+                                        {% set start_index = [question_index - 2, 0]|max %}
+                                        {% for chat in user_chats_filtered[start_index:question_index] %}
+                                        <div class="context-message mb-1">
+                                            <small class="text-info"><i class="fas fa-user me-1"></i> المستخدم:</small>
+                                            <small class="d-block ps-3">{{ chat.message }}</small>
+                                            <small class="text-success"><i class="fas fa-robot me-1"></i> AI:</small>
+                                            <small class="d-block ps-3">{{ chat.response }}</small>
+                                        </div>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- The Unanswered Question -->
+                                    <div class="question-text mb-3 p-3"
+                                        style="background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; border-radius: 8px;">
+                                        <strong class="text-warning"><i class="fas fa-question me-2"></i>
+                                            السؤال:</strong>
+                                        <p class="mb-0 mt-2">{{ question.question }}</p>
+                                    </div>
+
+                                    <!-- Admin Reply Form -->
+                                    <form action="{{ url_for('admin.answer_unanswered_question') }}" method="POST"
+                                        class="answer-form">
+                                        <input type="hidden" name="question_id" value="{{ question.doc_id }}">
+                                        <input type="hidden" name="question_text" value="{{ question.question }}">
+                                        <input type="hidden" name="user_id" value="{{ question.user_id }}">
+
+                                        <div class="mb-3">
+                                            <label class="form-label text-white"><i class="fas fa-reply me-2"></i>
+                                                الرد:</label>
+                                            <textarea class="form-control bg-dark text-white border-secondary"
+                                                name="answer" rows="3" placeholder="اكتب الرد المناسب هنا..."
+                                                required></textarea>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="fas fa-save me-2"></i> حفظ الرد
+                                        </button>
+                                    </form>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                                <p>رائع! جميع الأسئلة تم الرد عليها ✅</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 

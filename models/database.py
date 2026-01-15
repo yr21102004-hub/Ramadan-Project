@@ -492,6 +492,13 @@ class UnansweredQuestionsModel(SQLiteModel):
         conn.commit()
         conn.close()
 
+    def delete_by_id(self, doc_id):
+        """Delete unanswered question by doc_id"""
+        conn = self.db_mgr.get_connection()
+        conn.execute(f"DELETE FROM {self.table} WHERE doc_id = ?", (doc_id,))
+        conn.commit()
+        conn.close()
+
     def get_by_user(self, user_id):
         conn = self.db_mgr.get_connection()
         rows = conn.execute(f"SELECT * FROM {self.table} WHERE user_id = ?", (user_id,)).fetchall()

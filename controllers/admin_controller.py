@@ -409,6 +409,34 @@ def answer_question():
     flash("تم حفظ الإجابة وإضافتها لقاعدة المعرفة، وتم إزالة السؤال من القائمة.")
     return redirect(url_for('admin.admin_dashboard'))
 
+@admin_bp.route('/admin/answer_unanswered_question', methods=['POST'])
+@login_required
+def answer_unanswered_question():
+    """Answer an unanswered question from user dashboard"""
+    if current_user.role != 'admin': 
+        return "Access Denied", 403
+    
+    question_id = request.form.get('question_id')
+    question_text = request.form.get('question_text')
+    answer = request.form.get('answer')
+    user_id = request.form.get('user_id')
+    
+    if not answer or not question_text:
+        flash("يرجى كتابة إجابة قبل الحفظ.")
+        return redirect(request.referrer or url_for('admin.admin_dashboard'))
+    
+    # Add to learned answers
+    learned_model.create(question=question_text, answer=answer)
+    
+    # Delete from unanswered questions
+    if question_id:
+        unanswered_model.delete_by_id(question_id)
+    else:
+        unanswered_model.delete(question_text)
+    
+    flash(f"✅ تم حفظ الرد بنجاح! السؤال تمت إضافته لقاعدة المعرفة وتم حذفه من القائمة.")
+    return redirect(request.referrer or url_for('user.profile', username=user_id))
+
 @admin_bp.route('/admin/delete_message', methods=['POST'])
 @login_required
 def delete_message():
