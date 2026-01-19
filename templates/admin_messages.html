@@ -27,6 +27,7 @@
                         <th>الخدمة</th>
                         <th>الرسالة</th>
                         <th>التاريخ</th>
+                        <th>الحالة</th>
                         <th>إجراءات</th>
                     </tr>
                 </thead>
@@ -43,6 +44,30 @@
                         </td>
                         <td class="small">{{ msg.created_at }}</td>
                         <td>
+                            {% if msg.status == 'done' %}
+                            <span class="badge bg-success">تمت المراجعة</span>
+                            {% elif msg.status == 'rejected' %}
+                            <span class="badge bg-danger">مرفوض</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">قيد الانتظار</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if msg.status != 'done' and msg.status != 'rejected' %}
+                            <div class="d-flex gap-2" style="display:inline-flex !important;">
+                                <form method="POST" action="{{ url_for('admin.admin_message_status') }}">
+                                    <input type="hidden" name="doc_id" value="{{ msg.doc_id }}">
+                                    <input type="hidden" name="status" value="done">
+                                    <button type="submit" class="btn btn-sm btn-success" title="تحديد تم">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <button class="btn btn-sm btn-danger" onclick="openRejectModal('{{ msg.doc_id }}')"
+                                    title="رفض">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            {% endif %}
                             <form method="POST" action="{{ url_for('admin.delete_message') }}" style="display: inline;"
                                 onsubmit="return confirm('هل أنت متأكد من حذف هذه الرسالة؟');">
                                 <input type="hidden" name="doc_id" value="{{ msg.doc_id }}">
@@ -133,4 +158,40 @@
         color: #000;
     }
 </style>
+
+<!-- Reject Message Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-modal">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">رفض الطلب</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('admin.admin_message_status') }}" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="doc_id" id="rejectDocId">
+                    <input type="hidden" name="status" value="rejected">
+                    <div class="mb-3">
+                        <label for="admin_notes" class="form-label text-white">سبب الرفض (اختياري)</label>
+                        <textarea class="form-control glass-input" id="admin_notes" name="admin_notes" rows="3"
+                            placeholder="اترك فارغاً لاستخدام السبب الافتراضي: تم الرفض لاسباب خاصة"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-danger">تأكيد الرفض</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openRejectModal(docId) {
+        document.getElementById('rejectDocId').value = docId;
+        var modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+        modal.show();
+    }
+</script>
 {% endblock %}

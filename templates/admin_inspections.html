@@ -130,9 +130,15 @@
                             </td>
                             <td>
                                 {% if req.status == 'new_request' %}
-                                <button class="btn btn-sm btn-gold" onclick="openAssignModal('{{ req.doc_id }}')">
-                                    <i class="fas fa-eye me-1"></i> التفاصيل / تعيين
-                                </button>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button class="btn btn-sm btn-gold" onclick="openAssignModal('{{ req.doc_id }}')">
+                                        <i class="fas fa-eye me-1"></i> التفاصيل / تعيين
+                                    </button>
+                                    <button class="btn btn-sm btn-danger"
+                                        onclick="openRejectInspectionModal('{{ req.doc_id }}')">
+                                        <i class="fas fa-times me-1"></i> رفض
+                                    </button>
+                                </div>
                                 {% elif req.status == 'inspection_done' %}
                                 <button class="btn btn-sm btn-info text-white"
                                     onclick="openReportModal('{{ req.doc_id }}')">
@@ -140,6 +146,12 @@
                                 </button>
                                 {% elif req.status == 'assigned_to_worker' %}
                                 <span class="text-muted small">بانتظار التقرير</span>
+                                {% elif req.status == 'admin_visit' %}
+                                <button class="btn btn-sm btn-success" onclick="openCompleteModal('{{ req.doc_id }}')">
+                                    <i class="fas fa-check-double me-1"></i> إتمام المعاينة
+                                </button>
+                                {% elif req.status == 'rejected' %}
+                                <span class="badge bg-danger">مرفوض</span>
                                 {% else %}
                                 <button class="btn btn-sm btn-outline-light"
                                     onclick="openReportModal('{{ req.doc_id }}')">
@@ -438,6 +450,64 @@
     }
 </style>
 
+</script>
+
+<!-- Complete Inspection Modal -->
+<div class="modal fade" id="completeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-modal">
+            <div class="modal-header">
+                <h5 class="modal-title text-success">إتمام المعاينة (إداري)</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="completeForm" method="POST">
+                <div class="modal-body">
+                    <p class="text-white">هل أنت متأكد من إتمام هذه المعاينة؟</p>
+                    <p class="text-muted small">سيتم تسجيل أن الإدارة قامت بزيارة العميل، وسيظهر له أن التقرير جاهز.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label text-gold">ملاحظات الزيارة (اختياري)</label>
+                        <textarea name="admin_notes" class="form-control glass-input" rows="3"
+                            placeholder="أضف أي تفاصيل عن الزيارة هنا..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-success">تأكيد الإتمام</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Inspection Modal -->
+<div class="modal fade" id="rejectInspectionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-modal">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">رفض طلب المعاينة</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="rejectInspectionForm" method="POST">
+                <div class="modal-body">
+                    <p class="text-white">هل أنت متأكد من رفض طلب المعاينة؟</p>
+                    <p class="text-muted small">سيتم إخطار العميل بالرفض وسبب الرفض إن وُجد.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label text-gold">سبب الرفض (اختياري)</label>
+                        <textarea name="admin_notes" class="form-control glass-input" rows="3"
+                            placeholder="اترك فارغاً لاستخدام السبب الافتراضي: تم الرفض لاسباب خاصة"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-danger">تأكيد الرفض</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     var map;
     var marker;
@@ -550,6 +620,22 @@
 
                 reportModal.show();
             });
+    }
+
+    // Complete Modal
+    var completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
+
+    function openCompleteModal(reqId) {
+        document.getElementById('completeForm').action = `/admin/inspection/${reqId}/complete`;
+        completeModal.show();
+    }
+
+    // Reject Inspection Modal
+    var rejectInspectionModal = new bootstrap.Modal(document.getElementById('rejectInspectionModal'));
+
+    function openRejectInspectionModal(reqId) {
+        document.getElementById('rejectInspectionForm').action = `/admin/inspection/${reqId}/reject`;
+        rejectInspectionModal.show();
     }
 
 

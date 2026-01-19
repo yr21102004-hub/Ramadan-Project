@@ -13,7 +13,7 @@
             </div>
             <div class="col-md-4 text-md-start">
                 <div class="date-badge glass">
-                    <i class="fas fa-calendar-day me-2"></i> {{ user.created_at[:10] }}
+                    <i class="fas fa-calendar-day me-2"></i> {{ (user.created_at or '')[:10] }}
                 </div>
             </div>
         </div>
@@ -273,10 +273,23 @@
                                                 <small class="text-muted">{{ req.created_at }}</small>
                                             </div>
                                         </div>
+                                        {% if req.status == 'done' %}
+                                        <span class="status-badge received">تمت المراجعة</span>
+                                        {% elif req.status == 'rejected' %}
+                                        <span class="status-badge received bg-danger">تم الرفض</span>
+                                        {% else %}
                                         <span class="status-badge pending">تحت المراجعة</span>
+                                        {% endif %}
                                     </div>
                                     <div class="p-3 pt-0 border-top border-dim">
                                         <p class="mb-0 small text-muted-dynamic">{{ req.message }}</p>
+                                        {% if req.admin_response and req.status == 'rejected' %}
+                                        <div class="mt-2 p-2 rounded bg-danger bg-opacity-10 border border-danger">
+                                            <p class="mb-0 small text-danger"><i
+                                                    class="fas fa-exclamation-circle me-1"></i> <strong>سبب
+                                                    الرفض:</strong> {{ req.admin_response }}</p>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 {% endfor %}

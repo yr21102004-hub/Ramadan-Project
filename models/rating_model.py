@@ -1,7 +1,10 @@
 """
 Rating Model - handles worker ratings
 """
-from tinydb import Query
+# from tinydb import Query - Removed for SQLite migration
+class Query:
+    pass
+
 from datetime import datetime
 from .database import Database
 
@@ -17,10 +20,10 @@ class RatingModel:
     def add_rating(self, user_id, worker_id, quality_rating, behavior_rating, comment=""):
         """Add a new rating"""
         # Check if user already rated this worker
-        existing = self.table.search(
-            (self.query.user_id == user_id) & 
-            (self.query.worker_id == worker_id)
-        )
+        existing = self.table.search({
+            'user_id': user_id,
+            'worker_id': worker_id
+        })
         
         if existing:
             return {'success': False, 'message': 'لقد قمت بتقييم هذا الصنايعي من قبل'}
@@ -64,18 +67,18 @@ class RatingModel:
     
     def user_has_rated(self, user_id, worker_id):
         """Check if user has already rated this worker"""
-        result = self.table.search(
-            (self.query.user_id == user_id) & 
-            (self.query.worker_id == worker_id)
-        )
+        result = self.table.search({
+            'user_id': user_id,
+            'worker_id': worker_id
+        })
         return len(result) > 0
     
     def get_user_project_rating(self, user_id):
         """Get project rating by a specific user"""
-        result = self.table.search(
-            (self.query.user_id == user_id) & 
-            (self.query.worker_id == 'PROJECT')
-        )
+        result = self.table.search({
+            'user_id': user_id,
+            'worker_id': 'PROJECT'
+        })
         return result[0] if result else None
 
     def add_project_rating(self, user_id, rating, comment=""):

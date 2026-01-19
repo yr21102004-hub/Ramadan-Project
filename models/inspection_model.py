@@ -1,7 +1,10 @@
 """
 Inspection Request Model - handles inspection requests
 """
-from tinydb import Query
+# from tinydb import Query - Removed for SQLite migration
+class Query:
+    pass
+
 from datetime import datetime, timedelta
 from .database import Database
 import math
@@ -96,6 +99,19 @@ class InspectionRequestModel:
         }, doc_ids=[request_id])
         
         return {'success': True, 'message': 'تم رفض الطلب'}
+    
+    def admin_reject_request(self, request_id, reason=''):
+        """Admin rejects the inspection request"""
+        if not reason:
+            reason = "تم الرفض لاسباب خاصة"
+        
+        self.table.update({
+            'status': 'rejected',
+            'admin_rejection_reason': reason,
+            'rejected_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }, doc_ids=[request_id])
+        
+        return {'success': True, 'message': 'تم رفض طلب المعاينة'}
     
     def complete_request(self, request_id):
         """Mark request as completed"""

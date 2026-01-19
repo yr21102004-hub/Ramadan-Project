@@ -123,9 +123,9 @@
                                     <span class="progress-text">{{ user.project_percentage }}%</span>
                                 </div>
                             </td>
-                            <td class="small">{{ user.created_at[:10] }}</td>
+                            <td class="small">{{ (user.created_at or '')[:10] }}</td>
                             <td>
-                                <div class="btn-group" role="group">
+                                <div class="d-flex gap-2 justify-content-center">
                                     <a href="{{ url_for('user.profile', username=user.username) }}"
                                         class="btn btn-sm btn-outline-info" title="عرض الملف">
                                         <i class="fas fa-eye"></i>
@@ -135,13 +135,14 @@
                                         data-percentage="{{ user.project_percentage }}" title="تحديث النسبة">
                                         <i class="fas fa-percentage"></i>
                                     </button>
+                                    {% if user.username != current_user.username %}
                                     <form method="POST" action="{{ url_for('user.delete', username=user.username) }}"
-                                        style="display: inline;"
-                                        onsubmit="return confirm('هل أنت متأكد من حذف هذا المستخدم؟');">
+                                        onsubmit="return confirm('هل أنت متأكد من حذف هذا المستخدم؟ وسيتم حذف جميع بياناته!');">
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>

@@ -61,6 +61,15 @@
                         <p class="text-white opacity-75 mb-3">{{ req.description }}</p>
                         {% endif %}
 
+                        {% if req.status == 'rejected' and req.admin_rejection_reason %}
+                        <div class="alert alert-danger bg-danger bg-opacity-10 border border-danger mb-3">
+                            <p class="mb-0 small text-danger">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                <strong>سبب الرفض:</strong> {{ req.admin_rejection_reason }}
+                            </p>
+                        </div>
+                        {% endif %}
+
                         <div class="location-info mb-3">
                             <i class="fas fa-map-marker-alt text-gold me-2"></i>
                             <span class="text-white small">{{ req.user_address or 'موقع محدد على الخريطة' }}</span>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file, jsonify
 from flask_login import login_required, current_user
 from datetime import datetime
 import os
@@ -27,10 +27,62 @@ complaint_model = ComplaintModel()
 inspection_model = InspectionRequestModel()
 db = Database()
 
+@admin_bp.before_app_request
+def restrict_to_admins_globally():
+    """Ensure only authenticated admins can access any admin route (including aliases)"""
+    # Detect if it's an admin route by path (case-insensitive) or endpoint
+    path = request.path.lower()
+    endpoint = request.endpoint or ""
+    
+    # Check for admin endpoints (including aliases defined in app.py)
+    admin_endpoints = [
+        'admin', 'admin_users', 'admin_messages', 'admin_chats', 'admin_backup', 
+        'admin_learned_answers', 'admin_transfers', 'admin_unanswered_questions', 
+        'admin_complaints', 'admin_inspections', 'security_audit', 'setup_2fa', 
+        'toggle_2fa', 'add_user', 'delete_user', 'update_project_percentage',
+        'confirm_payment', 'view_chats', 'admin_dashboard', 'manual_backup',
+        'admin_unanswered', 'admin_learned', 'admin_messages', 'answer_question',
+        'delete_answered_question', 'delete_message', 'answer_unanswered_question'
+    ]
+    
+    is_admin_path = path.startswith('/admin')
+    is_admin_endpoint = endpoint.startswith('admin.') or endpoint in admin_endpoints
+
+    if is_admin_path or is_admin_endpoint:
+        # Log if someone is trying to use the username query param bypass attempt
+        q_user = request.args.get('username')
+        if q_user:
+            security_log_model.create("Admin URL Param Detection", 
+                                    f"URL contains username param: {q_user} for path {request.path}",
+                                    severity="medium")
+
+        # If the user is not authenticated, redirect to login
+        if not current_user.is_authenticated:
+            flash('عذراً، يجب تسجيل الدخول أولاً للوصول إلى لوحة التحكم.', 'warning')
+            
+            # Log the unauthenticated attempt
+            security_log_model.create("Unauthenticated Admin Access Attempt", 
+                                    f"Anonymous tried to access {request.path}",
+                                    severity="medium")
+            
+            return redirect(url_for('auth.login', next=request.url))
+            
+        # If the user is authenticated but not an admin, redirect to home
+        if getattr(current_user, 'role', None) != 'admin':
+            flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'danger')
+            
+            # Log the unauthorized attempt
+            security_log_model.create("Unauthorized Admin Access Attempt", 
+                                    f"User {current_user.username} (role: {current_user.role}) tried to access {request.path}",
+                                    severity="high")
+            
+            return redirect(url_for('index'))
+
 @admin_bp.route('/admin')
+@login_required
 def admin_dashboard():
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
+    # Final safety check
+    if current_user.role != 'admin':
         return redirect(url_for('index'))
     
     users = user_model.get_all()
@@ -125,9 +177,6 @@ def admin_dashboard():
 
 @admin_bp.route('/admin/users')
 def admin_users():
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
-        return redirect(url_for('index'))
     
     # Get only users with role='user' or no role (default to user)
     all_users = user_model.get_all()
@@ -203,9 +252,6 @@ def admin_users():
 
 @admin_bp.route('/admin/analytics')
 def analytics_dashboard():
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
-        return redirect(url_for('index'))
     
     try:
         users = user_model.get_all()
@@ -353,9 +399,6 @@ def analytics_dashboard():
 
 @admin_bp.route('/admin/add_user', methods=['POST'])
 def add_user():
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
-        return redirect(url_for('index'))
         
     username = request.form.get('username')
     full_name = request.form.get('full_name')
@@ -403,7 +446,6 @@ def add_user():
 
 @admin_bp.route('/admin/answer_question', methods=['POST'])
 def answer_question():
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     question = request.form.get('question')
     answer = request.form.get('answer')
     
@@ -447,7 +489,6 @@ def answer_unanswered_question():
 
 @admin_bp.route('/admin/delete_message', methods=['POST'])
 def delete_message():
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     doc_id = request.form.get('doc_id')
     contact_model.delete(doc_id)
     flash("تم حذف الرسالة بنجاح.")
@@ -455,7 +496,6 @@ def delete_message():
 
 @admin_bp.route('/admin/delete_answered_question', methods=['POST'])
 def delete_answered_question():
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     question = request.form.get('question')
     question_record = unanswered_model.get_by_question(question)
     
@@ -470,30 +510,24 @@ def delete_answered_question():
 
 @admin_bp.route('/admin/delete_all_unanswered', methods=['POST'])
 def delete_all_unanswered_questions():
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     unanswered_model.delete_all()
     flash("تم حذف جميع الأسئلة المعلقة بنجاح.")
     return redirect(url_for('admin.admin_unanswered_questions'))
 
 @admin_bp.route('/admin/learned_answers')
 def learned_answers():
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     learned = learned_model.get_all()
     learned.sort(key=lambda x: x.get('learned_at', ''), reverse=True)
     return render_template('admin_learned.html', learned=learned)
 
 @admin_bp.route('/admin/chats')
 def view_chats():
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     chats = chat_model.get_all()
     return render_template('admin_chats.html', chats=chats)
 
 @admin_bp.route('/admin/unanswered')
 def admin_unanswered_questions():
     try:
-        if not current_user.is_authenticated or current_user.role != 'admin':
-            flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
-            return redirect(url_for('index'))
         unanswered = unanswered_model.get_all()
         if not unanswered:
             unanswered = []
@@ -528,14 +562,33 @@ def admin_unanswered_questions():
 @admin_bp.route('/admin/messages')
 def admin_messages():
     """View all contact messages"""
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     messages = contact_model.get_all()
     messages.sort(key=lambda x: x.get('created_at', ''), reverse=True)
     return render_template('admin_messages.html', messages=messages)
 
+@admin_bp.route('/admin/message/status', methods=['POST'])
+def admin_message_status():
+    """Update message status"""
+    doc_id = request.form.get('doc_id')
+    status = request.form.get('status')
+    admin_notes = request.form.get('admin_notes', '')
+    
+    if doc_id and status:
+        if status == 'rejected' and not admin_notes:
+            admin_notes = "تم الرفض لاسباب خاصة"
+            
+        contact_model.update_status(doc_id, status, admin_response=admin_notes)
+        if status == 'rejected':
+             flash('تم رفض الرسالة بنجاح', 'warning')
+        else:
+             flash('تم تحديث حالة الرسالة بنجاح', 'success')
+    else:
+        flash('حدث خطأ في البيانات', 'error')
+        
+    return redirect(url_for('admin.admin_messages'))
+
 @admin_bp.route('/admin/backup')
 def manual_backup():
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
         if not os.path.exists('backups'): os.makedirs('backups')
@@ -550,7 +603,6 @@ def manual_backup():
 
 @admin_bp.route('/admin/setup_2fa')
 def setup_2fa():
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     if not current_user.two_factor_secret:
         secret = pyotp.random_base32()
         user_model.update(current_user.username, {'two_factor_secret': secret})
@@ -566,7 +618,6 @@ def setup_2fa():
 
 @admin_bp.route('/admin/toggle_2fa', methods=['POST'])
 def toggle_2fa():
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     action = request.form.get('action')
     if action == 'enable':
         user_model.update(current_user.username, {'two_factor_enabled': True})
@@ -577,7 +628,6 @@ def toggle_2fa():
     return redirect(url_for('admin.admin_dashboard'))
 @admin_bp.route('/admin/security/clear', methods=['POST'])
 def clear_security_logs():
-    if not current_user.is_authenticated or current_user.role != 'admin': return redirect(url_for('home.home_page'))
     security_log_model.truncate()
     security_log_model.create("Logs Cleared", f"Admin {current_user.username} cleared all security logs", severity="info")
     flash("تم مسح سجلات المراقبة الأمنية بنجاح، وبدء التسجيل من جديد.")
@@ -585,9 +635,6 @@ def clear_security_logs():
 
 @admin_bp.route('/admin/security/audit')
 def security_audit():
-    if not current_user.is_authenticated or current_user.role != 'admin': 
-        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
-        return redirect(url_for('index'))
     
     # Auto Backup Check and List Fetching
     backup_dir = 'backups'
@@ -699,9 +746,6 @@ def security_audit():
 @admin_bp.route('/admin/complaints')
 def admin_complaints():
     """View and manage complaints"""
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
-        return redirect(url_for('index'))
     
     # Get all complaints
     all_complaints = complaint_model.get_all()
@@ -727,8 +771,6 @@ def admin_complaints():
 @admin_bp.route('/admin/complaint/<int:complaint_id>/update', methods=['POST'])
 def update_complaint_status(complaint_id):
     """Update complaint status"""
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        return redirect(url_for('index'))
     
     status = request.form.get('status')
     admin_notes = request.form.get('admin_notes', '')
@@ -743,9 +785,6 @@ def update_complaint_status(complaint_id):
 @admin_bp.route('/admin/inspections')
 def admin_inspections():
     """View and manage inspections"""
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
-        return redirect(url_for('index'))
     
     # Get all requests
     all_requests = inspection_model.get_all()
@@ -766,8 +805,6 @@ def admin_inspections():
 @admin_bp.route('/admin/inspection/<request_id>/assign', methods=['POST'])
 def assign_inspection(request_id):
     """Assign admin to inspection"""
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        return redirect(url_for('index'))
     
     # Always assign to admin since workers are removed
     inspection_model.assign_admin_visit(request_id)
@@ -779,8 +816,6 @@ def assign_inspection(request_id):
 @admin_bp.route('/admin/inspection/<request_id>/details')
 def inspection_details(request_id):
     """Get inspection details"""
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        return jsonify({'error': 'Unauthorized'}), 403
         
     req = inspection_model.get_request_by_id(request_id)
     if not req:
@@ -795,8 +830,6 @@ def inspection_details(request_id):
 @admin_bp.route('/admin/inspection/<request_id>/approve', methods=['POST'])
 def approve_inspection_report(request_id):
     """Admin: Approve or Reject Inspection Report"""
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        return redirect(url_for('index'))
         
     decision = request.form.get('decision')
     admin_notes = request.form.get('admin_notes', '')
@@ -811,14 +844,64 @@ def approve_inspection_report(request_id):
         
     return redirect(url_for('admin.admin_inspections'))
 
+@admin_bp.route('/admin/inspection/<request_id>/reject', methods=['POST'])
+def admin_reject_inspection(request_id):
+    """Admin rejects an inspection request"""
+    
+    reason = request.form.get('admin_notes', '')
+    
+    result = inspection_model.admin_reject_request(request_id, reason)
+    
+    if result['success']:
+        flash(result['message'], 'warning')
+    else:
+        flash('حدث خطأ أثناء رفض الطلب', 'error')
+    
+    return redirect(url_for('admin.admin_inspections'))
+
+@admin_bp.route('/admin/inspection/<request_id>/complete', methods=['POST'])
+def admin_complete_inspection(request_id):
+    """Admin completes the inspection directly"""
+    
+    admin_notes = request.form.get('admin_notes', '')
+    
+    # Update status to completed or approved directly if it was an admin visit
+    # Assuming 'approved_for_user' is the state where user sees results, or 'completed'
+    # The requirement says "determined that it was reviewed and reached with the user"
+    
+    # Find the request
+    req = inspection_model.get_request_by_id(request_id)
+    if not req:
+        flash('الطلب غير موجود', 'error')
+        return redirect(url_for('admin.admin_inspections'))
+
+    # Mark as completed/approved
+    # We can reuse approve_report logic or create a new method for direct admin completion
+    # forcing a simple report
+    
+    report_data = {
+        'job_type': 'معاينة إدارية',
+        'place_status': 'تمت الزيارة',
+        'job_size': 'غير محدد',
+        'photos': [],
+        'voice_note_url': None,
+        'admin_notes': admin_notes
+    }
+    
+    # 1. Submit a dummy/admin report
+    inspection_model.submit_report(request_id, report_data)
+    
+    # 2. Approve it immediately
+    inspection_model.approve_report(request_id)
+    
+    flash('تم تسجيل إتمام المعاينة بنجاح', 'success')
+    return redirect(url_for('admin.admin_inspections'))
+
 
 
 @admin_bp.route('/admin/transfers')
 def admin_transfers():
     """Admin: Transfers List"""
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        flash('عذراً، هذه الصفحة مخصصة للإدارة فقط.', 'warning')
-        return redirect(url_for('index'))
         
     payments = payment_model.get_all()
     # Sort by timestamp desc
@@ -832,8 +915,6 @@ def admin_transfers():
 @admin_bp.route('/admin/payment/confirm/<doc_id>', methods=['POST'])
 def confirm_payment(doc_id):
     """Admin: Confirm a payment"""
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        return redirect(url_for('index'))
         
     payment_model.update_status(doc_id, 'Confirmed')
     flash('تم تأكيد التحويل بنجاح', 'success')
@@ -841,14 +922,10 @@ def confirm_payment(doc_id):
 
 @admin_bp.route('/admin/backup/download/<filename>')
 def download_backup_file(filename):
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        return redirect(url_for('index'))
     return send_file(os.path.join('backups', filename), as_attachment=True)
 
 @admin_bp.route('/admin/backup/delete/<filename>', methods=['POST'])
 def delete_backup_file(filename):
-    if not current_user.is_authenticated or current_user.role != 'admin':
-        return redirect(url_for('index'))
     try:
         os.remove(os.path.join('backups', filename))
         flash('تم حذف النسخة الاحتياطية بنجاح')

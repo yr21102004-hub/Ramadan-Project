@@ -77,9 +77,21 @@ class Database:
                 message TEXT,
                 user_id TEXT,
                 service TEXT,
-                created_at TEXT
+                created_at TEXT,
+                status TEXT DEFAULT 'pending',
+                admin_response TEXT
             )
         ''')
+        
+        try:
+             cursor.execute("SELECT status FROM contacts LIMIT 1")
+        except sqlite3.OperationalError:
+             cursor.execute("ALTER TABLE contacts ADD COLUMN status TEXT DEFAULT 'pending'")
+
+        try:
+             cursor.execute("SELECT admin_response FROM contacts LIMIT 1")
+        except sqlite3.OperationalError:
+             cursor.execute("ALTER TABLE contacts ADD COLUMN admin_response TEXT")
         
         # 4. Unanswered Questions
         cursor.execute('''
@@ -275,12 +287,77 @@ class GenericSQLiteModel(SQLiteModel):
 
     def search(self, query=None):
         # Very basic search shim for TinyDB compatibility
-        # In practice, the caller should be updated to use SQL
-        return self.all()
+        # Supports simple equality checks if query is a dictionary {col: val}
+        conn = self.db_mgr.get_connection()
+        if isinstance(query, dict):
+            conditions = []
+            values = []
+            for k, v in query.items():
+                conditions.append(f"{k} = ?")
+                values.append(v)
+            if conditions:
+                sql = f"SELECT * FROM {self.table} WHERE {' AND '.join(conditions)}"
+                rows = conn.execute(sql, values).fetchall()
+            else:
+                rows = conn.execute(f"SELECT * FROM {self.table}").fetchall()
+        else:
+            # Fallback for complex queries (not supported) return all and let python filter if possible?
+            # Or just return all as before (unsafe but keeps existing behavior)
+            rows = conn.execute(f"SELECT * FROM {self.table}").fetchall()
+        
+        conn.close()
+        return [self._dict_from_row(r) for r in rows]
 
-    def get(self, query=None):
-        all_data = self.all()
-        return all_data[0] if all_data else None
+    def get(self, doc_id=None, **kwargs):
+        conn = self.db_mgr.get_connection()
+        if doc_id:
+            row = conn.execute(f"SELECT * FROM {self.table} WHERE id = ?", (doc_id,)).fetchone()
+        elif kwargs:
+            conditions = []
+            values = []
+            for k, v in kwargs.items():
+                conditions.append(f"{k} = ?")
+                values.append(v)
+            row = conn.execute(f"SELECT * FROM {self.table} WHERE {' AND '.join(conditions)}", values).fetchone()
+        else:
+            row = None
+        
+        conn.close()
+        return self._dict_from_row(row)
+
+    def update(self, data, doc_ids=None, query=None):
+        filtered_data = self._filter_data(data)
+        if not filtered_data: return
+        
+        set_clause = ', '.join([f"{k} = ?" for k in filtered_data.keys()])
+        values = list(filtered_data.values())
+        
+        sql = f"UPDATE {self.table} SET {set_clause}"
+        
+        if doc_ids:
+            placeholders = ', '.join(['?'] * len(doc_ids))
+            sql += f" WHERE id IN ({placeholders})"
+            values.extend(doc_ids)
+        elif isinstance(query, dict):
+            conditions = []
+            for k, v in query.items():
+                conditions.append(f"{k} = ?")
+                values.append(v)
+            if conditions:
+                sql += f" WHERE {' AND '.join(conditions)}"
+        
+        conn = self.db_mgr.get_connection()
+        conn.execute(sql, values)
+        conn.commit()
+        conn.close()
+
+    def remove(self, doc_ids=None):
+        if not doc_ids: return
+        conn = self.db_mgr.get_connection()
+        placeholders = ', '.join(['?'] * len(doc_ids))
+        conn.execute(f"DELETE FROM {self.table} WHERE id IN ({placeholders})", doc_ids)
+        conn.commit()
+        conn.close()
 
 class UserModel(SQLiteModel):
     def __init__(self):
@@ -460,9 +537,35 @@ class ContactModel(SQLiteModel):
 
     def create(self, name, phone, message, user_id=None, service=None):
         created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        status = 'pending'
         conn = self.db_mgr.get_connection()
-        conn.execute(f"INSERT INTO {self.table} (name, phone, message, user_id, service, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                     (name, phone, message, user_id, service, created_at))
+        try:
+            conn.execute(f"INSERT INTO {self.table} (name, phone, message, user_id, service, created_at, status, admin_response) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                         (name, phone, message, user_id, service, created_at, status, None))
+            conn.commit()
+        except sqlite3.OperationalError:
+            # Fallback (shim)
+            try:
+                 conn.execute(f"INSERT INTO {self.table} (name, phone, message, user_id, service, created_at, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                             (name, phone, message, user_id, service, created_at, status))
+            except:
+                 conn.execute(f"INSERT INTO {self.table} (name, phone, message, user_id, service, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                             (name, phone, message, user_id, service, created_at))
+            conn.commit()
+        finally:
+            conn.close()
+
+    def update_status(self, doc_id, status, admin_response=None):
+        """Update message status and response"""
+        conn = self.db_mgr.get_connection()
+        if admin_response is not None:
+             try:
+                conn.execute(f"UPDATE {self.table} SET status = ?, admin_response = ? WHERE id = ?", (status, admin_response, doc_id))
+             except sqlite3.OperationalError:
+                # Column might be missing, try adding it or ignoring
+                pass
+        else:
+             conn.execute(f"UPDATE {self.table} SET status = ? WHERE id = ?", (status, doc_id))
         conn.commit()
         conn.close()
 
