@@ -361,8 +361,58 @@
 
     <!-- Footer -->
     <footer>
-        <div class="container footer-content">
-            <p>&copy; 2026 جميع الحقوق محفوظة لـ الحاج رمضان محمد جبر للدهانات والديكورات.</p>
+        <div class="container">
+            <div class="footer-content">
+                <!-- Brand Info -->
+                <div class="footer-brand">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="RMG Logo" style="height: 60px;">
+                    <p>الحاج رمضان محمد جبر للدهانات والديكورات. نحول أحلامك إلى واقع ملموس بأعلى معايير الجودة
+                        والفخامة. خبرة سنوات في صنع الجمال.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-col">
+                    <h4>روابط سريعة</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('web.index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('web.about') }}">عن الشركة</a></li>
+                        <li><a href="{{ url_for('web.projects') }}">معرض الأعمال</a></li>
+                        <li><a href="{{ url_for('web.contact') }}">اطلب معاينة</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services -->
+                <div class="footer-col">
+                    <h4>خدماتنا</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('web.services') }}">التشطيب المتكامل</a></li>
+                        <li><a href="{{ url_for('web.services') }}">ديكورات جبس بورد</a></li>
+                        <li><a href="{{ url_for('web.services') }}">الدهانات الحديثة</a></li>
+                        <li><a href="{{ url_for('web.services') }}">التصميم الداخلي</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="footer-col">
+                    <h4>تواصل معنا</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone ms-2 text-gold"></i> 01000000000</li>
+                        <li><i class="fas fa-envelope ms-2 text-gold"></i> info@rmg.com</li>
+                        <li><i class="fas fa-map-marker-alt ms-2 text-gold"></i> القاهرة، مصر</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 جميع الحقوق محفوظة لـ <strong>الحاج رمضان محمد جبر</strong>. <br> تم التطوير والبرمجة
+                    بواسطة Smart Tech Solutions.</p>
+            </div>
         </div>
     </footer>
 
