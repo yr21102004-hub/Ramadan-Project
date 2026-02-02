@@ -13,6 +13,15 @@
             <div class="col-lg-8 mx-auto" data-aos="fade-up">
                 <div class="premium-card" style="padding: 40px; line-height: 1.8;">
 
+                    {% if project.description %}
+                    <div class="mb-5" style="text-align: justify;">
+                        <p style="color: #ddd; font-size: 1.15rem; line-height: 2; text-indent: 20px;">
+                            {{ project.description }}
+                        </p>
+                    </div>
+                    <hr style="border-color: var(--primary); opacity: 0.3; margin: 40px 0;">
+                    {% endif %}
+
                     {% for section in project.sections %}
                     <div class="mb-5">
                         <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: bold;">
