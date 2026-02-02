@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="section-padding" style="margin-top: 80px;">
+    <div class="container">
+        <div class="service-detail-header text-center mb-5">
+            <h1 class="section-title">{{ project.title }}</h1>
+            <div class="divider center-divider"></div>
+        </div>
+
+        <div class="row align-items-start" style="display: flex; flex-wrap: wrap; gap: 40px;">
+            <!-- Content Side -->
+            <div class="col-lg-8 mx-auto" data-aos="fade-up">
+                <div class="premium-card" style="padding: 40px; line-height: 1.8;">
+
+                    {% for section in project.sections %}
+                    <div class="mb-5">
+                        <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: bold;">
+                            <i class="fas fa-paint-roller ms-2"></i> {{ section.title }}
+                        </h3>
+                        <ul class="service-features-list" style="list-style: none; padding: 0;">
+                            {% for item in section.items %}
+                            <li style="margin-bottom: 12px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-check-circle"
+                                    style="color: var(--primary); margin-left: 10px; margin-top: 5px;"></i>
+                                <span style="color: #ddd; font-size: 1.1rem;">{{ item }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+
+                    <div class="mt-5 text-center">
+                        <a href="{{ url_for('web.contact') }}" class="btn btn-primary">اطلب معاينة لهذا المشروع</a>
+                        <a href="{{ url_for('web.projects') }}" class="btn btn-outline" style="margin-right: 15px;">عودة
+                            للمشاريع</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

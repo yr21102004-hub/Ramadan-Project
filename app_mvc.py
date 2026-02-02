@@ -80,4 +80,5 @@ def internal_server_error(e):
     return "<h1>500 Internal Server Error</h1><p>Please try again.</p>", 500
 
 if __name__ == '__main__':
+    print("Server starting...")
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)

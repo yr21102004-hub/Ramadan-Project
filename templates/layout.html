@@ -381,7 +381,7 @@
                     <h4>روابط سريعة</h4>
                     <ul class="footer-links">
                         <li><a href="{{ url_for('web.index') }}">الرئيسية</a></li>
-                        <li><a href="{{ url_for('web.about') }}">عن الشركة</a></li>
+                        <li><a href="{{ url_for('web.about') }}">من نحن</a></li>
                         <li><a href="{{ url_for('web.projects') }}">معرض الأعمال</a></li>
                         <li><a href="{{ url_for('web.contact') }}">اطلب معاينة</a></li>
                     </ul>
@@ -402,8 +402,8 @@
                 <div class="footer-col">
                     <h4>تواصل معنا</h4>
                     <ul class="footer-links">
-                        <li><i class="fas fa-phone ms-2 text-gold"></i> 01000000000</li>
-                        <li><i class="fas fa-envelope ms-2 text-gold"></i> info@rmg.com</li>
+                        <li><i class="fas fa-phone ms-2 text-gold"></i> 01099155572</li>
+                        <li><i class="fas fa-envelope ms-2 text-gold"></i> ramadangaber01@gmail.com</li>
                         <li><i class="fas fa-map-marker-alt ms-2 text-gold"></i> القاهرة، مصر</li>
                     </ul>
                 </div>
@@ -459,27 +459,55 @@
             });
         };
 
-        // Preloader Logic
+        // Preloader Logic - Show on first visit OR slow loading
+        const pageLoadStart = performance.now();
+        let preloaderShown = false;
+
         const hidePreloader = () => {
             const preloader = document.getElementById('preloader');
+
+            // Check if this is the first visit in this session
+            const isFirstVisit = !sessionStorage.getItem('preloaderShown');
+
+            // Calculate loading time
+            const loadingTime = performance.now() - pageLoadStart;
+            const isSlowLoading = loadingTime > 800; // If loading takes more than 800ms
+
             if (preloader && preloader.style.visibility !== 'hidden') {
-                // Force a minimum display time of 2.5 seconds to see the animation
-                setTimeout(() => {
+                // Show preloader if: First visit OR Slow loading
+                if (isFirstVisit || isSlowLoading) {
+                    preloaderShown = true;
+
+                    // Mark that preloader has been shown (only for first visit)
+                    if (isFirstVisit) {
+                        sessionStorage.setItem('preloaderShown', 'true');
+                    }
+
+                    // Force a minimum display time of 2.5 seconds to see the animation
+                    setTimeout(() => {
+                        preloader.style.opacity = '0';
+                        preloader.style.visibility = 'hidden';
+
+                        // Initialize Animations NOW so they play as the page is revealed
+                        initAOS();
+
+                        // Show Welcome Modal after preloader (only on first visit)
+                        if (isFirstVisit) {
+                            setTimeout(() => {
+                                const modal = document.getElementById('islamic-welcome-modal');
+                                if (modal && !sessionStorage.getItem('welcomeShown')) {
+                                    // modal.classList.add('active'); // Optional: Uncomment to re-enable welcome modal
+                                    // sessionStorage.setItem('welcomeShown', 'true');
+                                }
+                            }, 500);
+                        }
+                    }, 2500); // 2.5s Minimum Delay
+                } else {
+                    // Fast loading and not first visit - hide immediately
                     preloader.style.opacity = '0';
                     preloader.style.visibility = 'hidden';
-
-                    // Initialize Animations NOW so they play as the page is revealed
                     initAOS();
-
-                    // Show Welcome Modal after preloader (if needed)
-                    setTimeout(() => {
-                        const modal = document.getElementById('islamic-welcome-modal');
-                        if (modal && !sessionStorage.getItem('welcomeShown')) {
-                            // modal.classList.add('active'); // Optional: Uncomment to re-enable welcome modal
-                            // sessionStorage.setItem('welcomeShown', 'true');
-                        }
-                    }, 500);
-                }, 2500); // 2.5s Minimum Delay
+                }
             } else {
                 // If preloader already hidden/gone, init AOS immediately
                 initAOS();
