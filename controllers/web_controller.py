@@ -172,6 +172,10 @@ PROJECTS_DATA = {
                     'ضمان رضا العميل التام عن النتيجة النهائية'
                 ]
             }
+        ],
+        'images': [
+            'assets/luxury_hall.png',
+            'assets/column_painting.png'
         ]
     },
     'companies': {

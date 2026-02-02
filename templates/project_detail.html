@@ -22,6 +22,20 @@
                     <div style="border-top: 1px solid var(--primary); opacity: 0.3; margin: 40px 0;"></div>
                     {% endif %}
 
+                    {% if project.images %}
+                    <div class="row mb-5">
+                        {% for image in project.images %}
+                        <div class="col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                            <div class="project-image-card"
+                                style="border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid rgba(212, 175, 55, 0.2);">
+                                <img src="{{ url_for('static', filename=image) }}" alt="صورة المشروع" class="img-fluid"
+                                    style="width: 100%; height: 300px; object-fit: cover; transition: transform 0.5s ease;">
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
                     {% for section in project.sections %}
                     <div class="mb-5">
                         <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: bold;">
