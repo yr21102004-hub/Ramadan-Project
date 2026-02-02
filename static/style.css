@@ -610,20 +610,18 @@ h6 {
 }
 
 .project-item:nth-child(3) {
-    background-image: url('assets/villa.png');
+    background-image: url('assets/hero.png');
+    /* Apartments use generic hero image or need explicit apartment image */
 }
 
 .project-item:nth-child(4) {
-    background-image: url('assets/hero.png');
+    background-image: url('assets/company.png');
+    /* Factories */
 }
 
 .project-item:nth-child(5) {
     background-image: url('assets/company.png');
-}
-
-/* Factory */
-.project-item:nth-child(6) {
-    background-image: url('assets/company.png');
+    /* Companies */
 }
 
 /* Company */
@@ -1510,4 +1508,3 @@ footer::before {
 .log-severity-high .text-gold {
     color: #F44336 !important;
 }
-
