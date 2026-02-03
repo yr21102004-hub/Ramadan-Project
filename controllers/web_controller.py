@@ -75,6 +75,14 @@ SERVICES_DATA = {
     }
 }
 
+@web_bp.route('/manifest.json')
+def manifest():
+    return current_app.send_static_file('manifest.json')
+
+@web_bp.route('/favicon.ico')
+def favicon():
+    return current_app.send_static_file('logo.png') # Use logo as favicon
+
 @web_bp.route('/robots.txt')
 def robots():
     response = make_response("User-agent: *\nDisallow: /admin\nSitemap: " + url_for('web.sitemap', _external=True))

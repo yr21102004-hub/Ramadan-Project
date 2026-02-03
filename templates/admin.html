@@ -79,6 +79,28 @@
             </div>
         </div>
 
+        <!-- Quick Actions & Reports -->
+        <div class="row mb-5 g-4" data-aos="fade-up">
+            <div class="col-12">
+                <div class="glass p-4 rounded-4 border-gold-soft d-flex flex-wrap gap-3 align-items-center">
+                    <h5 class="mb-0 text-gold fw-bold me-3"><i class="fas fa-file-download me-2"></i> تقارير سريعة:</h5>
+                    <a href="{{ url_for('admin.export_users_report') }}"
+                        class="btn btn-outline-success btn-sm rounded-pill px-4">
+                        <i class="fas fa-users me-1"></i> تحميل بيانات العملاء (CSV)
+                    </a>
+                    <a href="{{ url_for('admin.export_payments_report') }}"
+                        class="btn btn-outline-info btn-sm rounded-pill px-4">
+                        <i class="fas fa-money-check-alt me-1"></i> تحميل سجل المدفوعات (CSV)
+                    </a>
+                    <div class="ms-md-auto d-flex gap-2">
+                        <span class="badge bg-dark-soft border-gold-soft py-2 px-3">
+                            <i class="fas fa-circle text-success me-1 small"></i> حالة النظام: متصل
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Main Navigation Cards -->
         <div class="row g-4 mb-5" data-aos="fade-up">
             <!-- Users Card -->
@@ -139,10 +161,6 @@
                     <div class="nav-card-badge"><i class="fas fa-lock"></i></div>
                 </a>
             </div>
-
-
-
-
 
             <!-- Complaints Card -->
             <div class="col-lg-4 col-md-6">

@@ -10,6 +10,8 @@ from flask_limiter.util import get_remote_address
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
 import os
+import logging
+from logging.handlers import RotatingFileHandler
 
 # Import Models
 from models.user import User
@@ -35,6 +37,19 @@ from config import Config
 # Initialize Flask app
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Logging Configuration
+if not app.debug:
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    file_handler = RotatingFileHandler('logs/error.log', maxBytes=10240000, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Ramadan Project Startup')
 
 # Force Secure Session settings
 app.config.update(
@@ -88,14 +103,22 @@ def page_not_found(e):
 def internal_server_error(e):
     return "<h1>500 Internal Server Error</h1><p>Please try again.</p>", 500
 
-# Security Headers Middleware
+# Security & Performance Headers Middleware
 @app.after_request
-def add_security_headers(response):
+def after_request_handler(response):
+    # Security Headers
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    
+    # Performance: Cache Control for Static Files
+    if request.path.startswith('/static'):
+        response.headers['Cache-Control'] = 'public, max-age=31536000' # 1 year for static assets
+    else:
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        
     return response
 
 # ============================================
