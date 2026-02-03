@@ -1,17 +1,26 @@
 :root {
-    /* Color Palette - Premium Gold & Charcoal */
+    /* Color Palette - Premium Gold & Charcoal & Cream */
     --primary: #D4AF37;
+    /* Original Gold for highlights */
+    --primary-muted: #C0A040;
+    /* Muted Gold for borders/secondary */
     --primary-light: #F3D778;
     --primary-dark: #B5922B;
     --accent: #E5C76B;
 
+    --cream: #F2E8D5;
+    /* New: Creamy Beige for secondary accents */
+    --cream-muted: rgba(242, 232, 213, 0.7);
+
     --dark: #0A0A0A;
     --surface: #121212;
-    --surface-light: #181818;
-    --surface-glass: rgba(18, 18, 18, 0.85);
+    --surface-light: #1A1A1A;
+    /* Slightly warmer surface */
+    --surface-glass: rgba(18, 18, 18, 0.9);
 
     --text: #FFFFFF;
-    --text-muted: rgba(255, 255, 255, 0.65);
+    --text-muted: rgba(242, 232, 213, 0.75);
+    /* Warmer text using cream tint */
     --text-gold: #D4AF37;
 
     --font-main: 'Cairo', system-ui, -apple-system, sans-serif;
@@ -20,11 +29,13 @@
     --transition-smooth: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     --transition-fast: all 0.2s ease;
 
-    --border-premium: 1px solid rgba(212, 175, 55, 0.15);
-    --border-subtle: 1px solid rgba(255, 255, 255, 0.06);
+    /* More subtle borders */
+    --border-premium: 1px solid rgba(192, 160, 64, 0.25);
+    --border-subtle: 1px solid rgba(242, 232, 213, 0.1);
 
     --shadow-premium: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
-    --shadow-gold: 0 20px 40px -10px rgba(212, 175, 55, 0.12);
+    --shadow-gold: 0 20px 40px -10px rgba(212, 175, 55, 0.1);
+    /* Reduced spread */
     --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
 
     --radius-lg: 24px;
@@ -34,7 +45,8 @@
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
+    /* Slimmer */
 }
 
 ::-webkit-scrollbar-track {
@@ -42,7 +54,8 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--primary-dark);
+    background: var(--primary-muted);
+    /* Less shiny thumb */
     border-radius: 10px;
 }
 
@@ -50,19 +63,29 @@
     background: var(--primary);
 }
 
-/* Light Mode Variables */
+/* Light Mode Variables - Elegant Cream Theme */
 body.light-mode {
-    --dark: #F5F5F7;
+    --dark: #FAF8F2;
+    /* Very light creamy background instead of cold gray */
     --surface: #FFFFFF;
-    --surface-light: #EBEBEB;
-    --surface-glass: rgba(245, 245, 247, 0.8);
+    --surface-light: #F2EFE9;
+    /* Warmer light surface */
+    --surface-glass: rgba(250, 248, 242, 0.85);
 
-    --text: #1D1D1F;
-    --text-muted: #86868B;
+    --text: #2C2C2C;
+    /* Softer black */
+    --text-muted: #666055;
+    /* Warm Gray */
+    --text-gold: #B5922B;
+    /* Darker gold for better contrast on light */
 
-    --border-subtle: 1px solid rgba(0, 0, 0, 0.08);
-    --shadow-premium: 0 10px 40px rgba(0, 0, 0, 0.1);
-    --shadow-gold: 0 10px 30px rgba(212, 175, 55, 0.1);
+    --primary-muted: #B5922B;
+
+    --border-premium: 1px solid rgba(181, 146, 43, 0.2);
+    --border-subtle: 1px solid rgba(0, 0, 0, 0.05);
+
+    --shadow-premium: 0 20px 40px -10px rgba(181, 146, 43, 0.1);
+    --shadow-gold: 0 10px 25px -5px rgba(181, 146, 43, 0.15);
 }
 
 * {
