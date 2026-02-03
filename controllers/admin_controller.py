@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import shutil
 import io
+import csv
 import base64
 import qrcode
 import pyotp
@@ -932,3 +933,66 @@ def delete_backup_file(filename):
     except Exception as e:
         flash(f'حدث خطأ أثناء الحذف: {e}')
     return redirect(url_for('admin.security_audit'))
+
+@admin_bp.route('/admin/export/users')
+def export_users_report():
+    """Export users report to CSV"""
+    users = user_model.get_all()
+    
+    # Create CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output, encoding='utf-8-sig') # utf-8-sig for Excel Arabic support
+    
+    # Header
+    writer.writerow(['المعرف', 'اسم المستخدم', 'الاسم الكامل', 'الهاتف', 'الموقع', 'نسبة الإنجاز', 'تاريخ التسجيل'])
+    
+    # Data
+    for user in users:
+        writer.writerow([
+            user.get('doc_id', ''),
+            user.get('username', ''),
+            user.get('full_name', ''),
+            user.get('phone', ''),
+            user.get('project_location', ''),
+            f"{user.get('project_percentage', 0)}%",
+            user.get('created_at', '')
+        ])
+        
+    output.seek(0)
+    
+    return send_file(
+        io.BytesIO(output.getvalue().encode('utf-8-sig')),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name=f"users_report_{datetime.now().strftime('%Y%m%d')}.csv"
+    )
+
+@admin_bp.route('/admin/export/payments')
+def export_payments_report():
+    """Export payments report to CSV"""
+    payments = payment_model.get_all()
+    
+    output = io.StringIO()
+    writer = csv.writer(output, encoding='utf-8-sig')
+    
+    # Header
+    writer.writerow(['المستخدم', 'المبلغ (جم)', 'طريقة الدفع', 'التفاصيل', 'التاريخ', 'الحالة'])
+    
+    for p in payments:
+        writer.writerow([
+            p.get('username', ''),
+            p.get('amount', ''),
+            p.get('method', ''),
+            p.get('details', ''),
+            p.get('timestamp', ''),
+            p.get('status', 'قيد المراجعة')
+        ])
+        
+    output.seek(0)
+    
+    return send_file(
+        io.BytesIO(output.getvalue().encode('utf-8-sig')),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name=f"payments_report_{datetime.now().strftime('%Y%m%d')}.csv"
+    )

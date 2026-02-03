@@ -73,8 +73,13 @@
         <div class="mb-5" data-aos="fade-up">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="text-gold"><i class="fas fa-user-tie me-2"></i> قائمة العملاء</h3>
-                <div class="search-box">
-                    <input type="text" id="searchInput" class="form-control" placeholder="بحث عن عميل...">
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('admin.export_users_report') }}" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-file-csv me-1"></i> تحميل ملف Excel/CSV
+                    </a>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" class="form-control" placeholder="بحث عن عميل...">
+                    </div>
                 </div>
             </div>
 
@@ -346,11 +351,16 @@
         <div class="mb-5" data-aos="fade-up">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="text-gold"><i class="fas fa-money-bill-wave me-2"></i> عمليات الدفع الأخيرة</h3>
-                {% if payments %}
-                <span class="badge bg-success">{{ payments|length }} عملية</span>
-                {% else %}
-                <span class="badge bg-secondary">لا توجد عمليات</span>
-                {% endif %}
+                <div class="d-flex gap-2 align-items-center">
+                    {% if payments %}
+                    <a href="{{ url_for('admin.export_payments_report') }}" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-file-invoice-dollar me-1"></i> تحميل التقرير
+                    </a>
+                    <span class="badge bg-success">{{ payments|length }} عملية</span>
+                    {% else %}
+                    <span class="badge bg-secondary">لا توجد عمليات</span>
+                    {% endif %}
+                </div>
             </div>
 
             {% if payments %}

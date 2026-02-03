@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, jsonify, request, url_for, make_response, current_app
 from flask_login import current_user
-from models import ContactModel, SecurityLogModel
+from models.database import ContactModel, LearnedAnswersModel
+from datetime import datetime
 
 contact_model = ContactModel()
 security_log_model = SecurityLogModel()
@@ -73,6 +74,28 @@ SERVICES_DATA = {
         'image': 'renovation.jpg'
     }
 }
+
+@web_bp.route('/robots.txt')
+def robots():
+    response = make_response("User-agent: *\nDisallow: /admin\nSitemap: " + url_for('web.sitemap', _external=True))
+    response.headers["Content-Type"] = "text/plain"
+    return response
+
+@web_bp.route('/sitemap.xml')
+def sitemap():
+    """Generate sitemap.xml dynamically."""
+    pages = []
+    
+    # Static pages
+    for rule in current_app.url_map.iter_rules():
+        if "GET" in rule.methods and len(rule.arguments) == 0:
+            if not rule.rule.startswith('/admin') and not rule.rule.startswith('/api'):
+                pages.append([url_for(rule.endpoint, _external=True), datetime.now().strftime("%Y-%m-%d")])
+
+    sitemap_xml = render_template('sitemap.xml', pages=pages)
+    response = make_response(sitemap_xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response
 
 @web_bp.route('/')
 def index():
