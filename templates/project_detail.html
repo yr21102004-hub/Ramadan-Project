@@ -20,8 +20,8 @@
 
                     {% if project.description %}
                     <div class="mb-5" style="text-align: justify;">
-                        <p style="color: #ddd; font-size: 1.15rem; line-height: 2; text-indent: 20px;">
-                            {{ project.description }}
+                        <p style="color: var(--text); font-size: 1.15rem; line-height: 2; text-indent: 20px;">
+                            {{ project.description | safe }}
                         </p>
                     </div>
                     <div style="border-top: 1px solid var(--primary); opacity: 0.3; margin: 40px 0;"></div>
@@ -63,7 +63,7 @@
                             <li style="margin-bottom: 12px; display: flex; align-items: flex-start;">
                                 <i class="fas fa-check-circle"
                                     style="color: var(--primary); margin-left: 10px; margin-top: 5px;"></i>
-                                <span style="color: #ddd; font-size: 1.1rem;">{{ item }}</span>
+                                <span style="color: var(--text); font-size: 1.1rem;">{{ item }}</span>
                             </li>
                             {% endfor %}
                         </ul>
