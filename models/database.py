@@ -171,9 +171,28 @@ class Database:
                 message TEXT,
                 status TEXT DEFAULT 'قيد المراجعة',
                 admin_notes TEXT,
+                contact_phone TEXT,
+                contact_email TEXT,
+                admin_response TEXT,
                 created_at TEXT
             )
         ''')
+        
+        # Migration for complaints table
+        try:
+            cursor.execute("SELECT contact_phone FROM complaints LIMIT 1")
+        except sqlite3.OperationalError:
+             cursor.execute("ALTER TABLE complaints ADD COLUMN contact_phone TEXT")
+             
+        try:
+            cursor.execute("SELECT contact_email FROM complaints LIMIT 1")
+        except sqlite3.OperationalError:
+             cursor.execute("ALTER TABLE complaints ADD COLUMN contact_email TEXT")
+
+        try:
+            cursor.execute("SELECT admin_response FROM complaints LIMIT 1")
+        except sqlite3.OperationalError:
+             cursor.execute("ALTER TABLE complaints ADD COLUMN admin_response TEXT")
 
         # 11. Inspection Requests
         cursor.execute('''
