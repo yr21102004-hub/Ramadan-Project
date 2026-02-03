@@ -219,6 +219,7 @@
                         <h6 class="text-white mb-3">اتخاذ القرار</h6>
 
                         <form id="assignForm" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="assignment_type" value="admin">
 
                             <div class="alert alert-info bg-dark border-0 text-white mb-4">
@@ -290,6 +291,7 @@
                         </div>
 
                         <form id="approveForm" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <h6 class="text-gold mb-3">قرار الإدارة</h6>
                             <div class="mb-3">
                                 <textarea name="admin_notes" class="form-control glass-input" rows="3"
@@ -461,6 +463,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="completeForm" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
                     <p class="text-white">هل أنت متأكد من إتمام هذه المعاينة؟</p>
                     <p class="text-muted small">سيتم تسجيل أن الإدارة قامت بزيارة العميل، وسيظهر له أن التقرير جاهز.</p>
@@ -489,6 +492,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="rejectInspectionForm" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
                     <p class="text-white">هل أنت متأكد من رفض طلب المعاينة؟</p>
                     <p class="text-muted small">سيتم إخطار العميل بالرفض وسبب الرفض إن وُجد.</p>

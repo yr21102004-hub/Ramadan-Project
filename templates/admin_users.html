@@ -138,6 +138,7 @@
                                     {% if user.username != current_user.username %}
                                     <form method="POST" action="{{ url_for('user.delete', username=user.username) }}"
                                         onsubmit="return confirm('هل أنت متأكد من حذف هذا المستخدم؟ وسيتم حذف جميع بياناته!');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -219,6 +220,7 @@
                 <div class="question-body">
                     <p class="mb-2"><strong>السؤال:</strong> {{ q.question }}</p>
                     <form method="POST" action="{{ url_for('admin.answer_question') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="question" value="{{ q.question }}">
                         <div class="mb-2">
                             <textarea name="answer" class="form-control" rows="2" placeholder="اكتب الإجابة هنا..."
@@ -396,6 +398,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ url_for('admin.add_user') }}" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -447,6 +450,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ url_for('user.update_percentage') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
                     <input type="hidden" name="username" id="updateUsername">
                     <label class="form-label">نسبة الإنجاز الجديدة</label>
