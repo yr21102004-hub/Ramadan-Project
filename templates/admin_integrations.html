@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="section-padding admin-section-bg">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-down">
+            <div>
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-light btn-sm mb-3">
+                    <i class="fas fa-arrow-right me-2"></i> العودة للوحة التحكم
+                </a>
+                <h2 class="section-title mb-0">الربط والأنظمة (Integrations)</h2>
+                <p class="text-muted mt-2">إدارة ربط CRM والخدمات الخارجية</p>
+            </div>
+        </div>
+
+        <div class="row g-4" data-aos="fade-up">
+            <!-- Zoho CRM -->
+            <div class="col-md-4">
+                <div class="integration-card glass p-4 text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-cloud fa-3x text-primary"></i>
+                    </div>
+                    <h4>Zoho CRM</h4>
+                    <p class="text-muted small">مزامنة العملاء والطلبات تلقائياً</p>
+                    <div class="status-indicator disconnected mb-3">غير متصل</div>
+                    <button class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="modal"
+                        data-bs-target="#crmModal" onclick="setupCrm('Zoho')">إعداد الربط</button>
+                </div>
+            </div>
+
+            <!-- HubSpot -->
+            <div class="col-md-4">
+                <div class="integration-card glass p-4 text-center">
+                    <div class="mb-3">
+                        <i class="fab fa-hubspot fa-3x text-warning"></i>
+                    </div>
+                    <h4>HubSpot</h4>
+                    <p class="text-muted small">إدارة علاقات العملاء والتسويق</p>
+                    <div class="status-indicator disconnected mb-3">غير متصل</div>
+                    <button class="btn btn-outline-warning btn-sm w-100" data-bs-toggle="modal"
+                        data-bs-target="#crmModal" onclick="setupCrm('HubSpot')">إعداد الربط</button>
+                </div>
+            </div>
+
+            <!-- Salesforce -->
+            <div class="col-md-4">
+                <div class="integration-card glass p-4 text-center">
+                    <div class="mb-3">
+                        <i class="fab fa-salesforce fa-3x text-info"></i>
+                    </div>
+                    <h4>Salesforce</h4>
+                    <p class="text-muted small">حلول المؤسسات الكبرى</p>
+                    <div class="status-indicator disconnected mb-3">غير متصل</div>
+                    <button class="btn btn-outline-info btn-sm w-100" data-bs-toggle="modal" data-bs-target="#crmModal"
+                        onclick="setupCrm('Salesforce')">إعداد الربط</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- CRM Setup Modal -->
+<div class="modal fade" id="crmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content glass-modal text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crmModalTitle">إعداد الربط</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">API Key</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary"
+                            placeholder="Enter API Key">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Client ID</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary">
+                    </div>
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle me-1"></i> سيتم تفعيل المزامنة التلقائية فور التحقق.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-success">حفظ وتوصيل</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setupCrm(name) {
+        document.getElementById('crmModalTitle').innerText = 'إعداد ربط: ' + name;
+    }
+</script>
+
+<style>
+    .admin-section-bg {
+        background: #0a0a0a;
+        min-height: 100vh;
+        padding-top: 100px;
+        direction: rtl;
+    }
+
+    .glass {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+    }
+
+    .status-indicator {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+    .disconnected {
+        background: rgba(255, 0, 0, 0.1);
+        color: #ff6b6b;
+        border: 1px solid rgba(255, 0, 0, 0.2);
+    }
+
+    .glass-modal {
+        background: #1a1a1a;
+        border: 1px solid #333;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="section-padding admin-section-bg">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-down">
+            <div>
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-light btn-sm mb-3">
+                    <i class="fas fa-arrow-right me-2"></i> العودة للوحة التحكم
+                </a>
+                <h2 class="section-title mb-0">نظام التقارير (Reports)</h2>
+                <p class="text-muted mt-2">تصدير بيانات النظام (PDF / Excel)</p>
+            </div>
+        </div>
+
+        <div class="row g-4" data-aos="fade-up">
+            <!-- PDF Reports -->
+            <div class="col-md-6">
+                <div class="glass p-4 rounded-4 h-100">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="icon-box bg-danger-soft text-danger me-3 rounded-circle p-3">
+                            <i class="fas fa-file-pdf fa-2x"></i>
+                        </div>
+                        <h4 class="text-white mb-0">تقارير PDF</h4>
+                    </div>
+                    <form action="{{ url_for('admin.export_pdf_report') }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">نوع التقرير</label>
+                            <select name="report_type" class="form-select bg-dark text-white border-secondary">
+                                <option value="monthly_summary">ملخص شهري شامل</option>
+                                <option value="tickets_status">حالة التذاكر والدعم</option>
+                                <option value="revenue">تقرير الإيرادات</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="fas fa-download me-2"></i> تحميل PDF
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Excel Reports -->
+            <div class="col-md-6">
+                <div class="glass p-4 rounded-4 h-100">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="icon-box bg-success-soft text-success me-3 rounded-circle p-3">
+                            <i class="fas fa-file-excel fa-2x"></i>
+                        </div>
+                        <h4 class="text-white mb-0">تقارير Excel</h4>
+                    </div>
+                    <form action="{{ url_for('admin.export_excel_report') }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">البيانات المطلوبة</label>
+                            <select name="data_type" class="form-select bg-dark text-white border-secondary">
+                                <option value="users">قائمة العملاء الكاملة</option>
+                                <option value="tickets">سجل التذاكر</option>
+                                <option value="payments">سجل المدفوعات</option>
+                                <option value="messages">رسائل التواصل</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-download me-2"></i> تحميل Excel
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<style>
+    .admin-section-bg {
+        background: #0a0a0a;
+        min-height: 100vh;
+        padding-top: 100px;
+        direction: rtl;
+    }
+
+    .glass {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+</style>
+{% endblock %}

@@ -79,6 +79,22 @@
             </div>
         </div>
 
+        <!-- Custom Reports: Weekly Activity Overview -->
+        <div class="row mb-5" data-aos="fade-up">
+            <div class="col-12">
+                <div class="glass p-4 rounded-4 border-gold-soft">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 text-white"><i class="fas fa-chart-bar text-gold me-2"></i> نظرة عامة على النظام
+                            (System Overview)</h5>
+                        <div class="badge bg-gold text-dark">Live Report</div>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="dashboardOverviewChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Quick Actions & Reports -->
         <div class="row mb-5 g-4" data-aos="fade-up">
             <div class="col-12">
@@ -547,4 +563,59 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var ctx = document.getElementById('dashboardOverviewChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['المستخدمين', 'الرسائل', 'المعاينات', 'التحويلات'],
+                datasets: [{
+                    label: 'العدد الإجمالي',
+                    data: [
+                        {{ analytics.total_users }},
+                {{ analytics.total_requests }}, 
+                        {{ analytics.total_inspections }},
+        {{ analytics.total_payments }}
+                    ],
+        backgroundColor: [
+        'rgba(54, 162, 235, 0.7)',
+        'rgba(255, 206, 86, 0.7)',
+        'rgba(153, 102, 255, 0.7)',
+        'rgba(75, 192, 192, 0.7)'
+    ],
+        borderColor: [
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(75, 192, 192, 1)'
+    ],
+        borderWidth: 1
+                }]
+            },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                ticks: { color: '#fff' }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { color: '#fff', font: { family: 'Cairo' } }
+            }
+        },
+        plugins: {
+            legend: {
+                labels: { color: '#fff', font: { family: 'Cairo' } }
+            }
+        }
+    }
+        });
+    });
+</script>
 {% endblock %}

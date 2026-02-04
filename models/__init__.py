@@ -11,7 +11,9 @@ from .database import (
     UnansweredQuestionsModel,
     ContactModel,
     SubscriptionModel,
-    ComplaintModel
+    ComplaintModel,
+    TicketModel,
+    TicketMessageModel
 )
 from .rating_model import RatingModel
 from .inspection_model import InspectionRequestModel
@@ -28,5 +30,7 @@ __all__ = [
     'SubscriptionModel',
     'RatingModel',
     'ComplaintModel',
-    'InspectionRequestModel'
+    'InspectionRequestModel',
+    'TicketModel',
+    'TicketMessageModel'
 ]

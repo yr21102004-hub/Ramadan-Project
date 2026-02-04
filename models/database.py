@@ -207,6 +207,33 @@ class Database:
                 created_at TEXT
             )
         ''')
+
+        # 12. Tickets Table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS tickets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT,
+                subject TEXT,
+                category TEXT,
+                priority TEXT DEFAULT 'Medium',
+                status TEXT DEFAULT 'Open',
+                created_at TEXT,
+                last_updated TEXT
+            )
+        ''')
+
+        # 13. Ticket Messages (Sub-table)
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS ticket_messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ticket_id INTEGER,
+                sender_id TEXT,
+                message TEXT,
+                attachment_path TEXT,
+                timestamp TEXT,
+                is_admin_reply BOOLEAN DEFAULT 0
+            )
+        ''')
         
         conn.commit()
         conn.close()
@@ -733,3 +760,57 @@ class SubscriptionModel(SQLiteModel):
         conn.execute(sql, list(filtered_data.values()))
         conn.commit()
         conn.close()
+
+class TicketModel(SQLiteModel):
+    def __init__(self):
+        super().__init__('tickets')
+
+    def create(self, user_id, subject, category, priority='Medium'):
+        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn = self.db_mgr.get_connection()
+        cursor = conn.execute("INSERT INTO tickets (user_id, subject, category, priority, status, created_at, last_updated) VALUES (?, ?, ?, ?, 'Open', ?, ?)",
+                     (user_id, subject, category, priority, created_at, created_at))
+        tid = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        return tid
+
+    def get_all(self):
+        conn = self.db_mgr.get_connection()
+        rows = conn.execute("SELECT * FROM tickets ORDER BY last_updated DESC").fetchall()
+        conn.close()
+        return [self._dict_from_row(r) for r in rows]
+
+    def get_by_user(self, user_id):
+        conn = self.db_mgr.get_connection()
+        rows = conn.execute("SELECT * FROM tickets WHERE user_id = ? ORDER BY last_updated DESC", (user_id,)).fetchall()
+        conn.close()
+        return [self._dict_from_row(r) for r in rows]
+    
+    def update_status(self, ticket_id, status):
+        updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn = self.db_mgr.get_connection()
+        conn.execute("UPDATE tickets SET status = ?, last_updated = ? WHERE id = ?", (status, updated_at, ticket_id))
+        conn.commit()
+        conn.close()
+
+class TicketMessageModel(SQLiteModel):
+    def __init__(self):
+        super().__init__('ticket_messages')
+
+    def create(self, ticket_id, sender_id, message, is_admin=False, attachment=None):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn = self.db_mgr.get_connection()
+        # Update ticket timestamp too
+        conn.execute("UPDATE tickets SET last_updated = ? WHERE id = ?", (timestamp, ticket_id))
+        
+        conn.execute("INSERT INTO ticket_messages (ticket_id, sender_id, message, attachment_path, timestamp, is_admin_reply) VALUES (?, ?, ?, ?, ?, ?)",
+                     (ticket_id, sender_id, message, attachment, timestamp, 1 if is_admin else 0))
+        conn.commit()
+        conn.close()
+
+    def get_by_ticket(self, ticket_id):
+        conn = self.db_mgr.get_connection()
+        rows = conn.execute("SELECT * FROM ticket_messages WHERE ticket_id = ? ORDER BY timestamp ASC", (ticket_id,)).fetchall()
+        conn.close()
+        return [self._dict_from_row(r) for r in rows]

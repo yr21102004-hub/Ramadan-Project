@@ -2,7 +2,7 @@
 Flask Application Entry Point
 Organized with MVC Architecture and OOP Principles
 """
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_limiter import Limiter
@@ -12,6 +12,10 @@ from dotenv import load_dotenv
 import os
 import logging
 from logging.handlers import RotatingFileHandler
+try:
+    from flask_compress import Compress
+except ImportError:
+    Compress = None
 
 # Import Models
 from models.user import User
@@ -59,6 +63,9 @@ app.config.update(
 )
 
 # Initialize extensions (CSRF initialized but disabled in config to avoid template errors)
+if Compress:
+    Compress(app)
+    
 bcrypt = Bcrypt(app)
 csrf = CSRFProtect(app) 
 # Rate Limiting Configuration

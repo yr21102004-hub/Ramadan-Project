@@ -1,0 +1,121 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="section-padding bg-dark text-white" style="min-height: 100vh; padding-top: 100px;">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-down">
+            <div>
+                <a href="{{ url_for('user.profile', username=current_user.username) }}"
+                    class="btn btn-outline-light btn-sm mb-3">
+                    <i class="fas fa-arrow-right me-2"></i> العودة للملف الشخصي
+                </a>
+                <h2 class="section-title mb-0">تذاكر الدعم الفني</h2>
+                <p class="text-muted mt-2">تابع حالة طلباتك أو افتح تذكرة جديدة</p>
+            </div>
+            <button class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#newTicketModal">
+                <i class="fas fa-plus me-2"></i> فتح تذكرة جديدة
+            </button>
+        </div>
+
+        <!-- Tickets List -->
+        <div class="row g-4" data-aos="fade-up">
+            {% if tickets %}
+            {% for t in tickets %}
+            <div class="col-md-6 col-lg-4">
+                <div class="stat-card glass h-100 p-4 rounded-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span
+                            class="badge {% if t.status=='Open' %}bg-danger{% elif t.status=='In Progress' %}bg-warning{% else %}bg-success{% endif %}">
+                            {{ t.status }}
+                        </span>
+                        <span class="text-muted small">{{ t.created_at[:10] }}</span>
+                    </div>
+                    <h5 class="text-white mb-2">{{ t.subject }}</h5>
+                    <p class="text-muted small mb-3">#{{ t.id }} - {{ t.category }}</p>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <span class="badge bg-secondary-soft text-white">{{ t.priority }} Priority</span>
+                        <!-- Future: Link to view full ticket details/chat -->
+                        <!-- <a href="#" class="btn btn-sm btn-outline-light">عرض التفاصيل</a> -->
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-ticket-alt fa-3x mb-3 opacity-25"></i>
+                    <p class="text-muted">لا توجد تذاكر حالياً. هل تواجه مشكلة؟ افتح تذكرة جديدة.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+
+<!-- New Ticket Modal -->
+<div class="modal fade" id="newTicketModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-modal text-white" style="background: #1a1a1a; border: 1px solid #333;">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title">فتح تذكرة جديدة</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('user.submit_ticket') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">الموضوع</label>
+                        <input type="text" name="subject" class="form-control bg-dark text-white border-secondary"
+                            required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">القسم</label>
+                            <select name="category" class="form-select bg-dark text-white border-secondary">
+                                <option value="Technical">دعم فني</option>
+                                <option value="Billing">فواتير ومدفوعات</option>
+                                <option value="Project">استفسار عن مشروع</option>
+                                <option value="Complaint">شكوى</option>
+                                <option value="Other">أخرى</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">الأولوية</label>
+                            <select name="priority" class="form-select bg-dark text-white border-secondary">
+                                <option value="Low">منخفضة</option>
+                                <option value="Medium" selected>متوسطة</option>
+                                <option value="High">عالية</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">تفاصيل المشكلة</label>
+                        <textarea name="message" class="form-control bg-dark text-white border-secondary" rows="5"
+                            required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-gold">إرسال التذكرة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .glass {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .bg-secondary-soft {
+        background: rgba(255, 255, 255, 0.1);
+    }
+</style>
+{% endblock %}

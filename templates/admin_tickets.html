@@ -1,0 +1,210 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="section-padding admin-section-bg">
+    <div class="container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-down">
+            <div>
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-light btn-sm mb-3">
+                    <i class="fas fa-arrow-right me-2"></i> العودة للوحة التحكم
+                </a>
+                <h2 class="section-title mb-0">نظام إدارة التذاكر (Tickets)</h2>
+                <p class="text-muted mt-2">إدارة الشكاوى وطلبات الدعم الفني</p>
+            </div>
+            <div>
+                <!-- Optional: Button to create ticket manually -->
+            </div>
+        </div>
+
+        <!-- Filter/Status Cards -->
+        <div class="row mb-5 g-4" data-aos="fade-up">
+            <div class="col-md-3">
+                <div class="stat-card glass h-100">
+                    <div class="stat-icon bg-danger-gradient">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ stats.open }}</h3>
+                        <p>تذاكر مفتوحة</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card glass h-100">
+                    <div class="stat-icon bg-warning-gradient">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ stats.in_progress }}</h3>
+                        <p>قيد التنفيذ</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card glass h-100">
+                    <div class="stat-icon bg-success-gradient">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ stats.closed }}</h3>
+                        <p>مغلقة</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card glass h-100">
+                    <div class="stat-icon bg-blue-gradient">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ stats.total }}</h3>
+                        <p>إجمالي التذاكر</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider mb-5"></div>
+
+        <!-- Tickets Table -->
+        <div class="mb-5" data-aos="fade-up">
+            <h3 class="text-gold mb-4"><i class="fas fa-list me-2"></i> قائمة التذاكر</h3>
+
+            {% if tickets %}
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>العميل</th>
+                            <th>الموضوع</th>
+                            <th>الأولوية</th>
+                            <th>الحالة</th>
+                            <th>التاريخ</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in tickets %}
+                        <tr>
+                            <td>#{{ t.id }}</td>
+                            <td>{{ t.user_id }}</td>
+                            <td>{{ t.subject }}</td>
+                            <td>
+                                {% if t.priority == 'High' %}
+                                <span class="badge bg-danger">مرتفع</span>
+                                {% elif t.priority == 'Medium' %}
+                                <span class="badge bg-warning text-dark">متوسط</span>
+                                {% else %}
+                                <span class="badge bg-secondary">منخفض</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if t.status == 'Open' %}
+                                <span class="badge bg-danger">مفتوح</span>
+                                {% elif t.status == 'In Progress' %}
+                                <span class="badge bg-warning text-dark">قيد التنفيذ</span>
+                                {% else %}
+                                <span class="badge bg-success">مغلق</span>
+                                {% endif %}
+                            </td>
+                            <td class="small">{{ t.created_at[:16] }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                                    data-bs-target="#ticketModal{{ t.id }}">
+                                    <i class="fas fa-edit"></i> تعديل
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="ticketModal{{ t.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content glass-modal">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-gold">تذكرة #{{ t.id }} - {{ t.subject }}</h5>
+                                        <button type="button" class="btn-close btn-close-white"
+                                            data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="POST" action="{{ url_for('admin.update_ticket', ticket_id=t.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">الحالة</label>
+                                                <select name="status" class="form-select">
+                                                    <option value="Open" {% if t.status=='Open' %}selected{% endif %}>
+                                                        مفتوح</option>
+                                                    <option value="In Progress" {% if t.status=='In Progress'
+                                                        %}selected{% endif %}>قيد التنفيذ</option>
+                                                    <option value="Closed" {% if t.status=='Closed' %}selected{% endif
+                                                        %}>مغلق</option>
+                                                </select>
+                                            </div>
+                                            <!-- Additional fields like Assign To could go here -->
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">إغلاق</button>
+                                            <button type="submit" class="btn btn-gold">حفظ التغييرات</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-check-circle fa-3x mb-3 opacity-25"></i>
+                <p>لا توجد تذاكر حالياً</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+
+<style>
+    /* Reusing admin styles */
+    .admin-section-bg {
+        background: #0a0a0a;
+        min-height: 100vh;
+        padding-top: 100px;
+        direction: rtl;
+    }
+
+    .modern-table {
+        background: #2d2d2d;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .modern-table th {
+        color: #D4AF37;
+        padding: 15px;
+    }
+
+    .modern-table td {
+        color: #fff;
+        padding: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-modal {
+        background: rgba(20, 20, 20, 0.95);
+        backdrop-filter: blur(10px);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-modal .form-control,
+    .glass-modal .form-select {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+</style>
+{% endblock %}

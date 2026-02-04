@@ -1,119 +1,29 @@
-/* GLOBAL TEXT CONTRAST FIXES - Guaranteed Overrides */
-:root {
-    --text: #FFFFFF !important;
-    --text-muted: rgba(255, 255, 255, 0.75) !important;
+/* Fixes for Image Warmth and Tone */
+.project-item {
+    filter: saturate(0.9) brightness(0.95);
+    /* Slightly muted for elegance */
+    transition: all 0.4s ease;
 }
 
-body {
-    color: var(--text) !important;
+.project-item:hover {
+    filter: saturate(1.1) brightness(1.05);
+    /* Warm up on hover */
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-span,
-div,
-li,
-td,
-th {
-    color: inherit;
+/* Warm Overlay for Hero */
+.hero-overlay {
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.85) 0%, rgba(30, 25, 20, 0.5) 50%, rgba(10, 10, 10, 0.9) 100%) !important;
 }
 
-/* Override common text colors */
-.text-muted,
-.text-secondary,
-.small.text-muted,
-.text-white-50 {
+/* Ensure text is readable on creamy backgrounds */
+.text-muted {
     color: var(--text-muted) !important;
 }
 
-.text-dark {
-    color: #fff !important;
-    /* In dark mode, text-dark should be white or strictly controlled */
-}
-
-/* Bootstrap Forms */
-.form-control,
-.form-select,
-.input-group-text {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: #fff !important;
-}
-
-.form-control:focus,
-.form-select:focus {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    border-color: #D4AF37 !important;
-    /* Gold */
-    color: #fff !important;
-    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25) !important;
-}
-
-.form-control::placeholder {
-    color: rgba(255, 255, 255, 0.4) !important;
-}
-
-.form-label,
-label {
-    color: #fff !important;
-}
-
-/* Cards & Modals */
-.card,
-.modal-content,
-.list-group-item {
-    background-color: #121212 !important;
-    /* Dark Surface */
-    color: #fff !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-.card-header,
-.card-footer,
-.modal-header,
-.modal-footer {
-    border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Close Button White */
-.btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%) !important;
-}
-
-/* Tables */
-.table {
-    color: #fff !important;
-}
-
-.table td,
-.table th {
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    color: #fff !important;
-    /* Force white text in tables */
-}
-
-.table-hover tbody tr:hover {
-    color: #fff !important;
-    background-color: rgba(255, 255, 255, 0.05) !important;
-}
-
-/* Dropdowns */
-.dropdown-menu {
-    background-color: #1E1E1E !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.dropdown-item {
-    color: #fff !important;
-}
-
-.dropdown-item:hover,
-.dropdown-item:focus {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    color: #fff !important;
+/* Section Separators */
+.section-separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neutral-border), transparent);
+    width: 80%;
+    margin: 40px auto;
 }

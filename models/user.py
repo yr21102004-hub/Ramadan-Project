@@ -17,7 +17,18 @@ class User(UserMixin):
     @staticmethod
     def get(username):
         user_model = UserModel()
-        user_data = user_model.get_by_username(username)
         if user_data:
             return User(user_data)
         return None
+
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
+
+    @property
+    def is_manager(self):
+        return self.role == 'manager'
+
+    @property
+    def is_viewer(self):
+        return self.role == 'viewer'

@@ -23,6 +23,11 @@
     /* Warmer text using cream tint */
     --text-gold: #D4AF37;
 
+    /* Third Neutral Color - Light Gray / Creamy Beige */
+    --neutral-light: #F2F2F2;
+    --neutral-cream: #F5F1E8;
+    --neutral-border: rgba(245, 241, 232, 0.15);
+
     --font-main: 'Cairo', system-ui, -apple-system, sans-serif;
     --font-heading: 'Amiri', serif;
 
@@ -77,6 +82,10 @@ body.light-mode {
     --text-muted: #666055;
     /* Warm Gray */
     --text-gold: #B5922B;
+
+    --neutral-light: #E0E0E0;
+    --neutral-cream: #E8E4D8;
+    --neutral-border: rgba(0, 0, 0, 0.08);
     /* Darker gold for better contrast on light */
 
     --primary-muted: #B5922B;
@@ -119,7 +128,8 @@ a {
 
 .premium-card {
     background: var(--surface-light);
-    border: var(--border-subtle);
+    border: 1px solid var(--neutral-border);
+    /* Updated to neutral */
     border-radius: var(--radius-lg);
     padding: 40px;
     transition: var(--transition-smooth);
@@ -131,7 +141,7 @@ a {
 
 .premium-card:hover {
     transform: translateY(-8px);
-    border-color: rgba(212, 175, 55, 0.3);
+    border-color: rgba(212, 175, 55, 0.4);
     box-shadow: var(--shadow-gold);
 }
 
@@ -142,7 +152,8 @@ a {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at top left, rgba(212, 175, 55, 0.1), transparent);
+    background: radial-gradient(circle at top left, rgba(242, 232, 213, 0.05), transparent);
+    /* Cream glow */
     pointer-events: none;
     opacity: 0;
     transition: var(--transition-fast);
@@ -284,7 +295,7 @@ h6 {
 .divider {
     height: 3px;
     width: 80px;
-    background: var(--primary);
+    background: linear-gradient(90deg, var(--primary), var(--neutral-cream));
     margin-bottom: 2.5rem;
     border-radius: 2px;
 }

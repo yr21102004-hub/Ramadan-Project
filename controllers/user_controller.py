@@ -4,8 +4,9 @@ from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import os
-from models import UserModel, ContactModel, PaymentModel, ChatModel, UnansweredQuestionsModel, SubscriptionModel, ComplaintModel, RatingModel
+from models import UserModel, ContactModel, PaymentModel, ChatModel, UnansweredQuestionsModel, SubscriptionModel, ComplaintModel, RatingModel, TicketModel, TicketMessageModel
 from websockets import notify_admins, broadcast_percentage_update
+from utils.email_sender import send_email
 
 user_bp = Blueprint('user', __name__)
 bcrypt = Bcrypt()
@@ -17,6 +18,8 @@ unanswered_model = UnansweredQuestionsModel()
 subscription_model = SubscriptionModel()
 complaint_model = ComplaintModel()
 rating_model = RatingModel()
+ticket_model = TicketModel()
+ticket_message_model = TicketMessageModel()
 
 @user_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -303,3 +306,46 @@ def toggle_memory():
         return jsonify({'success': True, 'message': msg})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@user_bp.route('/user/submit_ticket', methods=['POST'])
+@login_required
+def submit_ticket():
+    subject = request.form.get('subject')
+    category = request.form.get('category')
+    priority = request.form.get('priority')
+    message = request.form.get('message')
+    
+    if not subject or not message:
+        flash("يرجى ملء جميع الحقول", "error")
+        return redirect(url_for('user.user_tickets'))
+        
+    try:
+        # Create Ticket
+        ticket_id = ticket_model.create(current_user.username, subject, category, priority)
+        
+        # Add Initial Message
+        ticket_message_model.insert({
+            'ticket_id': ticket_id,
+            'sender_id': current_user.username,
+            'message': message,
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'is_admin_reply': 0
+        })
+        
+        # Email Notification (To Admin)
+        admin_email = os.getenv('ADMIN_EMAIL', 'admin@example.com')
+        # Use helper
+        send_email(admin_email, f"New Ticket #{ticket_id} from {current_user.username}", 
+                   f"<p>User <b>{current_user.username}</b> created a new ticket:</p><h3>{subject}</h3><p>{message}</p>")
+        
+        flash("تم إنشاء التذكرة بنجاح", "success")
+    except Exception as e:
+        flash(f"حدث خطأ: {e}", "error")
+        
+    return redirect(url_for('user.user_tickets'))
+
+@user_bp.route('/user/tickets')
+@login_required
+def user_tickets():
+    my_tickets = ticket_model.get_by_user(current_user.username)
+    return render_template('user_tickets.html', tickets=my_tickets)
