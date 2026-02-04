@@ -4,8 +4,8 @@
 <section class="project-hero"
     style="background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(10,10,10,0.8)); position: relative; padding: 120px 0 80px; margin-top: 60px; overflow: hidden;">
     <div class="hero-bg-pattern"
-        style="position: absolute; top:0; left:0; width:100%; height:100%; background-image: url('{{ url_for(" static",
-        filename="assets/wallpaper.jpg" ) }}'); opacity: 0.1; background-size: cover; z-index: -1;"></div>
+        style="position: absolute; top:0; left:0; width:100%; height:100%; background-image: url('{{ url_for('static', filename='assets/wallpaper.jpg') }}'); opacity: 0.1; background-size: cover; z-index: -1;">
+    </div>
 
     <div class="container text-center text-white" data-aos="fade-down">
         <h1 class="project-title-hero display-4 mb-3 text-gold" style="font-weight: 800; letter-spacing: 1px;">{{
@@ -15,7 +15,9 @@
     </div>
 </section>
 
-<section class="section-padding bg-darker" style="padding-top: 50px; background: var(--surface);">
+<section
+    class="section-padding {% if project.title == 'دهانات القصور والفلل الفاخرة' %}bg-villas-luxury{% elif project.title == 'بنود دهانات الشقق السكنية الفاخرة' %}bg-apartments-luxury{% elif project.title == 'بنود دهانات المصانع والمنشآت الصناعية' %}bg-factories-luxury{% elif project.title == 'بنود دهانات الشركات والمباني الإدارية' %}bg-companies-luxury{% elif project.title == 'بنود دهانات الفنادق والمنتجعات' %}bg-hotels-luxury{% else %}bg-pattern-luxury{% endif %}"
+    style="padding-top: 50px;">
     <div class="container">
         <!-- New 3-Column Image Grid -->
         {% if project.images and project.images|length >= 3 %}

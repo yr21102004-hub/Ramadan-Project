@@ -27,3 +27,134 @@
     width: 80%;
     margin: 40px auto;
 }
+
+/* Elegant Geometric Pattern for Backgrounds */
+.bg-pattern-luxury {
+    background-color: var(--surface);
+    background-image:
+        linear-gradient(45deg, rgba(212, 175, 55, 0.03) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.03) 75%, rgba(212, 175, 55, 0.03)),
+        linear-gradient(45deg, rgba(212, 175, 55, 0.03) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.03) 75%, rgba(212, 175, 55, 0.03));
+    background-position: 0 0, 20px 20px;
+    background-size: 40px 40px;
+}
+
+/* Add a gold glow to the overlay bottom */
+.project-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(to top, var(--surface), transparent);
+    z-index: 1;
+}
+
+/* Specific Background for Villas Page */
+.bg-villas-luxury {
+    background-color: #050505;
+    background-image: url('../static/assets/luxury_bg_villas.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 1;
+}
+
+.bg-villas-luxury::before {
+    display: none;
+}
+
+.bg-villas-luxury>.container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Specific Background for Apartments Page */
+.bg-apartments-luxury {
+    background-color: #050505;
+    background-image: url('../static/assets/luxury_bg_apartments.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 1;
+}
+
+.bg-apartments-luxury::before {
+    display: none;
+}
+
+.bg-apartments-luxury>.container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Specific Background for Factories Page */
+.bg-factories-luxury {
+    background-color: #111111;
+    background-image: url('../static/assets/luxury_bg_factories.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 1;
+}
+
+.bg-factories-luxury::before {
+    display: none;
+}
+
+.bg-factories-luxury>.container {
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 40px;
+    border-radius: 20px;
+}
+
+/* Specific Background for Companies Page */
+.bg-companies-luxury {
+    background-color: #080C15;
+    background-image: url('../static/assets/luxury_bg_companies.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 1;
+}
+
+.bg-companies-luxury::before {
+    display: none;
+}
+
+.bg-companies-luxury>.container {
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 40px;
+    border-radius: 20px;
+}
+
+/* Specific Background for Hotels Page */
+.bg-hotels-luxury {
+    background-color: #0A1020;
+    background-image: url('../static/assets/luxury_bg_hotels.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 1;
+}
+
+.bg-hotels-luxury::before {
+    display: none;
+}
+
+.bg-hotels-luxury>.container {
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 40px;
+    border-radius: 20px;
+}

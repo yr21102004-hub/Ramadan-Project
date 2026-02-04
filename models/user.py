@@ -17,6 +17,7 @@ class User(UserMixin):
     @staticmethod
     def get(username):
         user_model = UserModel()
+        user_data = user_model.get_by_username(username)
         if user_data:
             return User(user_data)
         return None
