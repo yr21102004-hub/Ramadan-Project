@@ -1,83 +1,112 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<style>
-    .project-image-container:hover img {
-        transform: scale(1.1) !important;
-    }
-</style>
-<section class="section-padding" style="margin-top: 80px;">
+<section class="project-hero"
+    style="background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(10,10,10,0.8)); position: relative; padding: 120px 0 80px; margin-top: 60px; overflow: hidden;">
+    <div class="hero-bg-pattern"
+        style="position: absolute; top:0; left:0; width:100%; height:100%; background-image: url('{{ url_for(" static",
+        filename="assets/wallpaper.jpg" ) }}'); opacity: 0.1; background-size: cover; z-index: -1;"></div>
+
+    <div class="container text-center text-white" data-aos="fade-down">
+        <h1 class="project-title-hero display-4 mb-3 text-gold" style="font-weight: 800; letter-spacing: 1px;">{{
+            project.title }}</h1>
+        <p class="lead text-muted-dynamic" style="max-width: 700px; margin: 0 auto; color: var(--neutral-light);">{{
+            project.headline|default('أحدث اتجاهات التصميم والتشطيب الفاخر') }}</p>
+    </div>
+</section>
+
+<section class="section-padding bg-darker" style="padding-top: 50px; background: var(--surface);">
     <div class="container">
-        <div class="service-detail-header text-center mb-5">
-            <h1 class="section-title">{{ project.title }}</h1>
-            <div class="divider center-divider"></div>
+        <!-- New 3-Column Image Grid -->
+        {% if project.images and project.images|length >= 3 %}
+        <div class="row g-4 mb-5" data-aos="fade-up">
+            {% for img in project.images[:3] %}
+            <div class="col-md-4">
+                <div class="project-grid-item"
+                    style="border-radius: 15px; overflow: hidden; position: relative; height: 350px; border: 1px solid var(--neutral-border);">
+                    <img src="{{ url_for('static', filename='assets/' ~ img) }}" alt="Project View"
+                        style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; filter: brightness(0.9);">
+                    <div class="overlay"
+                        style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
+                        <h5 class="text-white mb-1"><i class="fas fa-camera me-2 text-gold"></i> زاوية مميزة</h5>
+                        <p class="text-white-50 small mb-0">جودة التفاصيل</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
+        {% elif project.images %}
+        <!-- Fallback for fewer images -->
+        <div class="row justify-content-center mb-5" data-aos="fade-up">
+            <div class="col-lg-10">
+                <div class="project-featured-image shadow-premium"
+                    style="border-radius: 20px; overflow: hidden; border: 1px solid var(--neutral-border);">
+                    <img src="{{ url_for('static', filename='assets/' ~ project.images[0]) }}" alt="Main View"
+                        style="width: 100%; height: 500px; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
-        <div class="row align-items-start" style="display: flex; flex-wrap: wrap; gap: 40px;">
-            <!-- Content Side -->
-            <div class="col-lg-8 mx-auto" data-aos="fade-up">
-                <div class="premium-card" style="padding: 40px; line-height: 1.8;">
-
+        <!-- Content & Details -->
+        <div class="row align-items-start mt-5">
+            <div class="col-lg-10 mx-auto">
+                <div class="premium-card p-5" data-aos="fade-up" style="border: 1px solid var(--neutral-border);">
                     {% if project.description %}
-                    <div class="mb-5" style="text-align: justify;">
-                        <p style="color: var(--text); font-size: 1.15rem; line-height: 2; text-indent: 20px;">
+                    <div class="project-description mb-5">
+                        <p style="font-size: 1.15rem; line-height: 2.1; color: var(--text-muted); text-align: justify;">
                             {{ project.description | safe }}
                         </p>
                     </div>
-                    <div style="border-top: 1px solid var(--primary); opacity: 0.3; margin: 40px 0;"></div>
                     {% endif %}
 
-                    {% if project.images %}
-                    <div id="projectCarousel" class="carousel slide mb-5 premium-card" data-bs-ride="carousel"
-                        style="padding: 0; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.3);">
-                        <div class="carousel-inner">
-                            {% for img in project.images %}
-                            <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                <img src="{{ url_for('static', filename='assets/' ~ img) }}" class="d-block w-100"
-                                    alt="Project Image" style="height: 500px; object-fit: cover;">
+                    <div class="divider center-divider"></div>
+
+                    <!-- Tech Specs / Sections -->
+                    <div class="row g-5">
+                        {% for section in project.sections %}
+                        <div class="col-md-6">
+                            <div class="spec-box mb-3">
+                                <h4 class="text-gold mb-3"
+                                    style="border-right: 3px solid var(--primary); padding-right: 15px;">{{
+                                    section.title }}</h4>
+                                <ul class="spec-list list-unstyled">
+                                    {% for item in section.details %}
+                                    <li class="mb-3 d-flex align-items-start text-muted-dynamic">
+                                        <i class="fas fa-check-circle mt-1 me-2 text-gold opacity-75"></i>
+                                        <span>{{ item }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
                             </div>
-                            {% endfor %}
                         </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#projectCarousel"
-                            data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"
-                                style="background-color: rgba(0,0,0,0.5); border-radius: 50%; padding: 20px;"></span>
-                            <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#projectCarousel"
-                            data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"
-                                style="background-color: rgba(0,0,0,0.5); border-radius: 50%; padding: 20px;"></span>
-                            <span class="visually-hidden">Next</span>
-                        </button>
+                        {% endfor %}
                     </div>
-                    {% endif %}
 
-                    {% for section in project.sections %}
-                    <div class="mb-5">
-                        <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: bold;">
-                            <i class="fas fa-paint-roller ms-2"></i> {{ section.title }}
-                        </h3>
-                        <ul class="service-features-list" style="list-style: none; padding: 0;">
-                            {% for item in section.details %}
-                            <li style="margin-bottom: 12px; display: flex; align-items: flex-start;">
-                                <i class="fas fa-check-circle"
-                                    style="color: var(--primary); margin-left: 10px; margin-top: 5px;"></i>
-                                <span style="color: var(--text); font-size: 1.1rem;">{{ item }}</span>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endfor %}
-
-                    <div class="mt-5 text-center">
-                        <a href="{{ url_for('web.contact') }}" class="btn btn-primary">اطلب معاينة لهذا المشروع</a>
-                        <a href="{{ url_for('web.projects') }}" class="btn btn-outline" style="margin-right: 15px;">عودة
-                            للمشاريع</a>
+                    <div class="action-area text-center mt-5 pt-4 border-top border-secondary border-opacity-25">
+                        <a href="{{ url_for('web.contact') }}" class="btn btn-primary btn-lg px-5 shadow-gold">اطلب
+                            معاينة لهذا المشروع</a>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </section>
+
+<style>
+    .project-grid-item:hover img {
+        transform: scale(1.05);
+        filter: brightness(1);
+    }
+
+    .spec-list li {
+        transition: transform 0.2s;
+    }
+
+    .spec-list li:hover {
+        transform: translateX(-5px);
+        color: var(--text);
+    }
+</style>
 {% endblock %}

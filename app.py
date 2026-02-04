@@ -63,8 +63,9 @@ app.config.update(
 )
 
 # Initialize extensions (CSRF initialized but disabled in config to avoid template errors)
-if Compress:
-    Compress(app)
+# Optimization disabled due to conflict with static files serving
+# if Compress:
+#    Compress(app)
     
 bcrypt = Bcrypt(app)
 csrf = CSRFProtect(app) 

@@ -24,3 +24,9 @@ class Config:
     # File Uploads
     UPLOAD_FOLDER = os.path.join('static', 'user_images')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB Max
+
+    # Compression Settings
+    # Only compress HTML and JSON to avoid issues with static files (CSS/JS) in some environments
+    COMPRESS_MIMETYPES = ['text/html', 'application/json']
+    COMPRESS_LEVEL = 6
+    COMPRESS_MIN_SIZE = 500

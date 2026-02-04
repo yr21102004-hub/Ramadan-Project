@@ -962,11 +962,7 @@ def export_excel_report():
 def admin_integrations():
     return render_template('admin_integrations.html')
 
-        'completed': len([r for r in all_requests if r['status'] == 'completed']),
-        'total': len(all_requests)
-    }
-    
-    return render_template('admin_inspections.html', requests=all_requests, stats=stats)
+
 
 
 @admin_bp.route('/admin/inspection/<request_id>/assign', methods=['POST'])
