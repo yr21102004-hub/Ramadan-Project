@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block title %}{{ project.title }} | الحاج رمضان محمد جبر{% endblock %}
+{% block description %}{{ project.description[:150]|striptags|safe }}...{% endblock %}
+{% block og_title %}{{ project.title }} - تشطيبات الحاج رمضان{% endblock %}
 
 {% block content %}
 <section class="project-hero"
@@ -7,7 +10,8 @@
         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.9) 100%); z-index: 1;">
     </div>
 
-    <div class="container text-center text-white" style="position: relative; z-index: 2;" data-aos="fade-down">
+    <div class="container text-center text-white" style="position: relative; z-index: 2;" data-aos="zoom-out"
+        data-aos-duration="1500">
         <h1 class="project-title-hero display-4 mb-3 text-gold" style="font-weight: 800; letter-spacing: 1px;">{{
             project.title }}</h1>
         <p class="lead text-muted-dynamic" style="max-width: 700px; margin: 0 auto; color: var(--neutral-light);">{{
@@ -24,7 +28,7 @@
             <div class="col-md-4">
                 <div class="project-grid-item"
                     style="border-radius: 15px; overflow: hidden; position: relative; height: 350px; border: 1px solid var(--neutral-border);">
-                    <img src="{{ url_for('static', filename='assets/' ~ img) }}" alt="Project View"
+                    <img src="{{ url_for('static', filename='assets/' ~ img) }}" alt="Project View" loading="lazy"
                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; filter: brightness(0.9);">
                     <div class="overlay"
                         style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
@@ -42,7 +46,7 @@
                 <div class="project-featured-image shadow-premium"
                     style="border-radius: 20px; overflow: hidden; border: 1px solid var(--neutral-border);">
                     <img src="{{ url_for('static', filename='assets/' ~ project.images[0]) }}" alt="Main View"
-                        style="width: 100%; height: 500px; object-fit: cover;">
+                        loading="lazy" style="width: 100%; height: 500px; object-fit: cover;">
                 </div>
             </div>
         </div>

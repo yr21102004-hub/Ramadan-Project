@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO & Meta Tags -->
     <meta name="description"
-        content="الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.">
+        content="اكتشف خدماتنا المتكاملة: دهانات حديثة، جبس بورد، تشطيب منازل، وتركيب ورق حائط بأعلى جودة في
+مصر.">
     <meta name="keywords"
         content="دهانات, ديكورات, تشطيبات, نقاشه, جبس بورد, رمضان محمد جبر, تشطيب شقق, الوان حوائط, مصر">
     <meta name="author" content="الحاج رمضان محمد جبر">
@@ -15,14 +16,34 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="http://localhost/services">
-    <meta property="og:title" content="الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية">
-    <meta property="og:description" content="الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.">
-    <meta property="og:image" content="http://localhost/static/logo.png">
+    <meta property="og:title" content="خدمات التشطيب والديكور - الحاج رمضان محمد جبر">
+    <meta property="og:description" content="اكتشف خدماتنا المتكاملة: دهانات حديثة، جبس بورد، تشطيب منازل، وتركيب ورق حائط بأعلى جودة في
+مصر.">
+    <meta property="og:image" content="http://localhost/static/logo.webp">
 
     <!-- CSRF & Security -->
-    <meta name="csrf-token" content="IjFjYzNjZTVkMTc1YmJjMTNmZmNkZjk3NTQ1N2EyNjA0MTc4NDI1NDYi.aYTyEA.sCZK2Q3AMegKTANaH0G4Fyu4e5o">
+    <meta name="csrf-token" content="ImJjYzFlY2U2YmYwNTlhYmJlZjk0ZDY2ZTBmODkzNjUyNGVmZTdiYzUi.aYT57w.bQZsI2RJb-5fHjRa2L3JHEc1nU4">
 
-    <title>الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية</title>
+    <title>خدماتنا | الحاج رمضان محمد جبر</title>
+
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "الحاج رمضان محمد جبر للدهانات والديكورات",
+      "image": "http://localhost/static/logo.webp",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "القاهرة",
+        "addressCountry": "EG"
+      },
+      "url": "http://localhost/",
+      "telephone": "+201099155572",
+      "priceRange": "$$",
+      "description": "نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة في مصر."
+    }
+    </script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +60,7 @@
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="apple-touch-icon" href="static/logo.png">
+    <link rel="apple-touch-icon" href="static/logo.webp">
     <!-- AOS Animations -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <!-- Islamic Welcome Style -->
@@ -283,6 +304,17 @@
 </head>
 
 <body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollBar"></div>
+
+    <script>
+        window.onscroll = function () {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("scrollBar").style.width = scrolled + "%";
+        };
+    </script>
 
 
     <!-- Preloader -->
@@ -486,7 +518,7 @@
     <div id="chat-widget" class="chat-widget">
         <div class="chat-header">
             <div class="chat-title">
-                <img src="static/chat_logo.png" alt="AI Logo" class="chat-logo-img">
+                <img src="static/chat_logo.webp" alt="AI Logo" class="chat-logo-img">
                 <span>المساعد الذكي</span>
             </div>
             <span id="close-chat" class="close-chat"><i class="fas fa-times"></i></span>
@@ -504,7 +536,7 @@
     </div>
 
     <button id="chat-toggle-btn" class="chat-toggle-btn">
-        <img src="static/chat_logo.png" alt="Chat AI">
+        <img src="static/chat_logo.webp" alt="Chat AI">
     </button>
 
     <!-- Bootstrap 5 JS Bundle -->

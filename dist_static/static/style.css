@@ -454,7 +454,7 @@ h6 {
 .hero {
     height: 100vh;
     width: 100%;
-    background: url('assets/hero.png') no-repeat center center/cover;
+    background: url('assets/hero.webp') no-repeat center center/cover;
     position: relative;
     display: flex;
     align-items: center;
@@ -636,11 +636,11 @@ h6 {
 }
 
 .project-item:nth-child(1) {
-    background-image: url('assets/hotel.png');
+    background-image: url('assets/hotel.webp');
 }
 
 .project-item:nth-child(2) {
-    background-image: url('assets/palace.png');
+    background-image: url('assets/palace.webp');
 }
 
 .project-item:nth-child(3) {
@@ -649,12 +649,12 @@ h6 {
 }
 
 .project-item:nth-child(4) {
-    background-image: url('assets/company.png');
+    background-image: url('assets/company.webp');
     /* Factories */
 }
 
 .project-item:nth-child(5) {
-    background-image: url('assets/company.png');
+    background-image: url('assets/company.webp');
     /* Companies */
 }
 
@@ -1580,7 +1580,7 @@ footer::before {
 }
 
 .bg-pattern-luxury {
-    background-image: url('wallpaper.png');
+    background-image: url('wallpaper.webp');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

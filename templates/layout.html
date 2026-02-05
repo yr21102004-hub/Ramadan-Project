@@ -17,12 +17,31 @@
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
     <meta property="og:description" content="{{ self.description() }}">
-    <meta property="og:image" content="{{ url_for('static', filename='logo.png', _external=True) }}">
+    <meta property="og:image" content="{{ url_for('static', filename='logo.webp', _external=True) }}">
 
     <!-- CSRF & Security -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{% block title %}الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية{% endblock %}</title>
+
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "الحاج رمضان محمد جبر للدهانات والديكورات",
+      "image": "{{ url_for('static', filename='logo.webp', _external=True) }}",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "القاهرة",
+        "addressCountry": "EG"
+      },
+      "url": "{{ request.url_root }}",
+      "telephone": "+201099155572",
+      "priceRange": "$$",
+      "description": "نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة في مصر."
+    }
+    </script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +58,7 @@
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.webp') }}">
     <!-- AOS Animations -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <!-- Islamic Welcome Style -->
@@ -283,6 +302,17 @@
 </head>
 
 <body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollBar"></div>
+
+    <script>
+        window.onscroll = function () {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("scrollBar").style.width = scrolled + "%";
+        };
+    </script>
 
 
     <!-- Preloader -->
@@ -430,7 +460,7 @@
     <div id="chat-widget" class="chat-widget">
         <div class="chat-header">
             <div class="chat-title">
-                <img src="{{ url_for('static', filename='chat_logo.png') }}" alt="AI Logo" class="chat-logo-img">
+                <img src="{{ url_for('static', filename='chat_logo.webp') }}" alt="AI Logo" class="chat-logo-img">
                 <span>المساعد الذكي</span>
             </div>
             <span id="close-chat" class="close-chat"><i class="fas fa-times"></i></span>
@@ -448,7 +478,7 @@
     </div>
 
     <button id="chat-toggle-btn" class="chat-toggle-btn">
-        <img src="{{ url_for('static', filename='chat_logo.png') }}" alt="Chat AI">
+        <img src="{{ url_for('static', filename='chat_logo.webp') }}" alt="Chat AI">
     </button>
 
     <!-- Bootstrap 5 JS Bundle -->
