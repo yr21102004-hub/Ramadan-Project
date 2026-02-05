@@ -540,8 +540,8 @@
                             setTimeout(() => {
                                 const modal = document.getElementById('islamic-welcome-modal');
                                 if (modal && !sessionStorage.getItem('welcomeShown')) {
-                                    // modal.classList.add('active'); // Optional: Uncomment to re-enable welcome modal
-                                    // sessionStorage.setItem('welcomeShown', 'true');
+                                    modal.classList.add('active');
+                                    sessionStorage.setItem('welcomeShown', 'true');
                                 }
                             }, 500);
                         }
