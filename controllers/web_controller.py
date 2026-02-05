@@ -212,6 +212,7 @@ PROJECTS_DATA = {
     },
     'companies': {
         'title': 'بنود دهانات الشركات والمباني الإدارية',
+        'hero_image': 'luxury_bg_companies_new.jpg',
         'description': 'نوفر حلولاً متكاملة لتشطيب الشركات والمكاتب تجمع بين الفخامة والعملية، مع مراعاة الهوية البصرية للمنشأة وتوفير بيئة عمل ملهمة ومريحة.',
         'images': ['office_1.png', 'office_2.png', 'office_3.png'],
         'sections': [

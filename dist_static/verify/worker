@@ -20,7 +20,7 @@
     <meta property="og:image" content="http://localhost/static/logo.png">
 
     <!-- CSRF & Security -->
-    <meta name="csrf-token" content="ImNlN2Y1OTliN2Q2ODNiOTk1M2E4Mjc0NzYwN2NjMDcxNjU5YjUyNTMi.aYTrkw.DXTx7Bv4QCk7q2nSkcfpaEmfnKQ">
+    <meta name="csrf-token" content="IjFjYzNjZTVkMTc1YmJjMTNmZmNkZjk3NTQ1N2EyNjA0MTc4NDI1NDYi.aYTyEA.sCZK2Q3AMegKTANaH0G4Fyu4e5o">
 
     <title>الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية</title>
     <!-- Google Fonts -->
@@ -378,7 +378,7 @@
             
 
             <form action="login" method="POST">
-                <input type="hidden" name="csrf_token" value="ImNlN2Y1OTliN2Q2ODNiOTk1M2E4Mjc0NzYwN2NjMDcxNjU5YjUyNTMi.aYTrkw.DXTx7Bv4QCk7q2nSkcfpaEmfnKQ">
+                <input type="hidden" name="csrf_token" value="IjFjYzNjZTVkMTc1YmJjMTNmZmNkZjk3NTQ1N2EyNjA0MTc4NDI1NDYi.aYTyEA.sCZK2Q3AMegKTANaH0G4Fyu4e5o">
                 <div class="form-group" data-aos="fade-up" data-aos-delay="100">
                     <label>اسم المستخدم</label>
                     <input type="text" name="username" placeholder="أدخل اسم المستخدم" required>
