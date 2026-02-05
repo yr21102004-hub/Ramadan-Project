@@ -117,6 +117,9 @@ def service_detail(service_id):
     service = SERVICES_DATA.get(service_id)
     if not service:
         return render_template('404.html'), 404
+    
+    # Inject ID into service dict for template usage
+    service['id'] = service_id
         
     # Log this view for analytics
     security_log_model.create('Service View', f'User viewed service: {service["title"]}', severity="info")

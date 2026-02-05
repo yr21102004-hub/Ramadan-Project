@@ -67,14 +67,22 @@
                             <label>نوع الخدمة</label>
                             <select id="service" required
                                 style="width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.2); color: #fff; margin-bottom: 5px;">
-                                <option value="" disabled selected>اختر الخدمة المطلوبة</option>
-                                <option value="modern-paints">دهانات حديثة</option>
-                                <option value="gypsum-board">جبس بورد</option>
-                                <option value="integrated-finishing">تشطيب متكامل</option>
-                                <option value="putty-finishing">تأسيس ومعجون</option>
-                                <option value="wallpaper">ورق حائط</option>
-                                <option value="renovation">تجديد وترميم</option>
-                                <option value="general">استفسار عام</option>
+                                <option value="" disabled {{ 'selected' if not request.args.get('service') else '' }}>
+                                    اختر الخدمة المطلوبة</option>
+                                <option value="modern-paints" {{ 'selected' if
+                                    request.args.get('service')=='modern-paints' else '' }}>دهانات حديثة</option>
+                                <option value="gypsum-board" {{ 'selected' if
+                                    request.args.get('service')=='gypsum-board' else '' }}>جبس بورد</option>
+                                <option value="integrated-finishing" {{ 'selected' if
+                                    request.args.get('service')=='integrated-finishing' else '' }}>تشطيب متكامل</option>
+                                <option value="putty-finishing" {{ 'selected' if
+                                    request.args.get('service')=='putty-finishing' else '' }}>تأسيس ومعجون</option>
+                                <option value="wallpaper" {{ 'selected' if request.args.get('service')=='wallpaper'
+                                    else '' }}>ورق حائط</option>
+                                <option value="renovation" {{ 'selected' if request.args.get('service')=='renovation'
+                                    else '' }}>تجديد وترميم</option>
+                                <option value="general" {{ 'selected' if request.args.get('service')=='general' else ''
+                                    }}>استفسار عام</option>
                             </select>
                         </div>
                         <div class="form-group">
