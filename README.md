@@ -2,10 +2,14 @@
 
 ![Project Banner](static/logo.webp)
 
+[![Built with Antigravity](https://img.shields.io/badge/Built%20With-Antigravity-orange?style=for-the-badge&logo=sparkles)](https://deepmind.google/)
+[![Vibe Coding](https://img.shields.io/badge/Vibe-Coding-ff00ff?style=for-the-badge&logo=music)]()
 [![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-2.3-green.svg?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5-purple.svg?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![Status](https://img.shields.io/badge/Status-Active-success.svg?style=for-the-badge)]()
+
+> **⚡ Powered by Vibe Coding technology using Antigravity Agent.**
 
 **Haj Ramadan Paints & Decor** is a comprehensive web platform and Customer Relationship Management (CRM) system designed for a leading decoration and finishing company in Egypt. The platform bridges the gap between client service requests and operational management, offering a seamless experience from inquiry to project delivery.
 
@@ -127,8 +131,9 @@ Open your browser and navigate to: `http://127.0.0.1:5000`
 
 ## 📞 Contact & Support
 
-Developed by **Youssef (Smart Tech Solutions)**.  
+Developed by **Youssef (Smart Tech Solutions)** | Built with **Antigravity**.  
 For business inquiries or support, please contact: `ramadangaber01@gmail.com`
 
 ---
-&copy; 2026 Haj Ramadan Paints & Decor. All rights reserved.
+&copy; 2026 Haj Ramadan Paints & Decor. All rights reserved.  
+*Made with ❤️ and Vibe Coding.*
