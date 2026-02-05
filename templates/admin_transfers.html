@@ -66,6 +66,7 @@
                                 {% if 'pending' in p.status.lower() %}
                                 <form method="POST" action="{{ url_for('admin.confirm_payment', doc_id=p.doc_id) }}"
                                     style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-sm btn-success" title="تأكيد التحويل">
                                         <i class="fas fa-check"></i> تأكيد
                                     </button>
