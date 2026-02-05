@@ -1097,6 +1097,7 @@ def delete_backup_file(filename):
     return redirect(url_for('admin.security_audit'))
 
 @admin_bp.route('/admin/export/users')
+@login_required
 def export_users_report():
     """Export users report to CSV"""
     users = user_model.get_all()
@@ -1130,6 +1131,7 @@ def export_users_report():
     )
 
 @admin_bp.route('/admin/export/payments')
+@login_required
 def export_payments_report():
     """Export payments report to CSV"""
     payments = payment_model.get_all()
