@@ -582,6 +582,42 @@ def delete_chats():
     
     return redirect(url_for('admin.view_chats'))
 
+@admin_bp.route('/admin/chats/export')
+@login_required
+def export_chats():
+    """Export chat logs to CSV"""
+    if current_user.role != 'admin':
+        return redirect(url_for('index'))
+    
+    chats = chat_model.get_all()
+    
+    # Create CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow(['التوقيت', 'المستخدم', 'اسم المستخدم', 'رسالة العميل', 'رد الذكاء الاصطناعي', 'IP Address'])
+    
+    # Data
+    for chat in chats:
+        writer.writerow([
+            chat.get('timestamp', ''),
+            chat.get('username', 'زائر'),
+            chat.get('user_name', ''),
+            chat.get('message', ''),
+            chat.get('response', ''),
+            chat.get('user_ip', '')
+        ])
+    
+    output.seek(0)
+    
+    return send_file(
+        io.BytesIO(output.getvalue().encode('utf-8-sig')),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name=f"chat_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    )
+
 @admin_bp.route('/admin/unanswered')
 def admin_unanswered_questions():
     try:
