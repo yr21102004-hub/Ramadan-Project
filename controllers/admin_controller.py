@@ -600,7 +600,7 @@ def admin_message_status():
         
     return redirect(url_for('admin.admin_messages'))
 
-@admin_bp.route('/admin/backup')
+@admin_bp.route('/admin/backup', methods=['GET', 'POST'])
 def manual_backup():
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")

@@ -104,6 +104,7 @@
                         الآن.</small>
                 </div>
                 <form action="{{ url_for('admin.manual_backup') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-gold btn-sm"><i class="fas fa-plus me-1"></i> نسخة يدوية
                         جديدة</button>
                 </form>
@@ -133,6 +134,7 @@
                                 <form action="{{ url_for('admin.delete_backup_file', filename=backup.name) }}"
                                     method="POST" class="d-inline"
                                     onsubmit="return confirm('هل أنت متأكد من حذف هذه النسخة؟')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف"><i
                                             class="fas fa-trash"></i></button>
                                 </form>
