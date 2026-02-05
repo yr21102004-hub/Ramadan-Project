@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, jsonify, request, url_for, make_response, current_app
 from flask_login import current_user
-from models.database import ContactModel, LearnedAnswersModel, SecurityLogModel
+from models.database import ContactModel, LearnedAnswersModel, SecurityLogModel, RatingModel
 from datetime import datetime
 
 contact_model = ContactModel()
 security_log_model = SecurityLogModel()
+rating_model = RatingModel()
 
 web_bp = Blueprint('web', __name__)
 
@@ -107,7 +108,9 @@ def sitemap():
 
 @web_bp.route('/')
 def index():
-    return render_template('home.html')
+    # Fetch latest positive reviews with images
+    reviews = rating_model.get_latest_reviews(limit=6)
+    return render_template('home.html', reviews=reviews)
 
 @web_bp.route('/service/<service_id>')
 def service_detail(service_id):
