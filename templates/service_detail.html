@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block title %}{{ service.title }} | الحاج رمضان محمد جبر{% endblock %}
+{% block description %}{{ service.description[:150]|safe }}...{% endblock %}
+{% block og_title %}{{ service.title }} - خدمات الحاج رمضان{% endblock %}
 
 {% block content %}
 <section class="section-padding" style="margin-top: 80px;">

@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO & Meta Tags -->
     <meta name="description"
-        content="استعرض قائمة المشاريع التي نخدمها: فنادق، قصور، فيلات، شقق سكنية، مصانع، وشركات في كافة أنحاء
-جمهورية مصر العربية.">
+        content="الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.">
     <meta name="keywords"
         content="دهانات, ديكورات, تشطيبات, نقاشه, جبس بورد, رمضان محمد جبر, تشطيب شقق, الوان حوائط, مصر">
     <meta name="author" content="الحاج رمضان محمد جبر">
@@ -15,16 +14,15 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="http://localhost/projects">
-    <meta property="og:title" content="سابقة أعمالنا ومشاريعنا - الحاج رمضان محمد جبر">
-    <meta property="og:description" content="استعرض قائمة المشاريع التي نخدمها: فنادق، قصور، فيلات، شقق سكنية، مصانع، وشركات في كافة أنحاء
-جمهورية مصر العربية.">
+    <meta property="og:url" content="http://localhost/forgot_password">
+    <meta property="og:title" content="الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية">
+    <meta property="og:description" content="الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.">
     <meta property="og:image" content="http://localhost/static/logo.webp">
 
     <!-- CSRF & Security -->
     <meta name="csrf-token" content="IjZlY2IxOTZmNjg0MWVkMDcwYTA4MzIzMGU4OTdhMDVhZDIyN2Y0NmQi.aYT7rg.YrZhaSdgHR0W2gYe4jvSlrADpR4">
 
-    <title>مشاريعنا | الحاج رمضان محمد جبر</title>
+    <title>الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية</title>
 
     <!-- Structured Data (Schema.org) -->
     <script type="application/ld+json">
@@ -391,71 +389,110 @@
 
     <!-- Page Content -->
     
-<!-- Projects / Coverage -->
-<section class="projects section-padding" style="margin-top: 80px;">
-    <div class="container">
-        <h2 class="section-title text-center" data-aos="fade-down">مشاريع نخدمها</h2>
-        <div class="divider center-divider" data-aos="zoom-in"></div>
-        <div class="projects-wrapper">
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="100">
-                <a href="project/hotels"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-hotel"></i>
-                        <span>فنادق</span>
-                    </div>
-                </a>
-            </div>
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="200">
-                <a href="project/villas"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-landmark"></i>
-                        <span>قصور و فلل</span>
-                    </div>
-                </a>
+<section class="section-padding"
+    style="margin-top: 80px; min-height: 85vh; display: flex; align-items: center; background: radial-gradient(circle at center, rgba(212, 175, 55, 0.03), transparent);">
+    <div class="container" data-aos="fade-up">
+        <div class="premium-card glass" style="max-width: 500px; margin: 0 auto; padding: 50px;">
+            <div class="text-center mb-5">
+                <div class="icon-pulse mb-3" style="display: inline-block;">
+                    <i class="fas fa-user-shield" style="font-size: 3.5rem; color: var(--gold);"></i>
+                </div>
+                <h2 class="text-gold mb-2">استعادة الحساب</h2>
+                <p class="text-muted-dynamic">أدخل بياناتك المسجلة لنرسل لك كود التحقق</p>
             </div>
 
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="400">
-                <a href="project/apartments"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-building"></i>
-                        <span>شقق سكنية</span>
-                    </div>
-                </a>
-            </div>
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="500">
-                <a href="project/factories"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-industry"></i>
-                        <span>مصانع</span>
-                    </div>
-                </a>
-            </div>
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="600">
-                <a href="project/companies"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-briefcase"></i>
-                        <span>شركات ومكاتب</span>
-                    </div>
-                </a>
-            </div>
-        </div>
+            
+            
+            
 
-        <div class="coverage-banner mt-5" data-aos="fade-up">
-            <i class="fas fa-map-marked-alt" data-aos="flip-left" data-aos-delay="300"></i>
-            <div class="coverage-text">
-                <h3>نطاق الخدمة</h3>
-                <p>نفخر بخدمة القاهرة و الجيزة و الاسكندرية و أسيوط و قنا و المنيا و شرم الشيخ و الساحل الشمالي و
-                    العالمين و العاصمة الادارية و الغردقة و السخنة و القليوبية و الأسكندرية و الشرقية و الغربية و في
-                    جميع مناطق الجمهورية</p>
+            <form action="forgot_password" method="POST">
+                <input type="hidden" name="csrf_token" value="IjZlY2IxOTZmNjg0MWVkMDcwYTA4MzIzMGU4OTdhMDVhZDIyN2Y0NmQi.aYT7rg.YrZhaSdgHR0W2gYe4jvSlrADpR4">
+
+                <div class="form-group mb-4">
+                    <label class="mb-2 d-block">اسم المستخدم</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="username" required placeholder="User123">
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="mb-2 d-block">رقم الهاتف المسجل</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" name="phone" required placeholder="01xxxxxxxxx">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block w-100 py-3 mb-4">
+                    إرسال كود التحقق <i class="fas fa-paper-plane ms-2"></i>
+                </button>
+            </form>
+
+            <div class="text-center">
+                <a href="login" class="text-gold text-decoration-none small hover-underline">
+                    <i class="fas fa-arrow-right me-1"></i> العودة لتسجيل الدخول
+                </a>
             </div>
         </div>
     </div>
 </section>
+
+<style>
+    .icon-pulse {
+        animation: pulse-gold 2s infinite;
+    }
+
+    @keyframes pulse-gold {
+        0% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 0 rgba(212, 175, 55, 0.4));
+        }
+
+        70% {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.2));
+        }
+
+        100% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 0 rgba(212, 175, 55, 0));
+        }
+    }
+
+    .input-with-icon {
+        position: relative;
+    }
+
+    .input-with-icon i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gold);
+        opacity: 0.6;
+    }
+
+    .input-with-icon input {
+        width: 100%;
+        padding: 12px 12px 12px 45px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #fff;
+        outline: none;
+        transition: 0.3s;
+    }
+
+    .input-with-icon input:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
+    }
+
+    .hover-underline:hover {
+        text-decoration: underline !important;
+    }
+</style>
 
 
     <!-- Footer -->

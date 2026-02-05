@@ -81,7 +81,7 @@ def manifest():
 
 @web_bp.route('/favicon.ico')
 def favicon():
-    return current_app.send_static_file('logo.png') # Use logo as favicon
+    return current_app.send_static_file('logo.webp') # Use logo as favicon
 
 @web_bp.route('/robots.txt')
 def robots():

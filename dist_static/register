@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO & Meta Tags -->
     <meta name="description"
-        content="استعرض قائمة المشاريع التي نخدمها: فنادق، قصور، فيلات، شقق سكنية، مصانع، وشركات في كافة أنحاء
-جمهورية مصر العربية.">
+        content="الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.">
     <meta name="keywords"
         content="دهانات, ديكورات, تشطيبات, نقاشه, جبس بورد, رمضان محمد جبر, تشطيب شقق, الوان حوائط, مصر">
     <meta name="author" content="الحاج رمضان محمد جبر">
@@ -15,16 +14,15 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="http://localhost/projects">
-    <meta property="og:title" content="سابقة أعمالنا ومشاريعنا - الحاج رمضان محمد جبر">
-    <meta property="og:description" content="استعرض قائمة المشاريع التي نخدمها: فنادق، قصور، فيلات، شقق سكنية، مصانع، وشركات في كافة أنحاء
-جمهورية مصر العربية.">
+    <meta property="og:url" content="http://localhost/register">
+    <meta property="og:title" content="الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية">
+    <meta property="og:description" content="الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.">
     <meta property="og:image" content="http://localhost/static/logo.webp">
 
     <!-- CSRF & Security -->
     <meta name="csrf-token" content="IjZlY2IxOTZmNjg0MWVkMDcwYTA4MzIzMGU4OTdhMDVhZDIyN2Y0NmQi.aYT7rg.YrZhaSdgHR0W2gYe4jvSlrADpR4">
 
-    <title>مشاريعنا | الحاج رمضان محمد جبر</title>
+    <title>الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية</title>
 
     <!-- Structured Data (Schema.org) -->
     <script type="application/ld+json">
@@ -391,71 +389,176 @@
 
     <!-- Page Content -->
     
-<!-- Projects / Coverage -->
-<section class="projects section-padding" style="margin-top: 80px;">
+<section class="section-padding"
+    style="margin-top: 80px; min-height: 100vh; display: flex; align-items: center; background: radial-gradient(circle at bottom left, rgba(212, 175, 55, 0.05), transparent);">
     <div class="container">
-        <h2 class="section-title text-center" data-aos="fade-down">مشاريع نخدمها</h2>
-        <div class="divider center-divider" data-aos="zoom-in"></div>
-        <div class="projects-wrapper">
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="100">
-                <a href="project/hotels"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-hotel"></i>
-                        <span>فنادق</span>
-                    </div>
-                </a>
-            </div>
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="200">
-                <a href="project/villas"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-landmark"></i>
-                        <span>قصور و فلل</span>
-                    </div>
-                </a>
-            </div>
+        <div class="premium-card" style="max-width: 550px; margin: 0 auto;" data-aos="zoom-in">
+            <h2 class="section-title text-center" style="font-size: 2rem;">إنشاء حساب جديد</h2>
+            <p class="text-center text-muted-dynamic" style="margin-bottom: 30px;">انضم إلى Haj Ramadan Decor وابدأ رحلة
+                التميز</p>
 
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="400">
-                <a href="project/apartments"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-building"></i>
-                        <span>شقق سكنية</span>
-                    </div>
-                </a>
-            </div>
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="500">
-                <a href="project/factories"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-industry"></i>
-                        <span>مصانع</span>
-                    </div>
-                </a>
-            </div>
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="600">
-                <a href="project/companies"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-briefcase"></i>
-                        <span>شركات ومكاتب</span>
-                    </div>
-                </a>
-            </div>
-        </div>
+            
+            
+            
 
-        <div class="coverage-banner mt-5" data-aos="fade-up">
-            <i class="fas fa-map-marked-alt" data-aos="flip-left" data-aos-delay="300"></i>
-            <div class="coverage-text">
-                <h3>نطاق الخدمة</h3>
-                <p>نفخر بخدمة القاهرة و الجيزة و الاسكندرية و أسيوط و قنا و المنيا و شرم الشيخ و الساحل الشمالي و
-                    العالمين و العاصمة الادارية و الغردقة و السخنة و القليوبية و الأسكندرية و الشرقية و الغربية و في
-                    جميع مناطق الجمهورية</p>
+            <form action="register" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="IjZlY2IxOTZmNjg0MWVkMDcwYTA4MzIzMGU4OTdhMDVhZDIyN2Y0NmQi.aYT7rg.YrZhaSdgHR0W2gYe4jvSlrADpR4">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group" data-aos="fade-up" data-aos-delay="100">
+                        <label>الاسم بالكامل</label>
+                        <input type="text" name="full_name" placeholder="الاسم الثلاثي" required>
+                    </div>
+                    <div class="form-group" data-aos="fade-up" data-aos-delay="150">
+                        <label>رقم الهاتف</label>
+                        <input type="tel" name="phone" placeholder="01xxxxxxxxx" required>
+                    </div>
+                </div>
+
+                <div class="form-group" data-aos="fade-up" data-aos-delay="200">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" name="email" required placeholder="example@domain.com">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group" data-aos="fade-up" data-aos-delay="250">
+                        <label>اسم المستخدم</label>
+                        <input type="text" name="username" placeholder="اسم للدخول" required>
+                    </div>
+                    <div class="form-group" data-aos="fade-up" data-aos-delay="300">
+                        <label>كلمة المرور</label>
+                        <input type="password" name="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <input type="hidden" name="role" value="user">
+
+                <div id="user_fields">
+                    <div class="form-group" data-aos="fade-up" data-aos-delay="350">
+                        <label>وصف المشروع (اختياري)</label>
+                        <textarea name="project_description"
+                            placeholder="اكتب وصفاً مختصراً لمشروعك (مثال: شقة 150 متر، تشطيب كامل...)"
+                            style="min-height: 80px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group" data-aos="fade-up" data-aos-delay="400">
+                    <label>صورة شخصية (اختياري)</label>
+                    <div style="position: relative;">
+                        <input type="file" name="profile_image" id="profile_image" accept="image/*"
+                            style="display: none;" onchange="updateFileName(this)">
+                        <label for="profile_image" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt" style="margin-left: 8px;"></i>
+                            <span id="file-name">اختر صورة</span>
+                        </label>
+                        <small style="display: block; margin-top: 8px; color: #999; font-size: 0.85rem;">
+                            يمكنك رفع صورة شخصية لحسابك (JPG, PNG)
+                        </small>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px;">انضم إلينا
+                    الآن</button>
+            </form>
+
+            <div style="margin-top: 30px; text-align: center; font-size: 0.95rem;">
+                <span class="text-muted-dynamic">لديك حساب بالفعل؟</span>
+                <a href="login" class="text-gold" style="font-weight: 600; margin-right: 5px;">سجل
+                    دخولك</a>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    function updateFileName(input) {
+        const fileName = document.getElementById('file-name');
+        if (input.files && input.files[0]) {
+            fileName.textContent = input.files[0].name;
+        } else {
+            fileName.textContent = 'اختر صورة';
+        }
+    }
+</script>
+
+<style>
+    .file-upload-label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+        border: 2px dashed rgba(212, 175, 55, 0.3);
+        border-radius: var(--radius-sm);
+        color: var(--gold);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        width: 100%;
+    }
+
+    .file-upload-label:hover {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
+        border-color: var(--gold);
+        transform: translateY(-2px);
+    }
+
+    .file-upload-label i {
+        font-size: 1.2rem;
+    }
+
+    /* Role Selector Styling */
+    .role-selector {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .role-radio {
+        display: none;
+    }
+
+    .role-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 2px solid rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: 0.3s;
+        color: #888;
+    }
+
+    .role-label i {
+        font-size: 1.8rem;
+    }
+
+    .role-radio:checked+.role-label {
+        border-color: var(--gold);
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--gold);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.1);
+    }
+
+    .form-select-premium {
+        width: 100%;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-sm);
+        color: white;
+        outline: none;
+    }
+
+    .form-select-premium option {
+        background: #111;
+        color: white;
+    }
+</style>
 
 
     <!-- Footer -->

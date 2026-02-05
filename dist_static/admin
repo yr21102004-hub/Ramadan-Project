@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO & Meta Tags -->
     <meta name="description"
-        content="استعرض قائمة المشاريع التي نخدمها: فنادق، قصور، فيلات، شقق سكنية، مصانع، وشركات في كافة أنحاء
-جمهورية مصر العربية.">
+        content="الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.">
     <meta name="keywords"
         content="دهانات, ديكورات, تشطيبات, نقاشه, جبس بورد, رمضان محمد جبر, تشطيب شقق, الوان حوائط, مصر">
     <meta name="author" content="الحاج رمضان محمد جبر">
@@ -15,16 +14,15 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="http://localhost/projects">
-    <meta property="og:title" content="سابقة أعمالنا ومشاريعنا - الحاج رمضان محمد جبر">
-    <meta property="og:description" content="استعرض قائمة المشاريع التي نخدمها: فنادق، قصور، فيلات، شقق سكنية، مصانع، وشركات في كافة أنحاء
-جمهورية مصر العربية.">
+    <meta property="og:url" content="http://localhost/login?next=http://localhost/admin">
+    <meta property="og:title" content="الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية">
+    <meta property="og:description" content="الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.">
     <meta property="og:image" content="http://localhost/static/logo.webp">
 
     <!-- CSRF & Security -->
     <meta name="csrf-token" content="IjZlY2IxOTZmNjg0MWVkMDcwYTA4MzIzMGU4OTdhMDVhZDIyN2Y0NmQi.aYT7rg.YrZhaSdgHR0W2gYe4jvSlrADpR4">
 
-    <title>مشاريعنا | الحاج رمضان محمد جبر</title>
+    <title>الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية</title>
 
     <!-- Structured Data (Schema.org) -->
     <script type="application/ld+json">
@@ -391,67 +389,46 @@
 
     <!-- Page Content -->
     
-<!-- Projects / Coverage -->
-<section class="projects section-padding" style="margin-top: 80px;">
+<section class="section-padding"
+    style="margin-top: 80px; min-height: 80vh; display: flex; align-items: center; background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.05), transparent);">
     <div class="container">
-        <h2 class="section-title text-center" data-aos="fade-down">مشاريع نخدمها</h2>
-        <div class="divider center-divider" data-aos="zoom-in"></div>
-        <div class="projects-wrapper">
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="100">
-                <a href="project/hotels"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-hotel"></i>
-                        <span>فنادق</span>
-                    </div>
-                </a>
-            </div>
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="200">
-                <a href="project/villas"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-landmark"></i>
-                        <span>قصور و فلل</span>
-                    </div>
-                </a>
-            </div>
+        <div class="premium-card" style="max-width: 450px; margin: 0 auto;" data-aos="zoom-in">
+            <h2 class="section-title text-center" style="font-size: 2rem;">تسجيل الدخول</h2>
+            <p class="text-center text-muted-dynamic" style="margin-bottom: 30px;">مرحباً بك مجدداً في RMG Decor</p>
 
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="400">
-                <a href="project/apartments"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-building"></i>
-                        <span>شقق سكنية</span>
-                    </div>
-                </a>
+            
+            
+            
+            <div class="glass"
+                style="background: rgba(255, 0, 0, 0.1); color: #ff6b6b; padding: 12px; border-radius: var(--radius-sm); margin-bottom: 25px; text-align: center; border: 1px solid rgba(255, 0, 0, 0.2);">
+                عذراً، يجب تسجيل الدخول أولاً للوصول إلى لوحة التحكم.
             </div>
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="500">
-                <a href="project/factories"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-industry"></i>
-                        <span>مصانع</span>
-                    </div>
-                </a>
-            </div>
-            <div class="project-item" data-aos="zoom-in" data-aos-delay="600">
-                <a href="project/companies"
-                    style="display: block; width: 100%; height: 100%;">
-                    <div class="project-content">
-                        <i class="fas fa-briefcase"></i>
-                        <span>شركات ومكاتب</span>
-                    </div>
-                </a>
-            </div>
-        </div>
+            
+            
+            
 
-        <div class="coverage-banner mt-5" data-aos="fade-up">
-            <i class="fas fa-map-marked-alt" data-aos="flip-left" data-aos-delay="300"></i>
-            <div class="coverage-text">
-                <h3>نطاق الخدمة</h3>
-                <p>نفخر بخدمة القاهرة و الجيزة و الاسكندرية و أسيوط و قنا و المنيا و شرم الشيخ و الساحل الشمالي و
-                    العالمين و العاصمة الادارية و الغردقة و السخنة و القليوبية و الأسكندرية و الشرقية و الغربية و في
-                    جميع مناطق الجمهورية</p>
+            <form action="login" method="POST">
+                <input type="hidden" name="csrf_token" value="IjZlY2IxOTZmNjg0MWVkMDcwYTA4MzIzMGU4OTdhMDVhZDIyN2Y0NmQi.aYT7rg.YrZhaSdgHR0W2gYe4jvSlrADpR4">
+                <div class="form-group" data-aos="fade-up" data-aos-delay="100">
+                    <label>اسم المستخدم</label>
+                    <input type="text" name="username" placeholder="أدخل اسم المستخدم" required>
+                </div>
+                <div class="form-group" data-aos="fade-up" data-aos-delay="200">
+                    <label>كلمة المرور</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px;">دخول آمن</button>
+            </form>
+
+            <div style="margin-top: 30px; text-align: center; font-size: 0.95rem;">
+                <span class="text-muted-dynamic">ليس لديك حساب؟</span>
+                <a href="register" class="text-gold"
+                    style="font-weight: 600; margin-right: 5px;">سجل
+                    الآن</a>
+                <div style="margin-top: 20px;">
+                    <a href="forgot_password" class="text-muted-dynamic"
+                        style="font-size: 0.85rem; transition: var(--transition-fast);">نسيت كلمة المرور؟</a>
+                </div>
             </div>
         </div>
     </div>
