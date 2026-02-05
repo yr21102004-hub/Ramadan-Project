@@ -1103,7 +1103,7 @@ def export_users_report():
     
     # Create CSV in memory
     output = io.StringIO()
-    writer = csv.writer(output, encoding='utf-8-sig') # utf-8-sig for Excel Arabic support
+    writer = csv.writer(output)  # Fixed: removed invalid encoding parameter
     
     # Header
     writer.writerow(['المعرف', 'اسم المستخدم', 'الاسم الكامل', 'الهاتف', 'الموقع', 'نسبة الإنجاز', 'تاريخ التسجيل'])
@@ -1135,7 +1135,7 @@ def export_payments_report():
     payments = payment_model.get_all()
     
     output = io.StringIO()
-    writer = csv.writer(output, encoding='utf-8-sig')
+    writer = csv.writer(output)  # Fixed: removed invalid encoding parameter
     
     # Header
     writer.writerow(['المستخدم', 'المبلغ (جم)', 'طريقة الدفع', 'التفاصيل', 'التاريخ', 'الحالة'])
