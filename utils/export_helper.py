@@ -365,7 +365,7 @@ def export_analytics_excel(analytics_data):
     ws_srv = wb.create_sheet("تحليل الخدمات")
     ws_srv.sheet_view.rightToLeft = True
     
-    current_row = ExportHelper.add_title_section(ws_srv, "تحليل الخدمات الأكثر طلباً")
+    current_row = ExportHelper.add_title_section(ws_srv, "تحليل الخدمات (طلب ومشاهدة)")
     current_row += 1
     
     services_map = {
@@ -374,14 +374,18 @@ def export_analytics_excel(analytics_data):
         'wallpaper': 'ورق حائط', 'renovation': 'تجديد وترميم', 'general': 'استفسار عام'
     }
     
+    # --- Requested Services ---
+    ws_srv.merge_cells(f'A{current_row}:B{current_row}')
+    ws_srv[f'A{current_row}'].value = "الخدمات الأكثر طلباً (رسائل)"
+    ws_srv[f'A{current_row}'].font = Font(bold=True)
+    current_row += 1
+
     ws_srv.cell(row=current_row, column=1, value="الخدمة")
     ws_srv.cell(row=current_row, column=2, value="عدد الطلبات")
     ExportHelper.style_header_row(ws_srv, current_row, 2)
     
     srv_data = analytics_data.get('services_breakdown', {})
     start_row = current_row + 1
-    
-    # Sort by value desc
     sorted_srv = sorted(srv_data.items(), key=lambda x: x[1], reverse=True)
     
     for i, (key, count) in enumerate(sorted_srv):
@@ -389,9 +393,10 @@ def export_analytics_excel(analytics_data):
         ws_srv.cell(row=start_row + i, column=1, value=name)
         ws_srv.cell(row=start_row + i, column=2, value=count)
         
-    ExportHelper.style_data_rows(ws_srv, start_row, start_row + len(sorted_srv) - 1, 2)
-    ExportHelper.auto_adjust_column_width(ws_srv, 2)
+    if sorted_srv:
+        ExportHelper.style_data_rows(ws_srv, start_row, start_row + len(sorted_srv) - 1, 2)
     
+    # Chart for Requests
     if sorted_srv:
         pie = PieChart()
         pie.title = "توزيع طلبات الخدمات"
@@ -399,9 +404,33 @@ def export_analytics_excel(analytics_data):
         cats = Reference(ws_srv, min_col=1, min_row=start_row, max_row=start_row + len(sorted_srv) - 1)
         pie.add_data(data, titles_from_data=True)
         pie.set_categories(cats)
-        pie.height = 12
-        pie.width = 12
-        ws_srv.add_chart(pie, "D2")
+        pie.height = 10; pie.width = 10
+        ws_srv.add_chart(pie, "D3")
+        
+    # --- Viewed Services ---
+    current_row = start_row + len(sorted_srv) + 5
+    ws_srv.merge_cells(f'A{current_row}:B{current_row}')
+    ws_srv[f'A{current_row}'].value = "الخدمات الأكثر مشاهدة (زيارات)"
+    ws_srv[f'A{current_row}'].font = Font(bold=True)
+    current_row += 1
+    
+    ws_srv.cell(row=current_row, column=1, value="الخدمة")
+    ws_srv.cell(row=current_row, column=2, value="عدد المشاهدات")
+    ExportHelper.style_header_row(ws_srv, current_row, 2)
+    
+    view_data = analytics_data.get('most_viewed_services', {})
+    start_row_view = current_row + 1
+    sorted_view = sorted(view_data.items(), key=lambda x: x[1], reverse=True)
+    
+    for i, (key, count) in enumerate(sorted_view):
+        ws_srv.cell(row=start_row_view + i, column=1, value=key)
+        ws_srv.cell(row=start_row_view + i, column=2, value=count)
+
+    if sorted_view:
+        ExportHelper.style_data_rows(ws_srv, start_row_view, start_row_view + len(sorted_view) - 1, 2)
+        
+    ExportHelper.auto_adjust_column_width(ws_srv, 2)
+
 
     # ==========================================
     # 3. Financial Analysis Sheet
@@ -431,23 +460,93 @@ def export_analytics_excel(analytics_data):
     ExportHelper.style_data_rows(ws_fin, start_row, start_row + len(fin_labels) - 1, 2)
     ExportHelper.auto_adjust_column_width(ws_fin, 2)
     
-    # Financial Pie Chart (Payments Status)
     pie_fin = PieChart()
     pie_fin.title = "حالة المدفوعات"
-    # Create temp data for chart
-    ws_fin.cell(row=10, column=1, value="مؤكدة")
-    ws_fin.cell(row=10, column=2, value=analytics_data.get('confirmed_payments_count', 0))
-    ws_fin.cell(row=11, column=1, value="قيد المراجعة")
-    ws_fin.cell(row=11, column=2, value=analytics_data.get('pending_payments_count', 0))
+    # Temp data for financial chart
+    ws_fin.cell(row=15, column=1, value="مؤكدة")
+    ws_fin.cell(row=15, column=2, value=analytics_data.get('confirmed_payments_count', 0))
+    ws_fin.cell(row=16, column=1, value="قيد المراجعة")
+    ws_fin.cell(row=16, column=2, value=analytics_data.get('pending_payments_count', 0))
     
-    data = Reference(ws_fin, min_col=2, min_row=10, max_row=11)
-    cats = Reference(ws_fin, min_col=1, min_row=10, max_row=11)
+    data = Reference(ws_fin, min_col=2, min_row=15, max_row=16)
+    cats = Reference(ws_fin, min_col=1, min_row=15, max_row=16)
     pie_fin.add_data(data, titles_from_data=False)
     pie_fin.set_categories(cats)
     ws_fin.add_chart(pie_fin, "D2")
+
+    # ==========================================
+    # 4. Advanced Insights Sheet (New)
+    # ==========================================
+    ws_adv = wb.create_sheet("تحليلات متقدمة")
+    ws_adv.sheet_view.rightToLeft = True
     
-    # Hide temp data (white text on white bg usually, or just leave it)
-    # Better: just leave it at bottom or use named ranges. For simplicity, we leave it.
+    current_row = ExportHelper.add_title_section(ws_adv, "تحليلات سلوك المستخدمين المتقدمة")
+    current_row += 1
+    
+    # --- A. Frequent AI Users ---
+    ws_adv.merge_cells(f'A{current_row}:B{current_row}')
+    ws_adv[f'A{current_row}'].value = "المستخدمين النشطين على AI (يومين فأكثر)"
+    ws_adv[f'A{current_row}'].font = Font(bold=True)
+    current_row += 1
+    
+    ws_adv.cell(row=current_row, column=1, value="المستخدم")
+    ws_adv.cell(row=current_row, column=2, value="عدد الأيام النشطة")
+    ExportHelper.style_header_row(ws_adv, current_row, 2)
+    
+    ai_data = analytics_data.get('frequent_ai_users', {})
+    start_row = current_row + 1
+    # Sort
+    sorted_ai = sorted(ai_data.items(), key=lambda x: x[1], reverse=True)
+    
+    for i, (usr, days) in enumerate(sorted_ai):
+        ws_adv.cell(row=start_row + i, column=1, value=usr)
+        ws_adv.cell(row=start_row + i, column=2, value=days)
+    if sorted_ai:
+        ExportHelper.style_data_rows(ws_adv, start_row, start_row + len(sorted_ai) - 1, 2)
+    
+    current_row = max(start_row + len(sorted_ai), current_row + 1) + 2
+    
+    # --- B. Daily One-Time Visitors ---
+    ws_adv.merge_cells(f'A{current_row}:B{current_row}')
+    ws_adv[f'A{current_row}'].value = "زوار اليوم (مرة واحدة)"
+    ws_adv[f'A{current_row}'].font = Font(bold=True)
+    current_row += 1
+    
+    ws_adv.cell(row=current_row, column=1, value="المستخدم")
+    ws_adv.cell(row=current_row, column=2, value="عدد الزيارات (1)")
+    ExportHelper.style_header_row(ws_adv, current_row, 2)
+    
+    daily_data = analytics_data.get('daily_one_time_visitors', {})
+    start_row = current_row + 1
+    for i, (usr, count) in enumerate(daily_data.items()):
+        ws_adv.cell(row=start_row + i, column=1, value=usr)
+        ws_adv.cell(row=start_row + i, column=2, value=count)
+    if daily_data:
+        ExportHelper.style_data_rows(ws_adv, start_row, start_row + len(daily_data) - 1, 2)
+        
+    current_row = max(start_row + len(daily_data), current_row + 1) + 2
+
+    # --- C. All Active Users (Visits) ---
+    ws_adv.merge_cells(f'A{current_row}:B{current_row}')
+    ws_adv[f'A{current_row}'].value = "جميع المستخدمين النشطين (إجمالي الزيارات)"
+    ws_adv[f'A{current_row}'].font = Font(bold=True)
+    current_row += 1
+    
+    ws_adv.cell(row=current_row, column=1, value="المستخدم")
+    ws_adv.cell(row=current_row, column=2, value="إجمالي الزيارات")
+    ExportHelper.style_header_row(ws_adv, current_row, 2)
+    
+    active_data = analytics_data.get('all_active_users', {})
+    # Sort
+    sorted_active = sorted(active_data.items(), key=lambda x: x[1], reverse=True)
+    start_row = current_row + 1
+    for i, (usr, count) in enumerate(sorted_active):
+        ws_adv.cell(row=start_row + i, column=1, value=usr)
+        ws_adv.cell(row=start_row + i, column=2, value=count)
+    if sorted_active:
+        ExportHelper.style_data_rows(ws_adv, start_row, start_row + len(sorted_active) - 1, 2)
+
+    ExportHelper.auto_adjust_column_width(ws_adv, 2)
 
     # Save
     output = io.BytesIO()

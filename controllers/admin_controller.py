@@ -428,9 +428,72 @@ def export_analytics():
         complaints = complaint_model.get_all()
         unanswered = unanswered_model.get_all()
         
-        # Prepare analytics data
-        # Prepare Service Analysis
+        sec_logs = security_log_model.get_all() # Load security logs
         from collections import Counter
+        from datetime import datetime
+
+        # 1. Advanced AI Analysis (Frequent Users)
+        user_ai_days = {}
+        for c in chats:
+            uname = c.get('user_name', 'Unknown')
+            ts = c.get('timestamp', '')
+            if ts:
+                date = ts.split(' ')[0]
+                if uname not in user_ai_days: user_ai_days[uname] = set()
+                user_ai_days[uname].add(date)
+        frequent_ai_stats = {u: len(d) for u, d in user_ai_days.items() if len(d) >= 2} # Users active on 2+ days
+        
+        # 2. Advanced Visitor Analysis
+        all_login_events = [l for l in sec_logs if 'Login' in str(l.get('event', '')) and 'Success' in str(l.get('event', ''))]
+        all_visitors_list = []
+        for l in all_login_events:
+            details = str(l.get('details', ''))
+            if 'User ' in details:
+                try:
+                    username = details.split('User ')[1].split(' ')[0]
+                    all_visitors_list.append(username)
+                except: pass
+        top_all_visitors_data = dict(Counter(all_visitors_list).most_common()) # Total visits per user
+
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        today_login_events = [l for l in sec_logs if 'Login' in str(l.get('event', '')) and 'Success' in str(l.get('event', '')) and str(l.get('timestamp', '')).startswith(today_str)]
+        today_visitors_list = []
+        for l in today_login_events:
+            details = str(l.get('details', ''))
+            if 'User ' in details:
+                try:
+                    username = details.split('User ')[1].split(' ')[0]
+                    today_visitors_list.append(username)
+                except: pass
+        today_counts = Counter(today_visitors_list)
+        daily_one_time_visitors = {k: v for k, v in today_counts.items() if v == 1} # Users visited exactly once today
+        
+        # 3. Service Views Analysis
+        service_views = []
+        for l in sec_logs:
+            if str(l.get('event')) == 'Service View':
+                details = str(l.get('details', ''))
+                if 'User viewed service: ' in details:
+                    try:
+                        svc_title = details.split('User viewed service: ')[1]
+                        service_views.append(svc_title)
+                    except: pass
+        most_viewed_services = dict(Counter(service_views).most_common())
+        
+        # 4. Page Views (Popularity)
+        page_views = []
+        for l in sec_logs:
+            event = str(l.get('event', ''))
+            if 'View' in event or 'Page' in event:
+                details = str(l.get('details', ''))
+                if 'page: ' in details.lower():
+                    parts = details.lower().split('page: ')
+                    if len(parts) > 1:
+                        pname = parts[1].strip()
+                        page_views.append(pname)
+        page_popularity = dict(Counter(page_views).most_common())
+
+        # Prepare Service Requests Analysis
         service_counts = Counter([m.get('service', 'general') for m in messages])
         
         # Prepare Financial Analysis
@@ -448,11 +511,17 @@ def export_analytics():
             'completed_projects': len([u for u in users if u.get('project_percentage', 0) == 100]),
             'ongoing_projects': len([u for u in users if 0 < u.get('project_percentage', 0) < 100]),
             'not_started': len([u for u in users if u.get('project_percentage', 0) == 0]),
-            # New Data
+            # Service & Financial Data
             'services_breakdown': dict(service_counts),
             'total_revenue': total_revenue,
             'confirmed_payments_count': len(confirmed_payments),
-            'pending_payments_count': len(payments) - len(confirmed_payments)
+            'pending_payments_count': len(payments) - len(confirmed_payments),
+            # Advanced Insights Data
+            'frequent_ai_users': frequent_ai_stats,
+            'all_active_users': top_all_visitors_data,
+            'daily_one_time_visitors': daily_one_time_visitors,
+            'most_viewed_services': most_viewed_services,
+            'page_popularity': page_popularity
         }
         
         # Generate Excel file
