@@ -505,6 +505,22 @@ class ChatModel(SQLiteModel):
         conn.commit()
         conn.close()
 
+    def delete_all(self):
+        """Delete all chat logs (admin only)"""
+        conn = self.db_mgr.get_connection()
+        conn.execute(f"DELETE FROM {self.table}")
+        conn.commit()
+        conn.close()
+    
+    def delete_by_date_range(self, start_date):
+        """Delete chats from a specific date onwards (admin only)"""
+        conn = self.db_mgr.get_connection()
+        cursor = conn.execute(f"DELETE FROM {self.table} WHERE timestamp >= ?", (start_date,))
+        deleted_count = cursor.rowcount
+        conn.commit()
+        conn.close()
+        return deleted_count
+
 class PaymentModel(SQLiteModel):
     def __init__(self):
         super().__init__('payments')

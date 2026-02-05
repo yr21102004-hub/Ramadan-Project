@@ -536,7 +536,51 @@ def learned_answers():
 @admin_bp.route('/admin/chats')
 def view_chats():
     chats = chat_model.get_all()
+    chats.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
     return render_template('admin_chats.html', chats=chats)
+
+@admin_bp.route('/admin/chats/delete', methods=['POST'])
+@login_required
+def delete_chats():
+    """Delete chat logs based on time period"""
+    if current_user.role != 'admin':
+        return redirect(url_for('index'))
+    
+    period = request.form.get('period', 'all')
+    
+    try:
+        from datetime import datetime, timedelta
+        
+        if period == 'all':
+            # Delete all chats
+            chat_model.delete_all()
+            flash('تم حذف جميع سجلات المحادثات بنجاح', 'success')
+            security_log_model.create("Chat Logs Deleted", 
+                                     f"Admin {current_user.username} deleted all chat logs", 
+                                     severity="medium")
+        
+        elif period == 'week':
+            # Delete chats from last week
+            week_ago = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
+            deleted_count = chat_model.delete_by_date_range(week_ago)
+            flash(f'تم حذف سجلات آخر أسبوع ({deleted_count} محادثة)', 'success')
+            security_log_model.create("Chat Logs Deleted", 
+                                     f"Admin {current_user.username} deleted last week's chat logs ({deleted_count} chats)", 
+                                     severity="medium")
+        
+        elif period == 'month':
+            # Delete chats from last month
+            month_ago = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d %H:%M:%S")
+            deleted_count = chat_model.delete_by_date_range(month_ago)
+            flash(f'تم حذف سجلات آخر شهر ({deleted_count} محادثة)', 'success')
+            security_log_model.create("Chat Logs Deleted", 
+                                     f"Admin {current_user.username} deleted last month's chat logs ({deleted_count} chats)", 
+                                     severity="medium")
+        
+    except Exception as e:
+        flash(f'حدث خطأ أثناء الحذف: {str(e)}', 'error')
+    
+    return redirect(url_for('admin.view_chats'))
 
 @admin_bp.route('/admin/unanswered')
 def admin_unanswered_questions():
