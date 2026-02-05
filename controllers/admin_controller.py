@@ -413,11 +413,49 @@ def analytics_dashboard():
 @admin_bp.route('/admin/analytics/export')
 @login_required
 def export_analytics():
-    """Export comprehensive site analytics to CSV"""
+    """Export comprehensive site analytics to Excel with professional formatting"""
     if current_user.role != 'admin':
         return redirect(url_for('index'))
     
     try:
+        from utils.export_helper import export_analytics_excel
+        
+        users = user_model.get_all()
+        messages = contact_model.get_all()
+        chats = chat_model.get_all()
+        payments = payment_model.get_all()
+        inspections = db.inspection_requests.all()
+        complaints = complaint_model.get_all()
+        unanswered = unanswered_model.get_all()
+        
+        # Prepare analytics data
+        analytics_data = {
+            'total_users': len(users),
+            'total_requests': len(messages),
+            'total_chats': len(chats),
+            'total_payments': len(payments),
+            'total_inspections': len(inspections),
+            'total_complaints': len(complaints),
+            'pending_questions': len(unanswered),
+            'completed_projects': len([u for u in users if u.get('project_percentage', 0) == 100]),
+            'ongoing_projects': len([u for u in users if 0 < u.get('project_percentage', 0) < 100]),
+            'not_started': len([u for u in users if u.get('project_percentage', 0) == 0]),
+        }
+        
+        # Generate Excel file
+        output = export_analytics_excel(analytics_data)
+        
+        return send_file(
+            output,
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            as_attachment=True,
+            download_name=f"site_analytics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        )
+        
+    except ImportError:
+        # Fallback to enhanced CSV
+        flash('مكتبة Excel غير متوفرة، سيتم التصدير بصيغة CSV محسّنة', 'warning')
+        
         users = user_model.get_all()
         messages = contact_model.get_all()
         chats = chat_model.get_all()
@@ -431,12 +469,14 @@ def export_analytics():
         writer = csv.writer(output)
         
         # Title
+        writer.writerow(['═══════════════════════════════════════════'])
         writer.writerow(['تقرير إحصائيات الموقع الشامل'])
         writer.writerow([f'تاريخ التقرير: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'])
+        writer.writerow(['═══════════════════════════════════════════'])
         writer.writerow([])
         
         # 1. General Statistics
-        writer.writerow(['الإحصائيات العامة'])
+        writer.writerow(['━━━ الإحصائيات العامة ━━━'])
         writer.writerow(['المؤشر', 'القيمة'])
         writer.writerow(['إجمالي المستخدمين', len(users)])
         writer.writerow(['إجمالي الرسائل', len(messages)])
@@ -448,45 +488,51 @@ def export_analytics():
         writer.writerow([])
         
         # 2. User Statistics
-        writer.writerow(['إحصائيات المستخدمين'])
-        writer.writerow(['المؤشر', 'القيمة'])
+        writer.writerow(['━━━ إحصائيات المستخدمين ━━━'])
+        writer.writerow(['المؤشر', 'القيمة', 'النسبة'])
         completed = len([u for u in users if u.get('project_percentage', 0) == 100])
         ongoing = len([u for u in users if 0 < u.get('project_percentage', 0) < 100])
         not_started = len([u for u in users if u.get('project_percentage', 0) == 0])
-        writer.writerow(['مشاريع مكتملة', completed])
-        writer.writerow(['مشاريع جارية', ongoing])
-        writer.writerow(['مشاريع لم تبدأ', not_started])
+        
+        total = len(users) if users else 1
+        writer.writerow(['مشاريع مكتملة (100%)', completed, f'{(completed/total*100):.1f}%'])
+        writer.writerow(['مشاريع جارية (1-99%)', ongoing, f'{(ongoing/total*100):.1f}%'])
+        writer.writerow(['مشاريع لم تبدأ (0%)', not_started, f'{(not_started/total*100):.1f}%'])
         
         total_percentage = sum([u.get('project_percentage', 0) for u in users])
         avg_completion = round(total_percentage / len(users), 1) if users else 0
-        writer.writerow(['متوسط نسبة الإنجاز', f'{avg_completion}%'])
+        writer.writerow(['متوسط نسبة الإنجاز', f'{avg_completion}%', ''])
         writer.writerow([])
         
         # 3. Payment Statistics
-        writer.writerow(['إحصائيات المدفوعات'])
+        writer.writerow(['━━━ إحصائيات المدفوعات ━━━'])
         writer.writerow(['المؤشر', 'القيمة'])
-        total_revenue = sum([p.get('amount', 0) for p in payments])
+        total_revenue = sum([float(p.get('amount', 0)) for p in payments])
         confirmed_payments = [p for p in payments if p.get('status') == 'Confirmed']
         pending_payments = [p for p in payments if 'pending' in p.get('status', '').lower()]
-        writer.writerow(['إجمالي الإيرادات', f'{total_revenue} جنيه'])
-        writer.writerow(['مدفوعات مؤكدة', len(confirmed_payments)])
-        writer.writerow(['مدفوعات قيد المراجعة', len(pending_payments)])
+        
+        writer.writerow(['إجمالي الإيرادات', f'{total_revenue:,.2f} جنيه'])
+        writer.writerow(['مدفوعات مؤكدة', f'{len(confirmed_payments)} ({len(confirmed_payments)/len(payments)*100:.1f}%)' if payments else '0'])
+        writer.writerow(['مدفوعات قيد المراجعة', f'{len(pending_payments)} ({len(pending_payments)/len(payments)*100:.1f}%)' if payments else '0'])
+        writer.writerow(['متوسط قيمة الدفعة', f'{total_revenue/len(payments):,.2f} جنيه' if payments else '0'])
         writer.writerow([])
         
         # 4. Message Statistics
-        writer.writerow(['إحصائيات الرسائل'])
-        writer.writerow(['الحالة', 'العدد'])
+        writer.writerow(['━━━ إحصائيات الرسائل ━━━'])
+        writer.writerow(['الحالة', 'العدد', 'النسبة'])
         pending_msgs = len([m for m in messages if m.get('status') == 'pending'])
         approved_msgs = len([m for m in messages if m.get('status') == 'approved'])
         rejected_msgs = len([m for m in messages if m.get('status') == 'rejected'])
-        writer.writerow(['قيد المراجعة', pending_msgs])
-        writer.writerow(['موافق عليها', approved_msgs])
-        writer.writerow(['مرفوضة', rejected_msgs])
+        
+        total_msgs = len(messages) if messages else 1
+        writer.writerow(['قيد المراجعة', pending_msgs, f'{(pending_msgs/total_msgs*100):.1f}%'])
+        writer.writerow(['موافق عليها', approved_msgs, f'{(approved_msgs/total_msgs*100):.1f}%'])
+        writer.writerow(['مرفوضة', rejected_msgs, f'{(rejected_msgs/total_msgs*100):.1f}%'])
         writer.writerow([])
         
         # 5. Service Requests
-        writer.writerow(['الخدمات الأكثر طلباً'])
-        writer.writerow(['الخدمة', 'عدد الطلبات'])
+        writer.writerow(['━━━ الخدمات الأكثر طلباً ━━━'])
+        writer.writerow(['الخدمة', 'عدد الطلبات', 'النسبة'])
         from collections import Counter
         service_counts = Counter([m.get('service', 'general') for m in messages])
         service_map = {
@@ -499,32 +545,38 @@ def export_analytics():
             'general': 'استفسار عام'
         }
         for service, count in service_counts.most_common():
-            writer.writerow([service_map.get(service, service), count])
+            writer.writerow([service_map.get(service, service), count, f'{(count/total_msgs*100):.1f}%'])
         writer.writerow([])
         
         # 6. AI Chat Efficiency
-        writer.writerow(['كفاءة الذكاء الاصطناعي'])
-        writer.writerow(['المؤشر', 'القيمة'])
+        writer.writerow(['━━━ كفاءة الذكاء الاصطناعي ━━━'])
+        writer.writerow(['المؤشر', 'القيمة', 'النسبة'])
         total_ai_msgs = len(chats)
         unanswered_count = len(unanswered)
         answered_count = max(0, total_ai_msgs - unanswered_count)
         efficiency_rate = round((answered_count / total_ai_msgs * 100), 1) if total_ai_msgs > 0 else 0
-        writer.writerow(['إجمالي المحادثات', total_ai_msgs])
-        writer.writerow(['تم الرد عليها', answered_count])
-        writer.writerow(['بدون إجابة', unanswered_count])
-        writer.writerow(['نسبة الكفاءة', f'{efficiency_rate}%'])
+        
+        writer.writerow(['إجمالي المحادثات', total_ai_msgs, '100%'])
+        writer.writerow(['تم الرد عليها', answered_count, f'{efficiency_rate}%'])
+        writer.writerow(['بدون إجابة', unanswered_count, f'{(100-efficiency_rate):.1f}%'])
         writer.writerow([])
         
         # 7. Inspection Requests
-        writer.writerow(['طلبات المعاينة'])
-        writer.writerow(['الحالة', 'العدد'])
+        writer.writerow(['━━━ طلبات المعاينة ━━━'])
+        writer.writerow(['الحالة', 'العدد', 'النسبة'])
         new_inspections = len([i for i in inspections if i.get('status') == 'new_request'])
         scheduled = len([i for i in inspections if i.get('status') == 'scheduled'])
         completed_insp = len([i for i in inspections if i.get('status') == 'completed'])
-        writer.writerow(['طلبات جديدة', new_inspections])
-        writer.writerow(['مجدولة', scheduled])
-        writer.writerow(['مكتملة', completed_insp])
+        
+        total_insp = len(inspections) if inspections else 1
+        writer.writerow(['طلبات جديدة', new_inspections, f'{(new_inspections/total_insp*100):.1f}%'])
+        writer.writerow(['مجدولة', scheduled, f'{(scheduled/total_insp*100):.1f}%'])
+        writer.writerow(['مكتملة', completed_insp, f'{(completed_insp/total_insp*100):.1f}%'])
         writer.writerow([])
+        
+        writer.writerow(['═══════════════════════════════════════════'])
+        writer.writerow(['نهاية التقرير'])
+        writer.writerow(['═══════════════════════════════════════════'])
         
         output.seek(0)
         
@@ -538,6 +590,7 @@ def export_analytics():
     except Exception as e:
         flash(f'حدث خطأ أثناء تصدير الإحصائيات: {str(e)}', 'error')
         return redirect(url_for('admin.analytics_dashboard'))
+
 
 @admin_bp.route('/admin/add_user', methods=['POST'])
 def add_user():
@@ -714,38 +767,146 @@ def delete_chats():
 @admin_bp.route('/admin/chats/export')
 @login_required
 def export_chats():
-    """Export chat logs to CSV"""
+    """Export chat logs to Excel with professional formatting"""
     if current_user.role != 'admin':
         return redirect(url_for('index'))
     
-    chats = chat_model.get_all()
+    try:
+        from utils.export_helper import export_chats_excel
+        
+        chats = chat_model.get_all()
+        # Sort by timestamp
+        chats.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+        
+        # Generate Excel file
+        output = export_chats_excel(chats)
+        
+        return send_file(
+            output,
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            as_attachment=True,
+            download_name=f"chat_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        )
+    except ImportError:
+        # Fallback to CSV
+        flash('مكتبة Excel غير متوفرة، سيتم التصدير بصيغة CSV', 'warning')
+        
+        chats = chat_model.get_all()
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Header
+        writer.writerow(['التوقيت', 'المستخدم', 'اسم المستخدم', 'رسالة العميل', 'رد الذكاء الاصطناعي', 'IP Address'])
+        
+        # Data
+        for chat in chats:
+            writer.writerow([
+                chat.get('timestamp', ''),
+                chat.get('username', 'زائر'),
+                chat.get('user_name', ''),
+                chat.get('message', ''),
+                chat.get('response', ''),
+                chat.get('user_ip', '')
+            ])
+        
+        output.seek(0)
+        
+        return send_file(
+            io.BytesIO(output.getvalue().encode('utf-8-sig')),
+            mimetype="text/csv",
+            as_attachment=True,
+            download_name=f"chat_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        )
+
+# ... (omitted unrelated routes) ...
+
+@admin_bp.route('/admin/export/pdf', methods=['POST'])
+@login_required
+@role_required(['admin'])
+def export_pdf_report():
+    report_type = request.form.get('report_type')
     
-    # Create CSV in memory
-    output = io.StringIO()
-    writer = csv.writer(output)
+    # Simple Text-based PDF generation logic
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
     
-    # Header
-    writer.writerow(['التوقيت', 'المستخدم', 'اسم المستخدم', 'رسالة العميل', 'رد الذكاء الاصطناعي', 'IP Address'])
+    # Add title
+    p.setFont("Helvetica-Bold", 18)
+    p.drawString(50, height - 50, "RMG Decor - Admin Report")
     
-    # Data
-    for chat in chats:
-        writer.writerow([
-            chat.get('timestamp', ''),
-            chat.get('username', 'زائر'),
-            chat.get('user_name', ''),
-            chat.get('message', ''),
-            chat.get('response', ''),
-            chat.get('user_ip', '')
-        ])
+    p.setFont("Helvetica", 12)
+    p.drawString(50, height - 80, f"Generated by: {current_user.full_name or current_user.username}")
+    p.drawString(50, height - 100, f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    p.drawString(50, height - 120, f"Report Type: {report_type.replace('_', ' ').title()}")
     
-    output.seek(0)
+    p.line(50, height - 130, width - 50, height - 130)
     
-    return send_file(
-        io.BytesIO(output.getvalue().encode('utf-8-sig')),
-        mimetype="text/csv",
-        as_attachment=True,
-        download_name=f"chat_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-    )
+    y = height - 160
+    
+    if report_type == 'monthly_summary':
+        users = user_model.get_all()
+        reqs = contact_model.get_all()
+        payments = payment_model.get_all()
+        chats = chat_model.get_all()
+        
+        revenue = sum(float(p.get('amount', 0)) for p in payments if p.get('status') == 'Confirmed')
+        
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y, "Monthly Summary Statistics:")
+        y -= 30
+        
+        p.setFont("Helvetica", 12)
+        stats = [
+            f"Total Users: {len(users)}",
+            f"Total Requests: {len(reqs)}",
+            f"Total Chats: {len(chats)}",
+            f"Total Revenue: {revenue:,.2f} EGP",
+            f"Active Projects: {len([u for u in users if 0 < u.get('project_percentage', 0) < 100])}"
+        ]
+        
+        for stat in stats:
+            p.drawString(70, y, f"- {stat}")
+            y -= 20
+            
+    elif report_type == 'financial_report':
+        payments = payment_model.get_all()
+        revenue = sum(float(p.get('amount', 0)) for p in payments if p.get('status') == 'Confirmed')
+        pending = sum(float(p.get('amount', 0)) for p in payments if 'pending' in p.get('status', '').lower())
+        
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y, "Financial Overview:")
+        y -= 30
+        
+        p.setFont("Helvetica", 12)
+        p.drawString(70, y, f"Total Revenue (Confirmed): {revenue:,.2f} EGP")
+        y -= 20
+        p.drawString(70, y, f"Pending Revenue: {pending:,.2f} EGP")
+        y -= 20
+        p.drawString(70, y, f"Total Transactions: {len(payments)}")
+        y -= 40
+        
+        p.setFont("Helvetica-Bold", 12)
+        p.drawString(50, y, "Recent Transactions (Last 10):")
+        y -= 20
+        
+        p.setFont("Helvetica", 10)
+        # Sort payments
+        payments.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+        
+        for pay in payments[:10]:
+            line = f"{pay.get('timestamp')} - {pay.get('username')} - {pay.get('amount')} EGP - {pay.get('status')}"
+            p.drawString(70, y, line)
+            y -= 15
+            if y < 50: # Page break logic simplified
+                p.showPage()
+                y = height - 50
+
+    p.showPage()
+    p.save()
+    
+    buffer.seek(0)
+    return send_file(buffer, as_attachment=True, download_name=f"report_{report_type}_{datetime.now().strftime('%Y%m%d')}.pdf", mimetype='application/pdf')
 
 @admin_bp.route('/admin/unanswered')
 def admin_unanswered_questions():
@@ -1308,64 +1469,140 @@ def delete_backup_file(filename):
 @admin_bp.route('/admin/export/users')
 @login_required
 def export_users_report():
-    """Export users report to CSV"""
-    users = user_model.get_all()
+    """Export users report to Excel with professional formatting"""
+    if current_user.role != 'admin':
+        return redirect(url_for('index'))
     
-    # Create CSV in memory
-    output = io.StringIO()
-    writer = csv.writer(output)  # Fixed: removed invalid encoding parameter
-    
-    # Header
-    writer.writerow(['المعرف', 'اسم المستخدم', 'الاسم الكامل', 'الهاتف', 'الموقع', 'نسبة الإنجاز', 'تاريخ التسجيل'])
-    
-    # Data
-    for user in users:
-        writer.writerow([
-            user.get('doc_id', ''),
-            user.get('username', ''),
-            user.get('full_name', ''),
-            user.get('phone', ''),
-            user.get('project_location', ''),
-            f"{user.get('project_percentage', 0)}%",
-            user.get('created_at', '')
-        ])
+    try:
+        from utils.export_helper import export_users_excel
         
-    output.seek(0)
-    
-    return send_file(
-        io.BytesIO(output.getvalue().encode('utf-8-sig')),
-        mimetype="text/csv",
-        as_attachment=True,
-        download_name=f"users_report_{datetime.now().strftime('%Y%m%d')}.csv"
-    )
+        users = user_model.get_all()
+        
+        # Generate Excel file
+        output = export_users_excel(users)
+        
+        return send_file(
+            output,
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            as_attachment=True,
+            download_name=f"users_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        )
+    except ImportError:
+        # Fallback to CSV if openpyxl not available
+        flash('مكتبة Excel غير متوفرة، سيتم التصدير بصيغة CSV', 'warning')
+        
+        users = user_model.get_all()
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Add BOM for Excel UTF-8 support
+        writer.writerow(['تقرير المستخدمين'])
+        writer.writerow([f'تاريخ التقرير: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'])
+        writer.writerow([])
+        
+        # Header with better formatting
+        writer.writerow(['#', 'اسم المستخدم', 'الاسم الكامل', 'رقم الهاتف', 'البريد الإلكتروني',
+                        'موقع المشروع', 'نسبة الإنجاز', 'تاريخ التسجيل'])
+        
+        # Data
+        for idx, user in enumerate(users, 1):
+            writer.writerow([
+                idx,
+                user.get('username', ''),
+                user.get('full_name', ''),
+                user.get('phone', ''),
+                user.get('email', ''),
+                user.get('project_location', ''),
+                f"{user.get('project_percentage', 0)}%",
+                user.get('created_at', '')
+            ])
+        
+        # Add summary
+        writer.writerow([])
+        writer.writerow(['الإحصائيات'])
+        writer.writerow(['إجمالي المستخدمين', len(users)])
+        writer.writerow(['مشاريع مكتملة', len([u for u in users if u.get('project_percentage', 0) == 100])])
+        writer.writerow(['مشاريع جارية', len([u for u in users if 0 < u.get('project_percentage', 0) < 100])])
+        
+        output.seek(0)
+        
+        return send_file(
+            io.BytesIO(output.getvalue().encode('utf-8-sig')),
+            mimetype="text/csv",
+            as_attachment=True,
+            download_name=f"users_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        )
+    except Exception as e:
+        flash(f'حدث خطأ أثناء التصدير: {str(e)}', 'error')
+        return redirect(url_for('admin.admin_users'))
+
 
 @admin_bp.route('/admin/export/payments')
 @login_required
 def export_payments_report():
-    """Export payments report to CSV"""
-    payments = payment_model.get_all()
+    """Export payments report to Excel with professional formatting"""
+    if current_user.role != 'admin':
+        return redirect(url_for('index'))
     
-    output = io.StringIO()
-    writer = csv.writer(output)  # Fixed: removed invalid encoding parameter
-    
-    # Header
-    writer.writerow(['المستخدم', 'المبلغ (جم)', 'طريقة الدفع', 'التفاصيل', 'التاريخ', 'الحالة'])
-    
-    for p in payments:
-        writer.writerow([
-            p.get('username', ''),
-            p.get('amount', ''),
-            p.get('method', ''),
-            p.get('details', ''),
-            p.get('timestamp', ''),
-            p.get('status', 'قيد المراجعة')
-        ])
+    try:
+        from utils.export_helper import export_payments_excel
         
-    output.seek(0)
-    
-    return send_file(
-        io.BytesIO(output.getvalue().encode('utf-8-sig')),
-        mimetype="text/csv",
-        as_attachment=True,
-        download_name=f"payments_report_{datetime.now().strftime('%Y%m%d')}.csv"
-    )
+        payments = payment_model.get_all()
+        
+        # Generate Excel file
+        output = export_payments_excel(payments)
+        
+        return send_file(
+            output,
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            as_attachment=True,
+            download_name=f"payments_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        )
+    except ImportError:
+        # Fallback to CSV
+        flash('مكتبة Excel غير متوفرة، سيتم التصدير بصيغة CSV', 'warning')
+        
+        payments = payment_model.get_all()
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Title
+        writer.writerow(['تقرير المدفوعات'])
+        writer.writerow([f'تاريخ التقرير: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'])
+        writer.writerow([])
+        
+        # Header
+        writer.writerow(['#', 'اسم المستخدم', 'المبلغ (جنيه)', 'طريقة الدفع', 
+                        'التفاصيل', 'التاريخ', 'الحالة'])
+        
+        for idx, p in enumerate(payments, 1):
+            writer.writerow([
+                idx,
+                p.get('username', ''),
+                f"{float(p.get('amount', 0)):,.2f}",
+                p.get('method', ''),
+                p.get('details', ''),
+                p.get('timestamp', ''),
+                p.get('status', 'قيد المراجعة')
+            ])
+        
+        # Summary
+        writer.writerow([])
+        writer.writerow(['الإحصائيات'])
+        total_revenue = sum([float(p.get('amount', 0)) for p in payments])
+        writer.writerow(['إجمالي الإيرادات', f"{total_revenue:,.2f} جنيه"])
+        writer.writerow(['عدد المدفوعات', len(payments)])
+        writer.writerow(['مدفوعات مؤكدة', len([p for p in payments if p.get('status') == 'Confirmed'])])
+        
+        output.seek(0)
+        
+        return send_file(
+            io.BytesIO(output.getvalue().encode('utf-8-sig')),
+            mimetype="text/csv",
+            as_attachment=True,
+            download_name=f"payments_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        )
+    except Exception as e:
+        flash(f'حدث خطأ أثناء التصدير: {str(e)}', 'error')
+        return redirect(url_for('admin.admin_dashboard'))
+

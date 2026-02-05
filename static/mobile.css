@@ -1,129 +1,357 @@
 /* ========================================
-   MOBILE RESPONSIVE ENHANCEMENTS
+   MOBILE RESPONSIVE ENHANCEMENTS - PREMIUM DESIGN
    ======================================== */
 
-/* Base Mobile Optimizations */
+/* Base Mobile Optimizations (Tablets & Small Laptops) */
+@media (max-width: 992px) {
+
+    /* Navigation */
+    .nav-links {
+        display: none;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    /* Grid Adjustments */
+    .about-grid,
+    .why-us-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .services-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+/* Mobile Devices (Phones) */
 @media (max-width: 768px) {
 
-    /* Typography */
+    /* ===== TYPOGRAPHY ===== */
     body {
-        font-size: 14px;
+        font-size: 15px;
+        line-height: 1.7;
     }
 
     h1,
     .hero-title {
-        font-size: 2rem !important;
+        font-size: 2.2rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 1rem !important;
     }
 
     h2,
     .section-title {
-        font-size: 1.75rem !important;
+        font-size: 1.8rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 1rem !important;
     }
 
     h3 {
-        font-size: 1.5rem !important;
+        font-size: 1.4rem !important;
+        line-height: 1.4 !important;
     }
 
-    /* Navigation */
+    p {
+        font-size: 1rem !important;
+        line-height: 1.7 !important;
+    }
+
+    /* ===== NAVIGATION ===== */
     .navbar {
-        padding: 10px 0 !important;
+        padding: 12px 0 !important;
+        backdrop-filter: blur(20px) !important;
     }
 
-    .navbar-brand img {
-        height: 40px !important;
+    .nav-container {
+        padding: 0 15px;
     }
 
-    .nav-link {
-        padding: 12px 15px !important;
-        font-size: 16px !important;
+    .logo img {
+        height: 45px !important;
     }
 
-    /* Hero Section */
-    .hero {
-        min-height: 60vh !important;
-        padding: 60px 0 !important;
+    .nav-actions {
+        gap: 10px;
     }
 
-    .hero-content {
-        padding: 20px !important;
+    .nav-actions .btn {
+        padding: 10px 20px !important;
+        font-size: 0.9rem !important;
     }
 
-    .hero-subtitle {
+    #theme-toggle {
+        width: 38px !important;
+        height: 38px !important;
         font-size: 1rem !important;
     }
 
-    /* Buttons */
+    /* Mobile Menu Enhancement */
+    .mobile-menu {
+        width: 85%;
+        max-width: 320px;
+        padding: 70px 30px 30px;
+        background: var(--surface);
+        backdrop-filter: blur(30px);
+        border-left: 1px solid var(--neutral-border);
+    }
+
+    .mobile-menu a {
+        font-size: 1.15rem;
+        padding: 15px 0;
+        border-bottom: 1px solid var(--neutral-border);
+        transition: all 0.3s ease;
+        display: block;
+    }
+
+    .mobile-menu a:hover {
+        color: var(--primary);
+        padding-right: 10px;
+    }
+
+    .close-menu {
+        top: 25px;
+        left: 25px;
+        font-size: 1.8rem;
+        color: var(--text);
+        transition: all 0.3s ease;
+    }
+
+    .close-menu:hover {
+        color: var(--primary);
+        transform: rotate(90deg);
+    }
+
+    /* ===== HERO SECTION ===== */
+    .hero {
+        min-height: 70vh !important;
+        height: auto !important;
+        padding: 100px 0 60px !important;
+    }
+
+    .hero-content {
+        padding: 0 20px !important;
+    }
+
+    .eyebrow {
+        font-size: 0.75rem !important;
+        padding: 6px 14px !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .hero h1 {
+        font-size: 2rem !important;
+        margin-bottom: 1.5rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .hero p {
+        font-size: 1rem !important;
+        margin-bottom: 2rem !important;
+        line-height: 1.6 !important;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* ===== BUTTONS ===== */
     .btn {
-        padding: 12px 24px !important;
-        font-size: 14px !important;
+        padding: 14px 28px !important;
+        font-size: 1rem !important;
+        border-radius: 10px !important;
+        font-weight: 700 !important;
     }
 
     .btn-lg {
-        padding: 14px 28px !important;
-        font-size: 15px !important;
+        padding: 16px 32px !important;
+        font-size: 1.05rem !important;
     }
 
-    /* Cards */
+    .btn i {
+        font-size: 1.1rem;
+    }
+
+    /* ===== SECTIONS ===== */
+    .section-padding {
+        padding: 60px 0 !important;
+    }
+
+    .section-title {
+        font-size: 1.9rem !important;
+        margin-bottom: 1rem !important;
+        text-align: center;
+    }
+
+    .divider {
+        width: 60px;
+        height: 3px;
+        margin: 0 auto 2rem auto;
+    }
+
+    /* ===== CONTAINER ===== */
+    .container {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+
+    /* ===== CARDS ===== */
     .premium-card {
-        padding: 20px !important;
+        padding: 25px !important;
         margin-bottom: 20px !important;
+        border-radius: 16px !important;
+    }
+
+    .premium-card:hover {
+        transform: translateY(-4px) !important;
     }
 
     .service-card,
     .project-card {
         margin-bottom: 20px !important;
+        padding: 30px 20px !important;
+        border-radius: 16px !important;
     }
 
-    /* Sections */
-    .section-padding {
-        padding: 60px 0 !important;
+    .service-icon {
+        font-size: 2.5rem !important;
+        margin-bottom: 15px !important;
     }
 
-    /* Container */
-    .container {
-        padding-left: 15px !important;
-        padding-right: 15px !important;
+    .service-card h3 {
+        font-size: 1.3rem !important;
+        margin-bottom: 12px !important;
     }
 
-    /* Tables */
+    .service-card p {
+        font-size: 0.95rem !important;
+        line-height: 1.6 !important;
+    }
+
+    /* ===== PROJECT CARDS ===== */
+    .projects-wrapper {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    .project-item {
+        height: 280px !important;
+        border-radius: 16px !important;
+    }
+
+    .project-content {
+        padding: 25px !important;
+    }
+
+    .project-content i {
+        font-size: 1.8rem !important;
+    }
+
+    .project-content span {
+        font-size: 1.3rem !important;
+    }
+
+    /* ===== STATS CARDS ===== */
+    .about-stats {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    .stat-card {
+        padding: 25px !important;
+        margin-bottom: 15px !important;
+        border-radius: 12px !important;
+    }
+
+    .stat-icon {
+        width: 55px !important;
+        height: 55px !important;
+        font-size: 1.4rem !important;
+    }
+
+    .stat-info h3 {
+        font-size: 2rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .stat-info p {
+        font-size: 0.95rem !important;
+    }
+
+    /* ===== FORMS ===== */
+    .form-control,
+    .form-select,
+    textarea {
+        font-size: 16px !important;
+        /* Prevents iOS zoom */
+        padding: 14px 16px !important;
+        border-radius: 10px !important;
+    }
+
+    .form-label {
+        font-size: 0.95rem !important;
+        margin-bottom: 8px !important;
+    }
+
+    /* ===== TABLES ===== */
     .table-responsive {
         border: none !important;
+        border-radius: 12px !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
     }
 
     .modern-table {
         font-size: 0.85rem !important;
+        min-width: 600px;
     }
 
     .modern-table th,
     .modern-table td {
-        padding: 10px 8px !important;
+        padding: 12px 10px !important;
         font-size: 0.85rem !important;
+        white-space: nowrap;
     }
 
-    /* Hide less important columns on mobile */
-    .modern-table th:nth-child(n+4),
-    .modern-table td:nth-child(n+4) {
-        display: none;
+    .modern-table th {
+        font-size: 0.8rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    /* Forms */
-    .form-control,
-    .form-select {
-        font-size: 16px !important;
-        /* Prevents zoom on iOS */
-        padding: 12px !important;
-    }
-
-    /* Modals */
+    /* ===== MODALS ===== */
     .modal-dialog {
-        margin: 10px !important;
+        margin: 15px !important;
+        max-width: calc(100% - 30px) !important;
     }
 
     .modal-content {
-        border-radius: 15px !important;
+        border-radius: 16px !important;
+        padding: 20px !important;
     }
 
-    /* Grid Layouts */
+    .modal-header {
+        padding: 15px 20px !important;
+    }
+
+    .modal-body {
+        padding: 20px !important;
+    }
+
+    .modal-footer {
+        padding: 15px 20px !important;
+    }
+
+    /* ===== GRID LAYOUTS ===== */
     .row {
         margin-left: -10px !important;
         margin-right: -10px !important;
@@ -132,52 +360,99 @@
     .row>* {
         padding-left: 10px !important;
         padding-right: 10px !important;
+        margin-bottom: 15px;
     }
 
-    /* Stats Cards */
-    .stat-card {
-        padding: 15px !important;
-        margin-bottom: 15px !important;
-    }
-
-    .stat-icon {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 1.25rem !important;
-    }
-
-    .stat-info h3 {
-        font-size: 1.5rem !important;
-    }
-
-    /* Navigation Cards */
+    /* ===== NAVIGATION CARDS (Admin Dashboard) ===== */
     .nav-card {
-        padding: 20px !important;
+        padding: 25px !important;
         margin-bottom: 15px !important;
+        border-radius: 14px !important;
+        text-align: center;
     }
 
     .nav-card-icon {
-        width: 60px !important;
-        height: 60px !important;
-        font-size: 1.5rem !important;
+        width: 65px !important;
+        height: 65px !important;
+        font-size: 1.6rem !important;
+        margin: 0 auto 15px !important;
     }
 
-    /* Footer */
+    .nav-card h3 {
+        font-size: 1.2rem !important;
+    }
+
+    /* ===== FOOTER ===== */
     footer {
-        padding: 40px 0 20px !important;
+        padding: 50px 0 25px !important;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr !important;
+        gap: 35px !important;
+    }
+
+    .footer-brand {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .footer-brand img {
+        height: 55px !important;
+        margin-bottom: 15px;
     }
 
     .footer-col {
         margin-bottom: 30px !important;
+        text-align: center;
     }
 
-    /* Chat Widget */
+    .footer-col h4 {
+        font-size: 1.2rem !important;
+        margin-bottom: 15px !important;
+    }
+
+    .footer-links li {
+        margin-bottom: 12px !important;
+    }
+
+    .footer-links a {
+        font-size: 1rem !important;
+    }
+
+    .footer-bottom {
+        text-align: center;
+        padding-top: 25px;
+        margin-top: 30px;
+        border-top: 1px solid var(--neutral-border);
+    }
+
+    .footer-bottom p {
+        font-size: 0.9rem !important;
+        line-height: 1.6 !important;
+    }
+
+    /* ===== CHAT WIDGET ===== */
     .chat-widget {
         width: 100% !important;
         height: 100% !important;
         bottom: 0 !important;
         right: 0 !important;
         border-radius: 0 !important;
+        max-height: 100vh;
+    }
+
+    .chat-header {
+        padding: 18px 20px !important;
+    }
+
+    .chat-body {
+        height: calc(100vh - 140px) !important;
+        padding: 20px !important;
+    }
+
+    .chat-footer {
+        padding: 15px 20px !important;
     }
 
     .chat-toggle-btn {
@@ -185,50 +460,68 @@
         right: 20px !important;
         width: 60px !important;
         height: 60px !important;
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
     }
 
-    /* Admin Dashboard */
+    .chat-toggle-btn img {
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    /* ===== ADMIN DASHBOARD ===== */
     .admin-section-bg {
-        padding-top: 80px !important;
+        padding-top: 90px !important;
+        padding-bottom: 40px !important;
     }
 
-    /* Image Grids */
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    /* ===== IMAGE GRIDS ===== */
     .image-grid {
         grid-template-columns: 1fr !important;
         gap: 15px !important;
     }
 
-    /* Service Detail */
+    /* ===== SERVICE DETAIL ===== */
     .service-detail-img {
         height: 250px !important;
+        border-radius: 16px !important;
     }
 
-    /* Project Detail */
+    /* ===== PROJECT DETAIL ===== */
     .project-hero-image {
         height: 300px !important;
+        border-radius: 16px !important;
     }
 
-    /* Spacing Utilities */
+    /* ===== SPACING UTILITIES ===== */
     .mb-5 {
-        margin-bottom: 2rem !important;
+        margin-bottom: 2.5rem !important;
     }
 
     .mt-5 {
-        margin-top: 2rem !important;
+        margin-top: 2.5rem !important;
     }
 
     .py-5 {
-        padding-top: 2rem !important;
-        padding-bottom: 2rem !important;
+        padding-top: 2.5rem !important;
+        padding-bottom: 2.5rem !important;
     }
 
-    /* Glass Effects - Reduce blur for performance */
+    .gap-3 {
+        gap: 15px !important;
+    }
+
+    /* ===== GLASS EFFECTS - Optimized for Performance ===== */
     .glass {
-        backdrop-filter: blur(5px) !important;
-        -webkit-backdrop-filter: blur(5px) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
     }
 
-    /* Animations - Reduce for performance */
+    /* ===== ANIMATIONS - Reduced for Performance ===== */
     * {
         animation-duration: 0.3s !important;
     }
@@ -237,28 +530,92 @@
         transition-duration: 0.4s !important;
     }
 
-    /* Scroll Progress Bar */
-    #scroll-progress {
+    /* Disable complex animations on mobile */
+    [data-aos="fade-up"],
+    [data-aos="fade-down"],
+    [data-aos="fade-left"],
+    [data-aos="fade-right"] {
+        transform: none !important;
+        opacity: 1 !important;
+    }
+
+    /* ===== SCROLL PROGRESS BAR ===== */
+    .scroll-progress {
         height: 3px !important;
     }
 
-    /* Preloader */
-    .preloader {
+    /* ===== PRELOADER ===== */
+    .preloader-v2 {
         font-size: 0.9rem !important;
     }
 
-    .preloader-logo {
-        width: 80px !important;
-        height: 80px !important;
+    .logo-text-v2 {
+        font-size: 3.5rem !important;
+        letter-spacing: 3px !important;
+    }
+
+    .logo-subtext-v2 {
+        font-size: 1rem !important;
+        letter-spacing: 6px !important;
+    }
+
+    /* ===== COVERAGE BANNER ===== */
+    .coverage-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px !important;
+    }
+
+    .coverage-banner i {
+        font-size: 2.5rem !important;
+    }
+
+    /* ===== WHY US SECTION ===== */
+    .why-list li {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .icon-box {
+        margin: 0 auto;
+    }
+
+    /* ===== OFFER CARD ===== */
+    .offer-card {
+        padding: 30px 20px !important;
+        border-radius: 16px !important;
+    }
+
+    .offer-badge {
+        top: -10px;
+        left: -10px;
+        font-size: 0.85rem;
+        padding: 8px 16px;
+    }
+
+    .offer-card h3 {
+        font-size: 1.6rem !important;
+    }
+
+    /* ===== FEATURE LIST ===== */
+    .feature-list li {
+        font-size: 1rem !important;
+        gap: 12px;
+    }
+
+    .feature-list i {
+        font-size: 1.2rem;
     }
 }
 
-/* Extra Small Devices (phones in portrait) */
+/* Extra Small Devices (Small Phones - Portrait) */
 @media (max-width: 576px) {
 
+    /* Typography - Even Smaller */
     h1,
     .hero-title {
-        font-size: 1.75rem !important;
+        font-size: 1.8rem !important;
     }
 
     h2,
@@ -266,90 +623,154 @@
         font-size: 1.5rem !important;
     }
 
-    .btn {
+    h3 {
+        font-size: 1.25rem !important;
+    }
+
+    /* Container - Tighter Padding */
+    .container {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+    /* Cards - More Compact */
+    .premium-card {
+        padding: 20px !important;
+        border-radius: 14px !important;
+    }
+
+    .service-card {
+        padding: 25px 18px !important;
+    }
+
+    /* Buttons - Full Width */
+    .btn:not(.btn-icon):not(.close-menu) {
         width: 100% !important;
         margin-bottom: 10px !important;
     }
 
     .btn-group .btn {
         width: auto !important;
+        flex: 1;
     }
 
-    /* Stack buttons vertically */
-    .d-flex.gap-3 {
+    /* Stack flex containers */
+    .d-flex.gap-3,
+    .d-flex.gap-2 {
         flex-direction: column !important;
-        gap: 10px !important;
+        gap: 12px !important;
     }
 
-    /* Full width cards */
+    /* Full width columns */
     .col-md-6,
     .col-lg-4,
-    .col-lg-3 {
+    .col-lg-3,
+    .col-sm-6 {
         width: 100% !important;
+        margin-bottom: 15px;
     }
 
-    /* Reduce padding further */
-    .container {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-    }
-
-    .premium-card {
-        padding: 15px !important;
-    }
-
-    /* Tables - Show only essential columns */
+    /* Tables - Show Only Essential Columns */
     .modern-table th:nth-child(n+3),
     .modern-table td:nth-child(n+3) {
         display: none;
     }
 
-    /* Make first 2 columns visible */
+    /* Keep first 2 columns visible */
     .modern-table th:nth-child(1),
     .modern-table th:nth-child(2),
     .modern-table td:nth-child(1),
     .modern-table td:nth-child(2) {
         display: table-cell !important;
     }
+
+    /* Hero - More Compact */
+    .hero {
+        min-height: 65vh !important;
+        padding: 90px 0 50px !important;
+    }
+
+    .hero h1 {
+        font-size: 1.75rem !important;
+    }
+
+    .hero p {
+        font-size: 0.95rem !important;
+    }
+
+    /* Project Items - Smaller */
+    .project-item {
+        height: 240px !important;
+    }
+
+    /* Logo */
+    .logo img {
+        height: 40px !important;
+    }
+
+    /* Stat Cards */
+    .stat-info h3 {
+        font-size: 1.75rem !important;
+    }
+
+    /* Modal - Full Screen on Small Phones */
+    .modal-dialog {
+        margin: 10px !important;
+        max-width: calc(100% - 20px) !important;
+    }
 }
 
 /* Landscape Orientation Fixes */
 @media (max-width: 768px) and (orientation: landscape) {
     .hero {
-        min-height: 80vh !important;
+        min-height: 85vh !important;
+        padding: 80px 0 40px !important;
     }
 
     .section-padding {
-        padding: 40px 0 !important;
+        padding: 50px 0 !important;
+    }
+
+    .project-item {
+        height: 250px !important;
     }
 }
 
 /* Touch Device Optimizations */
 @media (hover: none) and (pointer: coarse) {
 
-    /* Larger touch targets */
+    /* Larger touch targets - Accessibility */
     .btn,
     .nav-link,
-    a {
+    a:not(.logo a) {
         min-height: 44px !important;
-        min-width: 44px !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    /* Remove hover effects */
+    /* Remove hover effects on touch devices */
     .premium-card:hover,
     .service-card:hover,
-    .project-card:hover {
+    .project-card:hover,
+    .project-item:hover {
         transform: none !important;
     }
 
-    /* Disable parallax on touch devices */
+    /* Disable parallax on touch devices for performance */
     .bg-villas-luxury,
     .bg-apartments-luxury,
     .bg-factories-luxury,
     .bg-companies-luxury,
     .bg-hotels-luxury,
-    .bg-pattern-luxury {
+    .bg-pattern-luxury,
+    .hero {
         background-attachment: scroll !important;
+    }
+
+    /* Tap highlight color */
+    * {
+        -webkit-tap-highlight-color: rgba(212, 175, 55, 0.2);
     }
 }
 
@@ -361,6 +782,14 @@
     body {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* Sharper borders */
+    .premium-card,
+    .service-card,
+    .btn {
+        border-width: 0.5px;
     }
 }
 
@@ -370,8 +799,11 @@
     .navbar,
     .chat-widget,
     .chat-toggle-btn,
-    #scroll-progress,
-    .preloader {
+    .scroll-progress,
+    .preloader-v2,
+    .hamburger,
+    .mobile-menu,
+    #theme-toggle {
         display: none !important;
     }
 
@@ -384,5 +816,48 @@
     .glass {
         background: white !important;
         border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+
+    a {
+        text-decoration: underline;
+    }
+
+    .section-padding {
+        padding: 30px 0 !important;
+    }
+}
+
+/* iOS Specific Fixes */
+@supports (-webkit-touch-callout: none) {
+
+    /* Fix for iOS Safari bottom bar */
+    .hero {
+        min-height: -webkit-fill-available !important;
+    }
+
+    /* Fix for iOS input zoom */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    textarea,
+    select {
+        font-size: 16px !important;
+    }
+}
+
+/* Dark Mode Specific Mobile Adjustments */
+@media (max-width: 768px) {
+    body:not(.light-mode) {
+        /* Darker backgrounds for better contrast on mobile */
+        --surface: #0F0F0F;
+        --surface-light: #151515;
+    }
+
+    body.light-mode {
+        /* Lighter backgrounds for better readability */
+        --surface: #FFFFFF;
+        --surface-light: #F8F8F8;
     }
 }

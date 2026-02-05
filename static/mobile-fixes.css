@@ -1,0 +1,388 @@
+/* ========================================
+   MOBILE FIXES & ENHANCEMENTS
+   Critical fixes for mobile display issues
+   ======================================== */
+
+/* Prevent horizontal scroll on mobile */
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+/* Fix viewport issues on iOS */
+@supports (-webkit-touch-callout: none) {
+    body {
+        min-height: -webkit-fill-available;
+    }
+}
+
+/* Ensure all images are responsive */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Fix for long text breaking layout */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+span,
+div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+
+    /* Fix navbar overflow */
+    .navbar {
+        width: 100%;
+        max-width: 100vw;
+    }
+
+    .nav-container {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Fix hero section */
+    .hero {
+        width: 100%;
+        max-width: 100vw;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Fix container overflow */
+    .container {
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
+    /* Fix row overflow */
+    .row {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Improve button spacing */
+    .btn {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Fix footer */
+    footer {
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
+    .footer-content {
+        width: 100%;
+    }
+
+    /* Improve card layouts */
+    .premium-card,
+    .service-card,
+    .project-card {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Fix grid layouts */
+    .services-grid,
+    .projects-wrapper,
+    .about-stats,
+    .why-us-grid-container {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Improve text readability */
+    body {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+
+    /* Fix modal positioning */
+    .modal {
+        padding: 0 !important;
+    }
+
+    .modal-dialog {
+        width: 100%;
+        max-width: calc(100vw - 30px);
+    }
+
+    /* Improve form elements */
+    input,
+    textarea,
+    select {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    /* Fix table overflow */
+    .table-responsive {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    /* Improve spacing */
+    section {
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
+    /* Fix background images */
+    .hero,
+    .project-item,
+    [class*="bg-"] {
+        background-size: cover;
+        background-position: center;
+        background-attachment: scroll;
+    }
+
+    /* Improve icon sizing */
+    .service-icon,
+    .card-icon,
+    .icon-box {
+        flex-shrink: 0;
+    }
+
+    /* Fix flex layouts */
+    .d-flex {
+        flex-wrap: wrap;
+    }
+
+    /* Improve navigation */
+    .nav-links {
+        flex-wrap: nowrap;
+    }
+
+    /* Fix preloader */
+    .preloader-v2 {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* Improve scroll behavior */
+    * {
+        scroll-behavior: smooth;
+    }
+
+    /* Fix chat widget */
+    .chat-widget {
+        max-width: 100vw;
+        max-height: 100vh;
+    }
+
+    /* Improve accessibility - larger tap targets */
+    button,
+    a,
+    input[type="submit"],
+    input[type="button"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Fix overflow in cards */
+    .premium-card>*,
+    .service-card>*,
+    .project-card>* {
+        max-width: 100%;
+    }
+
+    /* Improve list layouts */
+    ul,
+    ol {
+        padding-right: 20px;
+        padding-left: 0;
+    }
+
+    /* Fix absolute positioning */
+    .position-absolute {
+        max-width: 100%;
+    }
+
+    /* Improve image grids */
+    .image-grid img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+
+    /* Fix video embeds */
+    iframe,
+    video {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Improve badge positioning */
+    .badge,
+    .offer-badge {
+        position: absolute;
+        max-width: 80%;
+    }
+
+    /* Fix sticky elements */
+    .sticky-top {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+    }
+
+    /* Improve shadow effects */
+    .premium-card,
+    .service-card {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Fix border radius on small screens */
+    .rounded,
+    .rounded-lg {
+        border-radius: 12px !important;
+    }
+
+    /* Improve contrast */
+    .text-muted,
+    .text-muted-dynamic {
+        opacity: 0.85;
+    }
+
+    /* Fix z-index issues */
+    .navbar {
+        z-index: 1000;
+    }
+
+    .mobile-menu {
+        z-index: 1001;
+    }
+
+    .preloader-v2 {
+        z-index: 9999;
+    }
+
+    /* Improve performance - reduce animations */
+    @media (prefers-reduced-motion: reduce) {
+
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 576px) {
+
+    /* Even tighter spacing */
+    .container {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+    /* Smaller typography */
+    html {
+        font-size: 14px;
+    }
+
+    /* Improve button layouts */
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+    }
+
+    /* Fix hero on very small screens */
+    .hero h1 {
+        font-size: 1.5rem !important;
+        line-height: 1.3 !important;
+    }
+
+    /* Improve card padding */
+    .premium-card {
+        padding: 15px !important;
+    }
+
+    /* Fix navigation */
+    .mobile-menu {
+        width: 90%;
+        max-width: 300px;
+    }
+}
+
+/* Landscape mode on mobile */
+@media (max-width: 896px) and (orientation: landscape) {
+
+    /* Reduce vertical spacing in landscape */
+    .section-padding {
+        padding: 40px 0 !important;
+    }
+
+    .hero {
+        min-height: 100vh !important;
+    }
+
+    /* Smaller typography in landscape */
+    h1 {
+        font-size: 1.8rem !important;
+    }
+
+    h2 {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* Fix for notched devices (iPhone X and newer) */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+    }
+
+    .navbar {
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
+    }
+
+    .mobile-menu {
+        padding-left: max(30px, env(safe-area-inset-left));
+        padding-right: max(30px, env(safe-area-inset-right));
+    }
+}
