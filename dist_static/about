@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO & Meta Tags -->
     <meta name="description"
-        content="{% block description %}الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.{% endblock %}">
+        content="الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.">
     <meta name="keywords"
         content="دهانات, ديكورات, تشطيبات, نقاشه, جبس بورد, رمضان محمد جبر, تشطيب شقق, الوان حوائط, مصر">
     <meta name="author" content="الحاج رمضان محمد جبر">
@@ -14,15 +14,15 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ request.url }}">
-    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
-    <meta property="og:description" content="{{ self.description() }}">
-    <meta property="og:image" content="{{ url_for('static', filename='logo.png', _external=True) }}">
+    <meta property="og:url" content="http://localhost/about">
+    <meta property="og:title" content="الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية">
+    <meta property="og:description" content="الحاج رمضان محمد جبر للدهانات والديكورات - الخيار الأول لتشطيب منزلك في مصر. نقدم خدمات دهانات حديثة، ديكورات جبس بورد، وتشطيب متكامل بأعلى معايير الجودة والدقة.">
+    <meta property="og:image" content="http://localhost/static/logo.png">
 
     <!-- CSRF & Security -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="ImZiNmYzYjNhN2IzNDcwZGE1ZDg1M2MyNDBmMjBkYmMyMWI3MzMxNmQi.aYTjJw.a_FyQ7pBOqkwpRzEpNvT37PqFGE">
 
-    <title>{% block title %}الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية{% endblock %}</title>
+    <title>الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,16 +34,16 @@
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Flask Static CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6">
-    <link rel="stylesheet" href="{{ url_for('static', filename='fixes.css') }}?v=3">
+    <link rel="stylesheet" href="static/style.css?v=6">
+    <link rel="stylesheet" href="static/fixes.css?v=3">
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="apple-touch-icon" href="static/logo.png">
     <!-- AOS Animations -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <!-- Islamic Welcome Style -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='islamic_welcome.css') }}">
+    <link rel="stylesheet" href="static/islamic_welcome.css">
 
     <!-- INLINE CRITICAL ANIMATION CSS TO BYPASS CACHE ISSUES -->
     <style>
@@ -316,33 +316,26 @@
     <nav class="navbar" id="main-nav">
         <div class="container nav-container">
             <div class="logo">
-                <a href="{{ url_for('web.index') }}">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="RMG Logo" style="height: 50px;">
+                <a href="index.html">
+                    <img src="static/logo.png" alt="RMG Logo" style="height: 50px;">
                 </a>
             </div>
             <ul class="nav-links">
-                <li><a href="{{ url_for('web.index') }}">الرئيسية</a></li>
-                <li><a href="{{ url_for('web.about') }}">من نحن</a></li>
-                <li><a href="{{ url_for('web.services') }}">خدماتنا</a></li>
-                <li><a href="{{ url_for('web.projects') }}">مشاريعنا</a></li>
-                <li><a href="{{ url_for('payment.payment') }}">الدفع الإلكتروني</a></li>
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="about">من نحن</a></li>
+                <li><a href="services">خدماتنا</a></li>
+                <li><a href="projects">مشاريعنا</a></li>
+                <li><a href="payment">الدفع الإلكتروني</a></li>
 
-                {% if current_user.is_authenticated %}
-                {% if current_user.role == 'admin' %}
-                <li><a href="{{ url_for('admin.admin_dashboard') }}">لوحة التحكم</a></li>
-                {% else %}
-                <li><a href="{{ url_for('user.profile', username=current_user.username) }}">حسابي</a></li>
-                {% endif %}
-                <li><a href="{{ url_for('auth.logout') }}" style="color: #ff6b6b;">خروج</a></li>
-                {% else %}
-                <li><a href="{{ url_for('auth.login') }}">دخول</a></li>
-                {% endif %}
+                
+                <li><a href="login">دخول</a></li>
+                
             </ul>
             <div class="nav-actions">
                 <button id="theme-toggle" class="btn-icon" aria-label="تبديل الوضع" style="margin-left: 10px;">
                     <i class="fas fa-moon"></i>
                 </button>
-                <a href="{{ url_for('web.contact') }}" class="btn btn-primary">اتصل بنا</a>
+                <a href="contact" class="btn btn-primary">اتصل بنا</a>
                 <div class="hamburger">
                     <i class="fas fa-bars"></i>
                 </div>
@@ -353,26 +346,97 @@
     <!-- Mobile Menu -->
     <div class="mobile-menu">
         <span class="close-menu"><i class="fas fa-times"></i></span>
-        <a href="{{ url_for('web.index') }}">الرئيسية</a>
-        <a href="{{ url_for('web.about') }}">من نحن</a>
-        <a href="{{ url_for('web.services') }}">خدماتنا</a>
-        <a href="{{ url_for('web.projects') }}">مشاريعنا</a>
+        <a href="index.html">الرئيسية</a>
+        <a href="about">من نحن</a>
+        <a href="services">خدماتنا</a>
+        <a href="projects">مشاريعنا</a>
 
-        <a href="{{ url_for('web.contact') }}">اتصل بنا</a>
-        {% if current_user.is_authenticated %}
-        {% if current_user.role == 'admin' %}
-        <a href="{{ url_for('admin.admin_dashboard') }}">لوحة التحكم</a>
-        {% else %}
-        <a href="{{ url_for('user.profile', username=current_user.username) }}">حسابي</a>
-        {% endif %}
-        <a href="{{ url_for('auth.logout') }}">تسجيل خروج</a>
-        {% else %}
-        <a href="{{ url_for('auth.login') }}">دخول / تسجيل</a>
-        {% endif %}
+        <a href="contact">اتصل بنا</a>
+        
+        <a href="login">دخول / تسجيل</a>
+        
     </div>
 
     <!-- Page Content -->
-    {% block content %}{% endblock %}
+    
+<!-- About Section -->
+<section class="about section-padding" style="margin-top: 80px;">
+    <div class="container about-grid">
+        <div class="about-text" data-aos="fade-left">
+            <h2 class="section-title">نبذة عنا</h2>
+            <div class="divider"></div>
+            <p><strong>الحاج رمضان محمد جبر</strong> للدهانات والديكورات متخصصون ويمتلكون خبرة تزيد عن
+                <strong>30 عاماً</strong> في تنفيذ كافة أعمال التشطيبات والديكورات الداخلية والخارجية.
+            </p>
+            <p>نجمع بين جودة الصنعة، والذوق الرفيع، والالتزام الصارم بالمواعيد لتقديم نتائج استثنائية تحول مساحتك
+                إلى تحفة فنية.</p>
+            <ul class="feature-list">
+                <li data-aos="fade-up" data-aos-delay="100"><i class="fas fa-check-circle"></i> نخدم جميع محافظات مصر
+                </li>
+                <li data-aos="fade-up" data-aos-delay="200"><i class="fas fa-check-circle"></i> متخصصون في الفنادق
+                    والقصور</li>
+                <li data-aos="fade-up" data-aos-delay="300"><i class="fas fa-check-circle"></i> اهتمام بأدق التفاصيل
+                </li>
+            </ul>
+        </div>
+        <div class="about-stats">
+            <div class="stat-card" data-aos="zoom-in" data-aos-delay="100">
+                <h3>+30</h3>
+                <p>عاماً من الخبرة</p>
+            </div>
+            <div class="stat-card" data-aos="zoom-in" data-aos-delay="200">
+                <h3>100%</h3>
+                <p>رضاء العملاء</p>
+            </div>
+            <div class="stat-card" data-aos="zoom-in" data-aos-delay="300">
+                <h3>كل</h3>
+                <p>أنحاء الجمهورية</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="why-us section-padding bg-gold-gradient">
+    <div class="container">
+        <div class="why-us-grid" style="grid-template-columns: 1fr;"> <!-- Full width since Offer is moved -->
+            <div class="why-content">
+                <h2 class="section-title text-black" data-aos="fade-down">لماذا تختارنا؟</h2>
+                <ul class="why-list">
+                    <li data-aos="fade-up" data-aos-delay="100">
+                        <span class="icon-box"><i class="fas fa-history"></i></span>
+                        <div>
+                            <h4>خبرة تزيد عن 30 عاماً</h4>
+                            <p>سنوات طويلة من العمل الجاد والخبرة المتراكمة.</p>
+                        </div>
+                    </li>
+                    <li data-aos="fade-up" data-aos-delay="200">
+                        <span class="icon-box"><i class="fas fa-medal"></i></span>
+                        <div>
+                            <h4>جودة فائقة</h4>
+                            <p>استخدام أجود الخامات وأحدث التقنيات العالمية.</p>
+                        </div>
+                    </li>
+                    <li data-aos="fade-up" data-aos-delay="300">
+                        <span class="icon-box"><i class="fas fa-clock"></i></span>
+                        <div>
+                            <h4>التزام بالمواعيد</h4>
+                            <p>نحترم وقتك ونلتزم بتسليم المشاريع في موعدها المحدد.</p>
+                        </div>
+                    </li>
+                    <li data-aos="fade-up" data-aos-delay="400">
+                        <span class="icon-box"><i class="fas fa-users-cog"></i></span>
+                        <div>
+                            <h4>فريق محترف</h4>
+                            <p>عمالة فنية مدربة على أعلى مستوى من الكفاءة والأمانة.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
 
     <!-- Footer -->
     <footer>
@@ -380,7 +444,7 @@
             <div class="footer-content">
                 <!-- Brand Info -->
                 <div class="footer-brand">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="RMG Logo" style="height: 60px;">
+                    <img src="static/logo.png" alt="RMG Logo" style="height: 60px;">
                     <p>الحاج رمضان محمد جبر للدهانات والديكورات. نحول أحلامك إلى واقع ملموس بأعلى معايير الجودة
                         والفخامة. خبرة سنوات في صنع الجمال.</p>
 
@@ -390,10 +454,10 @@
                 <div class="footer-col">
                     <h4>روابط سريعة</h4>
                     <ul class="footer-links">
-                        <li><a href="{{ url_for('web.index') }}">الرئيسية</a></li>
-                        <li><a href="{{ url_for('web.about') }}">من نحن</a></li>
-                        <li><a href="{{ url_for('web.projects') }}">معرض الأعمال</a></li>
-                        <li><a href="{{ url_for('web.contact') }}">اطلب معاينة</a></li>
+                        <li><a href="index.html">الرئيسية</a></li>
+                        <li><a href="about">من نحن</a></li>
+                        <li><a href="projects">معرض الأعمال</a></li>
+                        <li><a href="contact">اطلب معاينة</a></li>
                     </ul>
                 </div>
 
@@ -401,10 +465,10 @@
                 <div class="footer-col">
                     <h4>خدماتنا</h4>
                     <ul class="footer-links">
-                        <li><a href="{{ url_for('web.services') }}">التشطيب المتكامل</a></li>
-                        <li><a href="{{ url_for('web.services') }}">ديكورات جبس بورد</a></li>
-                        <li><a href="{{ url_for('web.services') }}">الدهانات الحديثة</a></li>
-                        <li><a href="{{ url_for('web.services') }}">التصميم الداخلي</a></li>
+                        <li><a href="services">التشطيب المتكامل</a></li>
+                        <li><a href="services">ديكورات جبس بورد</a></li>
+                        <li><a href="services">الدهانات الحديثة</a></li>
+                        <li><a href="services">التصميم الداخلي</a></li>
                     </ul>
                 </div>
 
@@ -430,7 +494,7 @@
     <div id="chat-widget" class="chat-widget">
         <div class="chat-header">
             <div class="chat-title">
-                <img src="{{ url_for('static', filename='chat_logo.png') }}" alt="AI Logo" class="chat-logo-img">
+                <img src="static/chat_logo.png" alt="AI Logo" class="chat-logo-img">
                 <span>المساعد الذكي</span>
             </div>
             <span id="close-chat" class="close-chat"><i class="fas fa-times"></i></span>
@@ -448,13 +512,13 @@
     </div>
 
     <button id="chat-toggle-btn" class="chat-toggle-btn">
-        <img src="{{ url_for('static', filename='chat_logo.png') }}" alt="Chat AI">
+        <img src="static/chat_logo.png" alt="Chat AI">
     </button>
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Flask Static JS -->
-    <script src="{{ url_for('static', filename='script.js') }}?v=9"></script>
+    <script src="static/script.js?v=9"></script>
     <!-- AOS Initialization -->
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>

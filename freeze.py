@@ -5,6 +5,7 @@ import os
 # Configure Freezer
 app.config['FREEZER_DESTINATION'] = 'dist_static'
 app.config['FREEZER_RELATIVE_URLS'] = True
+app.config['FREEZER_APPEND_EXTENSION'] = True
 
 freezer = Freezer(app)
 
