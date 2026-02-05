@@ -20,7 +20,7 @@
     <meta property="og:image" content="http://localhost/static/logo.webp">
 
     <!-- CSRF & Security -->
-    <meta name="csrf-token" content="IjZlY2IxOTZmNjg0MWVkMDcwYTA4MzIzMGU4OTdhMDVhZDIyN2Y0NmQi.aYT7rg.YrZhaSdgHR0W2gYe4jvSlrADpR4">
+    <meta name="csrf-token" content="IjI2N2E4ODU1MDExNzkzMDNjYzQ0YWM1MWQ4M2NlNzFkNzVkOTg0YjUi.aYT9XA.VHE_ibF2mHSH9f-_-l9TodDU3ms">
 
     <title>الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية</title>
 
@@ -402,7 +402,7 @@
             
 
             <form action="register" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="csrf_token" value="IjZlY2IxOTZmNjg0MWVkMDcwYTA4MzIzMGU4OTdhMDVhZDIyN2Y0NmQi.aYT7rg.YrZhaSdgHR0W2gYe4jvSlrADpR4">
+                <input type="hidden" name="csrf_token" value="IjI2N2E4ODU1MDExNzkzMDNjYzQ0YWM1MWQ4M2NlNzFkNzVkOTg0YjUi.aYT9XA.VHE_ibF2mHSH9f-_-l9TodDU3ms">
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="form-group" data-aos="fade-up" data-aos-delay="100">

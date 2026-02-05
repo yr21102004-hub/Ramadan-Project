@@ -5,7 +5,9 @@ import os
 # Configure Freezer
 app.config['FREEZER_DESTINATION'] = 'dist_static'
 app.config['FREEZER_RELATIVE_URLS'] = True
-app.config['FREEZER_APPEND_EXTENSION'] = True
+app.config['FREEZER_APPEND_EXTENSION'] = False  # Disable to avoid directory/file conflicts
+app.config['SERVER_NAME'] = 'localhost' # Fix external URL generation
+app.config['FREEZER_IGNORE_MIMETYPE_WARNINGS'] = True
 
 freezer = Freezer(app)
 
