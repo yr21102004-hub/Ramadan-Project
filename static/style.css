@@ -1549,7 +1549,6 @@ footer::before {
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    /* Parallax effect for luxury feel */
 }
 
 .bg-apartments-luxury {
@@ -1560,15 +1559,17 @@ footer::before {
 }
 
 .bg-factories-luxury {
-    background-image: url('assets/luxury_bg_factories.svg');
+    background-image: url('assets/luxury_bg_factories.jpg');
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
 }
 
 .bg-companies-luxury {
-    background-image: url('assets/luxury_bg_companies.svg');
+    background-image: url('assets/luxury_bg_companies.jpg');
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
 }
 
 .bg-hotels-luxury {
