@@ -15,9 +15,7 @@
     </div>
 </section>
 
-<section
-    class="section-padding {% if project.title == 'دهانات القصور والفلل الفاخرة' %}bg-villas-luxury{% elif project.title == 'بنود دهانات الشقق السكنية الفاخرة' %}bg-apartments-luxury{% elif project.title == 'بنود دهانات المصانع والمنشآت الصناعية' %}bg-factories-luxury{% elif project.title == 'بنود دهانات الشركات والمباني الإدارية' %}bg-companies-luxury{% elif project.title == 'بنود دهانات الفنادق والمنتجعات' %}bg-hotels-luxury{% else %}bg-pattern-luxury{% endif %}"
-    style="padding-top: 50px;">
+<section class="section-padding" style="padding-top: 50px;">
     <div class="container">
         <!-- New 3-Column Image Grid -->
         {% if project.images and project.images|length >= 3 %}
