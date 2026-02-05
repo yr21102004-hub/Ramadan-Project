@@ -53,7 +53,7 @@
 /* Specific Background for Villas Page */
 .bg-villas-luxury {
     background-color: #050505;
-    background-image: url('assets/luxury_bg_villas.svg');
+    background-image: url('assets/luxury_bg_villas.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -73,7 +73,7 @@
 /* Specific Background for Apartments Page */
 .bg-apartments-luxury {
     background-color: #050505;
-    background-image: url('assets/luxury_bg_apartments.svg');
+    background-image: url('assets/luxury_bg_apartments.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -93,7 +93,7 @@
 /* Specific Background for Factories Page */
 .bg-factories-luxury {
     background-color: #111111;
-    background-image: url('assets/luxury_bg_factories.svg');
+    background-image: url('assets/luxury_bg_factories.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -116,7 +116,7 @@
 /* Specific Background for Companies Page */
 .bg-companies-luxury {
     background-color: #080C15;
-    background-image: url('assets/luxury_bg_companies.svg');
+    background-image: url('assets/luxury_bg_companies.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
