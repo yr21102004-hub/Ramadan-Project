@@ -20,7 +20,7 @@
     <meta property="og:image" content="http://localhost/static/logo.png">
 
     <!-- CSRF & Security -->
-    <meta name="csrf-token" content="Ijk5M2UwY2M0ZGEzMDZhMjg2MDkzNzIwNTZkYjVjOWQ2ZDlmNzdhMDYi.aYToZg.kyWV7JVKajxcI3XzUS0_TJInORE">
+    <meta name="csrf-token" content="IjE1ZjExZWE4NDNhMTQ3ZjNiZGM2MTg0YTg4OWU5ZDVjOGJkYTQxNGYi.aYTpvQ.ai02Kw6FI7peiHgm-5ugGpvToBI">
 
     <title>الحاج رمضان محمد جبر | تشطيبات وديكورات عصرية</title>
     <!-- Google Fonts -->
@@ -372,7 +372,7 @@
             
 
             <form action="register" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="csrf_token" value="Ijk5M2UwY2M0ZGEzMDZhMjg2MDkzNzIwNTZkYjVjOWQ2ZDlmNzdhMDYi.aYToZg.kyWV7JVKajxcI3XzUS0_TJInORE">
+                <input type="hidden" name="csrf_token" value="IjE1ZjExZWE4NDNhMTQ3ZjNiZGM2MTg0YTg4OWU5ZDVjOGJkYTQxNGYi.aYTpvQ.ai02Kw6FI7peiHgm-5ugGpvToBI">
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="form-group" data-aos="fade-up" data-aos-delay="100">
