@@ -1,56 +1,147 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<section class="section-padding" style="margin-top: 80px;">
+<section class="section-padding admin-section-bg">
     <div class="container">
-        <h2 class="section-title text-center text-gold">سجل المحادثات الذكية</h2>
-        <div class="divider center-divider"></div>
-
-        <div class="admin-dashboard">
-            <div class="card" style="margin-bottom: 20px;">
-                {% if chats|length == 0 %}
-                <p class="text-center">لا توجد محادثات مسجلة حتى الآن.</p>
-                {% else %}
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
-                        <thead>
-                            <tr
-                                style="background-color: var(--surface-light); border-bottom: 2px solid var(--primary);">
-                                <th style="padding: 15px; text-align: right;">الوقت</th>
-                                <th style="padding: 15px; text-align: right;">المستخدم</th>
-                                <th style="padding: 15px; text-align: right;">رسالة العميل</th>
-                                <th style="padding: 15px; text-align: right;">رد الـ AI</th>
-                                <th style="padding: 15px; text-align: right;">IP</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for chat in chats %}
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 15px;">{{ chat.timestamp }}</td>
-                                <td style="padding: 15px;">
-                                    {% if chat.username %}
-                                    <span class="text-gold">{{ chat.user_name }}</span>
-                                    <br><small class="text-muted-dynamic">({{ chat.username }})</small>
-                                    {% else %}
-                                    <span class="text-muted-dynamic">زائر</span>
-                                    {% endif %}
-                                </td>
-                                <td style="padding: 15px; max-width: 300px;">{{ chat.message }}</td>
-                                <td style="padding: 15px; max-width: 300px; color: var(--text-muted);">{{ chat.response
-                                    }}</td>
-                                <td style="padding: 15px;">{{ chat.user_ip }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% endif %}
+        <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-down">
+            <div>
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-light btn-sm mb-3">
+                    <i class="fas fa-arrow-right me-2"></i> العودة للوحة التحكم
+                </a>
+                <h2 class="section-title mb-0">سجل المحادثات الذكية</h2>
+                <p class="text-muted mt-2">عرض جميع محادثات الذكاء الاصطناعي</p>
             </div>
+        </div>
 
-            <div class="text-center" style="margin-top: 30px;">
-                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-primary">عودة للوحة التحكم</a>
+        <div class="glass rounded-4 overflow-hidden" data-aos="fade-up">
+            {% if chats|length == 0 %}
+            <div class="empty-state">
+                <i class="fas fa-comments fa-3x mb-3 opacity-25"></i>
+                <p>لا توجد محادثات مسجلة حتى الآن.</p>
             </div>
+            {% else %}
+            <div class="table-responsive">
+                <table class="table modern-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>الوقت</th>
+                            <th>المستخدم</th>
+                            <th>رسالة العميل</th>
+                            <th>رد الـ AI</th>
+                            <th>IP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for chat in chats %}
+                        <tr>
+                            <td class="small">{{ chat.timestamp }}</td>
+                            <td>
+                                {% if chat.username %}
+                                <span class="text-gold fw-bold">{{ chat.user_name }}</span>
+                                <br><small class="text-muted">({{ chat.username }})</small>
+                                {% else %}
+                                <span class="text-muted">زائر</span>
+                                {% endif %}
+                            </td>
+                            <td style="max-width: 300px;">
+                                <div class="user-message">{{ chat.message }}</div>
+                            </td>
+                            <td style="max-width: 300px;">
+                                <div class="ai-response">{{ chat.response }}</div>
+                            </td>
+                            <td class="font-monospace small">{{ chat.user_ip }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
         </div>
     </div>
 </section>
+
+<style>
+    .admin-section-bg {
+        background: #0a0a0a;
+        min-height: 100vh;
+        padding-top: 100px;
+        direction: rtl;
+    }
+
+    .glass {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .modern-table {
+        background: #2d2d2d !important;
+        color: #ffffff !important;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .modern-table thead {
+        background: rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .modern-table th {
+        color: #D4AF37 !important;
+        background: transparent !important;
+        font-weight: 700;
+        padding: 18px 15px;
+        border: none;
+        white-space: nowrap;
+        font-size: 0.95rem;
+    }
+
+    .modern-table td {
+        color: #e0e0e0 !important;
+        background: transparent !important;
+        padding: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        vertical-align: middle;
+        font-size: 0.95rem;
+    }
+
+    .modern-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03) !important;
+    }
+
+    .user-message {
+        background: rgba(33, 150, 243, 0.15);
+        padding: 10px 15px;
+        border-radius: 10px;
+        color: #fff !important;
+        font-weight: 500;
+        border-left: 3px solid #2196f3;
+    }
+
+    .ai-response {
+        background: rgba(76, 175, 80, 0.15);
+        padding: 10px 15px;
+        border-radius: 10px;
+        color: #e8e8e8 !important;
+        border-left: 3px solid #4caf50;
+        line-height: 1.6;
+    }
+
+    .text-gold {
+        color: #D4AF37 !important;
+    }
+
+    .text-muted {
+        color: #999 !important;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+</style>
 {% endblock %}
