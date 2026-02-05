@@ -190,7 +190,8 @@
                             <div class="text-center">
                                 <p class="text-white mb-4">مبروك اكتمال المشروع! 🎉 يسعدنا معرفة رأيك في مستوى الخدمة.
                                 </p>
-                                <form action="{{ url_for('user.submit_project_rating') }}" method="POST">
+                                <form action="{{ url_for('user.submit_project_rating') }}" method="POST"
+                                    enctype="multipart/form-data">
                                     <div class="rating-stars mb-4">
                                         <input type="radio" name="rating" value="5" id="rs5" required><label
                                             for="rs5">★</label>
@@ -199,9 +200,18 @@
                                         <input type="radio" name="rating" value="2" id="rs2"><label for="rs2">★</label>
                                         <input type="radio" name="rating" value="1" id="rs1"><label for="rs1">★</label>
                                     </div>
+
+                                    <div class="mb-3 text-end">
+                                        <label class="form-label text-white-50">صورة من الواقع (اختياري)</label>
+                                        <input type="file" name="review_image"
+                                            class="form-control bg-dark border-secondary text-white" accept="image/*">
+                                        <div class="form-text text-muted">شاركنا صورة لتشطيب وحدتك</div>
+                                    </div>
+
                                     <div class="mb-3 text-end">
                                         <label class="form-label text-white-50">تعليقك (اختياري)</label>
-                                        <textarea name="comment" class="form-control" rows="3"
+                                        <textarea name="comment"
+                                            class="form-control bg-dark text-white border-secondary" rows="3"
                                             placeholder="اكتب ملاحظاتك هنا..."></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-gold px-5 rounded-pill">إرسال التقييم</button>
@@ -574,6 +584,7 @@
                     <span class="role-badge mb-4">عميل مخصص</span>
 
                     <div class="sidebar-info-rows text-md-start mt-4">
+                        <!-- ... (existing info rows) ... -->
                         <div class="info-row-item">
                             <span class="label">اسم المستخدم:</span>
                             <span class="value">{{ user.username }}</span>
@@ -587,6 +598,38 @@
                             <span class="value">{{ user.email or 'N/A' }}</span>
                         </div>
                     </div>
+
+                    {% if current_user.role == 'admin' and timeline %}
+                    <div class="divider my-4"></div>
+                    <div class="text-start">
+                        <h6 class="text-gold mb-3"><i class="fas fa-history me-2"></i> سجل النشاط الرقمي</h6>
+                        <div class="timeline-widget">
+                            {% for event in timeline[:5] %}
+                            <div class="timeline-event mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted" style="font-size: 0.7rem;">{{ event.date }}</small>
+                                    {% if event.type == 'payment' %}
+                                    <i class="fas fa-money-bill-wave text-success small"></i>
+                                    {% elif event.type == 'request' %}
+                                    <i class="fas fa-file-alt text-info small"></i>
+                                    {% elif event.type == 'complaint' %}
+                                    <i class="fas fa-exclamation-triangle text-danger small"></i>
+                                    {% elif event.type == 'question' %}
+                                    <i class="fas fa-question text-warning small"></i>
+                                    {% else %}
+                                    <i class="fas fa-circle text-secondary small"></i>
+                                    {% endif %}
+                                </div>
+                                <p class="mb-0 text-white small text-truncate" title="{{ event.details }}">{{
+                                    event.details }}</p>
+                            </div>
+                            {% endfor %}
+                            <div class="text-center mt-2">
+                                <small class="text-muted">عرض آخر 5 نشاطات</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
 
                     <div class="divider my-4"></div>
 

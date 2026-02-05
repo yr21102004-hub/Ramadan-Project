@@ -157,10 +157,17 @@ class Database:
                 quality_rating INTEGER,
                 behavior_rating INTEGER,
                 comment TEXT,
+                image_path TEXT,
                 timestamp TEXT,
                 created_at TEXT
             )
         ''')
+        
+        # Migration for ratings table
+        try:
+            cursor.execute("SELECT image_path FROM ratings LIMIT 1")
+        except sqlite3.OperationalError:
+            cursor.execute("ALTER TABLE ratings ADD COLUMN image_path TEXT")
         
         # 10. Complaints Table
         cursor.execute('''
@@ -272,7 +279,7 @@ class Database:
     def subscriptions(self): return SubscriptionModel()
     
     @property
-    def ratings(self): return GenericSQLiteModel('ratings')
+    def ratings(self): return RatingModel()
     
     @property
     def complaints(self): return ComplaintModel()
@@ -828,5 +835,31 @@ class TicketMessageModel(SQLiteModel):
     def get_by_ticket(self, ticket_id):
         conn = self.db_mgr.get_connection()
         rows = conn.execute("SELECT * FROM ticket_messages WHERE ticket_id = ? ORDER BY timestamp ASC", (ticket_id,)).fetchall()
+        conn.close()
+        return [self._dict_from_row(r) for r in rows]
+
+class RatingModel(SQLiteModel):
+    def __init__(self):
+        super().__init__('ratings')
+        
+    def create(self, username, user_id, quality_rating, behavior_rating, comment, image_path=None):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        created_at = timestamp
+        conn = self.db_mgr.get_connection()
+        conn.execute(f"INSERT INTO {self.table} (username, user_id, quality_rating, behavior_rating, comment, image_path, timestamp, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                     (username, user_id, quality_rating, behavior_rating, comment, image_path, timestamp, created_at))
+        conn.commit()
+        conn.close()
+        
+    def get_user_project_rating(self, username):
+        conn = self.db_mgr.get_connection()
+        row = conn.execute(f"SELECT * FROM {self.table} WHERE username = ? ORDER BY timestamp DESC LIMIT 1", (username,)).fetchone()
+        conn.close()
+        return self._dict_from_row(row)
+    
+    def get_latest_reviews(self, limit=5):
+        """Get latest reviews with images for the homepage"""
+        conn = self.db_mgr.get_connection()
+        rows = conn.execute(f"SELECT * FROM {self.table} WHERE comment IS NOT NULL AND comment != '' ORDER BY timestamp DESC LIMIT ?", (limit,)).fetchall()
         conn.close()
         return [self._dict_from_row(r) for r in rows]

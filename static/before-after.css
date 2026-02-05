@@ -1,0 +1,144 @@
+/* ========================================
+   BEFORE & AFTER COMPARISON SLIDER
+   ======================================== */
+
+.comparison-section {
+    position: relative;
+    width: 100%;
+    margin: 60px 0;
+    overflow: hidden;
+}
+
+.comparison-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    /* Adjust based on your layout */
+    margin: 0 auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    /* Gold/Primary border */
+    aspect-ratio: 16/9;
+    /* Maintain a consistent aspect ratio */
+}
+
+.comparison-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    /* Let clicks pass through to the slider handles */
+}
+
+.comparison-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    /* Initial split position */
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+    border-right: 2px solid var(--primary);
+    /* Gold line */
+}
+
+.comparison-overlay img {
+    width: 100%;
+    /* Important: Overlay image needs to fill the container width, not just the overlay width */
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    /* This is the magic to keep the image static while the container resizes */
+    max-width: none;
+    /* We need to set the width of this image to match the container width via JS or hardcode if fixed */
+}
+
+.comparison-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Initial position matches overlay width */
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    /* Gold */
+    border-radius: 50%;
+    z-index: 2;
+    cursor: ew-resize;
+    /* East-West resize cursor */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: background 0.2s;
+}
+
+.comparison-handle:hover {
+    background: #fff;
+    color: var(--primary);
+}
+
+.comparison-handle i {
+    color: #000;
+    font-size: 1.2rem;
+}
+
+.comparison-handle::before,
+.comparison-handle::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+    width: 2px;
+    height: 1000px;
+    /* Long vertical line */
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.comparison-handle::before {
+    top: 40px;
+}
+
+.comparison-handle::after {
+    bottom: 40px;
+}
+
+/* Labels */
+.label-badge {
+    position: absolute;
+    top: 20px;
+    padding: 5px 15px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    z-index: 2;
+    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.label-before {
+    left: 20px;
+}
+
+.label-after {
+    right: 20px;
+}
+
+/* Response on mobile */
+@media (max-width: 768px) {
+    .comparison-container {
+        aspect-ratio: 4/3;
+        /* Taller on mobile */
+    }
+}

@@ -172,7 +172,38 @@ def profile(username):
 
         # Fetch Project Rating
         project_rating = rating_model.get_user_project_rating(username)
-        
+
+        # Smart User Insights (Timeline) - Admin Only
+        user_timeline = []
+        if current_user.role == 'admin':
+            # Add Registration
+            if user_data.get('created_at'):
+                user_timeline.append({'type': 'register', 'date': user_data.get('created_at'), 'details': 'تسجيل حساب جديد'})
+            
+            # Add Payments
+            for p in user_payments:
+                user_timeline.append({'type': 'payment', 'date': p.get('timestamp'), 'details': f"دفع {p.get('amount')} ج.م ({p.get('status')})"})
+                
+            # Add Requests
+            for r in user_requests:
+                user_timeline.append({'type': 'request', 'date': r.get('created_at'), 'details': f"طلب {r.get('service')}: {r.get('message')[:30]}..."})
+
+            # Add Complaints
+            for c in user_complaints:
+                user_timeline.append({'type': 'complaint', 'date': c.get('created_at'), 'details': f"شكوى: {c.get('subject')}"})
+            
+            # Add Unanswered Questions (as indicators of interest)
+            for q in user_unanswered:
+                user_timeline.append({'type': 'question', 'date': q.get('timestamp'), 'details': f"سؤال: {q.get('question')}"})
+                
+            # Add Completed Project
+            if user_data.get('project_percentage') == 100:
+                 # We don't have exact completion date, assume last update or arbitrary
+                 pass
+
+            # Sort by date descending
+            user_timeline.sort(key=lambda x: x.get('date', ''), reverse=True)
+
         return render_template('user_dashboard.html', 
                             user=user_obj, 
                             requests=user_requests,
@@ -181,7 +212,8 @@ def profile(username):
                             unanswered=user_unanswered,
                             subscriptions=user_subscriptions,
                             complaints=user_complaints,
-                            project_rating=project_rating)
+                            project_rating=project_rating,
+                            timeline=user_timeline)
 
     except Exception as e:
         print(f"Error accessing profile for {username}: {e}")
@@ -211,6 +243,27 @@ def update_percentage():
     
     # Broadcast update via WebSocket
     broadcast_percentage_update(username, percentage)
+    
+    # Send Email Notification
+    try:
+        user_info = user_model.get_by_username(username)
+        if user_info and user_info.get('email'):
+            send_email(
+                user_info['email'],
+                "تحديث حالة مشروعك - RMG Decor",
+                f"""
+                <div dir="rtl" style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <h3 style="color: #333;">مرحباً {user_info['full_name']}،</h3>
+                    <p>يسعدنا إخبارك بأنه تم تحديث نسبة إنجاز مشروعك لتصبح:</p>
+                    <h2 style="color: #D4AF37; margin: 20px 0;">{percentage}%</h2>
+                    <p>يمكنك الدخول إلى <a href="{url_for('auth.login', _external=True)}">لوحة التحكم</a> لمتابعة المزيد من التفاصيل والصور.</p>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                    <p style="color: #888; font-size: 12px;">مؤسسة الحاج رمضان محمد جبر للديكور والتشطيبات</p>
+                </div>
+                """
+            )
+    except Exception as e:
+        print(f"Failed to send email: {e}")
     
     flash(f"تم تحديث نسبة الإنجاز للعميل {username} بنجاح.")
     return redirect(url_for('admin.admin_dashboard'))
@@ -254,7 +307,7 @@ def submit_complaint():
 @user_bp.route('/user/rate_project', methods=['POST'])
 @login_required
 def submit_project_rating():
-    """Submit rating for finished project"""
+    """Submit rating for finished project with optional image"""
     if current_user.role != 'user':
         return "Access Denied", 403
         
@@ -272,8 +325,41 @@ def submit_project_rating():
     except:
         flash("التقييم يجب أن يكون بين 1 و 5 نجوم.", 'error')
         return redirect(url_for('user.profile', username=current_user.username))
+
+    # Handle Image Upload
+    image_path = None
+    if 'review_image' in request.files:
+        file = request.files['review_image']
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            file_extension = filename.rsplit('.', 1)[1].lower() if '.' in filename else 'jpg'
+            unique_filename = f"review_{current_user.username}_{timestamp}.{file_extension}"
+            
+            # Save in static/user_images (or create distinct folder)
+            upload_folder = os.path.join('static', 'user_images')
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+                
+            file_path = os.path.join(upload_folder, unique_filename)
+            file.save(file_path)
+            
+            image_path = f"user_images/{unique_filename}"
+            
+    try:
+        # Use our new RatingModel
+        rating_model.create(
+            username=current_user.username,
+            user_id=str(current_user.id),
+            quality_rating=rating,
+            behavior_rating=rating, # Simplified for now
+            comment=comment,
+            image_path=image_path
+        )
+        flash("شكراً لك! تم استلام تقييمك بنجاح.", 'success')
+    except Exception as e:
+        flash(f"حدث خطأ أثناء حفظ التقييم: {e}", 'error')
         
-    flash(result['message'], 'success' if result['success'] else 'error')
     return redirect(url_for('user.profile', username=current_user.username))
 
 @user_bp.route('/user/clear_chat', methods=['POST'])

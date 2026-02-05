@@ -673,6 +673,28 @@ def answer_unanswered_question():
     # Add to learned answers
     learned_model.create(question=question_text, answer=answer)
     
+    # Send Email Notification
+    try:
+        user_info = user_model.get_by_username(user_id)
+        if user_info and user_info.get('email'):
+             send_email(
+                user_info['email'],
+                "تم الرد على سؤالك - RMG Decor AI",
+                f"""
+                <div dir="rtl" style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <h3 style="color: #333;">مرحباً {user_info['full_name']}،</h3>
+                    <p>لقد قمت بسؤالنا عبر الذكاء الاصطناعي عن: <strong>"{question_text}"</strong></p>
+                    <p>وقد قامت الإدارة بمراجعة سؤالك والرد عليه:</p>
+                    <blockquote style="background: #fff; border-right: 5px solid #D4AF37; padding: 15px; margin: 15px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        {answer}
+                    </blockquote>
+                    <p>تم تحديث قاعدة بيانات الذكاء الاصطناعي بهذه المعلومة لخدمتك بشكل أفضل مستقبلاً.</p>
+                </div>
+                """
+            )
+    except Exception as e:
+        print(f"Error sending email: {e}")
+    
     # Delete from unanswered questions
     if question_id:
         unanswered_model.delete_by_id(question_id)

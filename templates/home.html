@@ -112,6 +112,36 @@
     </div>
 </section>
 
+<!-- Before & After Transformation Demo -->
+<section class="section-padding bg-black">
+    <div class="container text-center">
+        <h2 class="section-title" data-aos="fade-down">لمسة سحرية</h2>
+        <div class="divider center-divider" data-aos="zoom-in"></div>
+        <p class="section-subtitle mb-5" data-aos="fade-up">انظر كيف نحول المساحات العادية إلى تحف فنية. اسحب المؤشر
+            للمقارنة.</p>
+
+        <div class="comparison-container" data-aos="zoom-in" data-aos-duration="1000">
+            <!-- Modified Image (After) - This is the base image -->
+            <img class="comparison-image" src="{{ url_for('static', filename='modern_paints.webp') }}"
+                alt="After Decoration">
+
+            <!-- Original Image (Before) - This is the overlay image -->
+            <div class="comparison-overlay">
+                <img src="{{ url_for('static', filename='putty_finishing.webp') }}" alt="Before Decoration">
+            </div>
+
+            <!-- Handle -->
+            <div class="comparison-handle">
+                <i class="fas fa-arrows-alt-h"></i>
+            </div>
+
+            <!-- Labels -->
+            <div class="label-badge label-before">قبل التأسيس</div>
+            <div class="label-badge label-after">بعد التشطيب</div>
+        </div>
+    </div>
+</section>
+
 <!-- Services Teaser -->
 <section class="section-padding bg-darker">
     <div class="container">
