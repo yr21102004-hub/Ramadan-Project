@@ -429,6 +429,14 @@ def export_analytics():
         unanswered = unanswered_model.get_all()
         
         # Prepare analytics data
+        # Prepare Service Analysis
+        from collections import Counter
+        service_counts = Counter([m.get('service', 'general') for m in messages])
+        
+        # Prepare Financial Analysis
+        confirmed_payments = [p for p in payments if p.get('status') == 'Confirmed']
+        total_revenue = sum(float(p.get('amount', 0)) for p in confirmed_payments)
+
         analytics_data = {
             'total_users': len(users),
             'total_requests': len(messages),
@@ -440,6 +448,11 @@ def export_analytics():
             'completed_projects': len([u for u in users if u.get('project_percentage', 0) == 100]),
             'ongoing_projects': len([u for u in users if 0 < u.get('project_percentage', 0) < 100]),
             'not_started': len([u for u in users if u.get('project_percentage', 0) == 0]),
+            # New Data
+            'services_breakdown': dict(service_counts),
+            'total_revenue': total_revenue,
+            'confirmed_payments_count': len(confirmed_payments),
+            'pending_payments_count': len(payments) - len(confirmed_payments)
         }
         
         # Generate Excel file

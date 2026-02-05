@@ -301,22 +301,23 @@ def export_analytics_excel(analytics_data):
     """Export comprehensive analytics to Excel with charts"""
     wb = Workbook()
     
+    # ==========================================
     # 1. Overview Sheet
+    # ==========================================
     ws1 = wb.active
     ws1.title = "نظرة عامة"
-    ws1.sheet_view.rightToLeft = True # Enable RTL
+    ws1.sheet_view.rightToLeft = True
     
     current_row = ExportHelper.add_title_section(
         ws1, 
         "تقرير الإحصائيات الشامل",
         f"تاريخ التقرير: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
     )
-    
     current_row += 2
     
     # General stats data
     labels = ['إجمالي المستخدمين', 'إجمالي الرسائل', 'إجمالي المحادثات', 'إجمالي المدفوعات', 
-              'طلبات المعاينة', 'الشكاوى', 'أسئلة بدون إجابة']
+              'طلبات المعاينة', 'الشكاوى', 'أسئلة بدون إجابة', 'مشاريع مكتملة', 'مشاريع جارية']
     values = [
         analytics_data.get('total_users', 0),
         analytics_data.get('total_requests', 0),
@@ -324,10 +325,11 @@ def export_analytics_excel(analytics_data):
         analytics_data.get('total_payments', 0),
         analytics_data.get('total_inspections', 0),
         analytics_data.get('total_complaints', 0),
-        analytics_data.get('pending_questions', 0)
+        analytics_data.get('pending_questions', 0),
+        analytics_data.get('completed_projects', 0),
+        analytics_data.get('ongoing_projects', 0)
     ]
     
-    # Write data for chart
     ws1.cell(row=current_row, column=1, value="المؤشر")
     ws1.cell(row=current_row, column=2, value="القيمة")
     ExportHelper.style_header_row(ws1, current_row, 2)
@@ -340,13 +342,15 @@ def export_analytics_excel(analytics_data):
     ExportHelper.style_data_rows(ws1, start_data_row, start_data_row + len(labels) - 1, 2)
     ExportHelper.auto_adjust_column_width(ws1, 2)
     
-    # Add Bar Chart
+    # Overview Chart
     chart = BarChart()
     chart.type = "col"
     chart.style = 10
     chart.title = "نظرة عامة على النظام"
     chart.y_axis.title = "العدد"
     chart.x_axis.title = "المؤشر"
+    chart.height = 10
+    chart.width = 15
     
     data = Reference(ws1, min_col=2, min_row=start_data_row-1, max_row=start_data_row + len(labels) - 1)
     cats = Reference(ws1, min_col=1, min_row=start_data_row, max_row=start_data_row + len(labels) - 1)
@@ -354,41 +358,98 @@ def export_analytics_excel(analytics_data):
     chart.set_categories(cats)
     chart.shape = 4
     ws1.add_chart(chart, "D5")
+
+    # ==========================================
+    # 2. Services Analysis Sheet
+    # ==========================================
+    ws_srv = wb.create_sheet("تحليل الخدمات")
+    ws_srv.sheet_view.rightToLeft = True
     
-    # 2. Project Status Sheet
-    ws2 = wb.create_sheet("تحليل المشاريع")
-    ws2.sheet_view.rightToLeft = True
+    current_row = ExportHelper.add_title_section(ws_srv, "تحليل الخدمات الأكثر طلباً")
+    current_row += 1
     
-    current_row = 2
-    ws2.cell(row=current_row, column=1, value="الحالة")
-    ws2.cell(row=current_row, column=2, value="العدد")
-    ExportHelper.style_header_row(ws2, current_row, 2)
+    services_map = {
+        'modern-paints': 'دهانات حديثة', 'gypsum-board': 'جبس بورد',
+        'integrated-finishing': 'تشطيب متكامل', 'putty-finishing': 'تأسيس ومعجون',
+        'wallpaper': 'ورق حائط', 'renovation': 'تجديد وترميم', 'general': 'استفسار عام'
+    }
     
-    project_labels = ['مشاريع مكتملة', 'مشاريع جارية', 'مشاريع لم تبدأ']
-    project_values = [
-        analytics_data.get('completed_projects', 0),
-        analytics_data.get('ongoing_projects', 0),
-        analytics_data.get('not_started', 0)
+    ws_srv.cell(row=current_row, column=1, value="الخدمة")
+    ws_srv.cell(row=current_row, column=2, value="عدد الطلبات")
+    ExportHelper.style_header_row(ws_srv, current_row, 2)
+    
+    srv_data = analytics_data.get('services_breakdown', {})
+    start_row = current_row + 1
+    
+    # Sort by value desc
+    sorted_srv = sorted(srv_data.items(), key=lambda x: x[1], reverse=True)
+    
+    for i, (key, count) in enumerate(sorted_srv):
+        name = services_map.get(key, key)
+        ws_srv.cell(row=start_row + i, column=1, value=name)
+        ws_srv.cell(row=start_row + i, column=2, value=count)
+        
+    ExportHelper.style_data_rows(ws_srv, start_row, start_row + len(sorted_srv) - 1, 2)
+    ExportHelper.auto_adjust_column_width(ws_srv, 2)
+    
+    if sorted_srv:
+        pie = PieChart()
+        pie.title = "توزيع طلبات الخدمات"
+        data = Reference(ws_srv, min_col=2, min_row=start_row-1, max_row=start_row + len(sorted_srv) - 1)
+        cats = Reference(ws_srv, min_col=1, min_row=start_row, max_row=start_row + len(sorted_srv) - 1)
+        pie.add_data(data, titles_from_data=True)
+        pie.set_categories(cats)
+        pie.height = 12
+        pie.width = 12
+        ws_srv.add_chart(pie, "D2")
+
+    # ==========================================
+    # 3. Financial Analysis Sheet
+    # ==========================================
+    ws_fin = wb.create_sheet("التقرير المالي")
+    ws_fin.sheet_view.rightToLeft = True
+    
+    current_row = ExportHelper.add_title_section(ws_fin, "ملخص مالي")
+    current_row += 1
+    
+    ws_fin.cell(row=current_row, column=1, value="المؤشر المالي")
+    ws_fin.cell(row=current_row, column=2, value="القيمة")
+    ExportHelper.style_header_row(ws_fin, current_row, 2)
+    
+    fin_labels = ['إجمالي الإيرادات (المؤكدة)', 'عدد عمليات الدفع المؤكدة', 'عمليات قيد المراجعة']
+    fin_values = [
+        f"{analytics_data.get('total_revenue', 0):,.2f} EGP",
+        analytics_data.get('confirmed_payments_count', 0),
+        analytics_data.get('pending_payments_count', 0)
     ]
     
     start_row = current_row + 1
-    for i, (label, value) in enumerate(zip(project_labels, project_values)):
-        ws2.cell(row=start_row + i, column=1, value=label)
-        ws2.cell(row=start_row + i, column=2, value=value)
+    for i, (label, val) in enumerate(zip(fin_labels, fin_values)):
+        ws_fin.cell(row=start_row + i, column=1, value=label)
+        ws_fin.cell(row=start_row + i, column=2, value=val)
         
-    ExportHelper.style_data_rows(ws2, start_row, start_row + len(project_labels) - 1, 2)
-    ExportHelper.auto_adjust_column_width(ws2, 2)
+    ExportHelper.style_data_rows(ws_fin, start_row, start_row + len(fin_labels) - 1, 2)
+    ExportHelper.auto_adjust_column_width(ws_fin, 2)
     
-    # Add Pie Chart for Projects
-    pie = PieChart()
-    pie.title = "نسبة إنجاز المشاريع"
-    data = Reference(ws2, min_col=2, min_row=start_row-1, max_row=start_row + len(project_labels) - 1)
-    cats = Reference(ws2, min_col=1, min_row=start_row, max_row=start_row + len(project_labels) - 1)
-    pie.add_data(data, titles_from_data=True)
-    pie.set_categories(cats)
-    ws2.add_chart(pie, "D2")
+    # Financial Pie Chart (Payments Status)
+    pie_fin = PieChart()
+    pie_fin.title = "حالة المدفوعات"
+    # Create temp data for chart
+    ws_fin.cell(row=10, column=1, value="مؤكدة")
+    ws_fin.cell(row=10, column=2, value=analytics_data.get('confirmed_payments_count', 0))
+    ws_fin.cell(row=11, column=1, value="قيد المراجعة")
+    ws_fin.cell(row=11, column=2, value=analytics_data.get('pending_payments_count', 0))
     
-    # Save to bytes
+    data = Reference(ws_fin, min_col=2, min_row=10, max_row=11)
+    cats = Reference(ws_fin, min_col=1, min_row=10, max_row=11)
+    pie_fin.add_data(data, titles_from_data=False)
+    pie_fin.set_categories(cats)
+    ws_fin.add_chart(pie_fin, "D2")
+    
+    # Hide temp data (white text on white bg usually, or just leave it)
+    # Better: just leave it at bottom or use named ranges. For simplicity, we leave it.
+
+    # Save
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
