@@ -410,6 +410,135 @@ def analytics_dashboard():
         flash(f"حدث خطأ أثناء تحميل الإحصائيات. تم تسجيل الخطأ للفحص.")
         return redirect(url_for('admin.admin_dashboard'))
 
+@admin_bp.route('/admin/analytics/export')
+@login_required
+def export_analytics():
+    """Export comprehensive site analytics to CSV"""
+    if current_user.role != 'admin':
+        return redirect(url_for('index'))
+    
+    try:
+        users = user_model.get_all()
+        messages = contact_model.get_all()
+        chats = chat_model.get_all()
+        payments = payment_model.get_all()
+        inspections = db.inspection_requests.all()
+        complaints = complaint_model.get_all()
+        unanswered = unanswered_model.get_all()
+        
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Title
+        writer.writerow(['تقرير إحصائيات الموقع الشامل'])
+        writer.writerow([f'تاريخ التقرير: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'])
+        writer.writerow([])
+        
+        # 1. General Statistics
+        writer.writerow(['الإحصائيات العامة'])
+        writer.writerow(['المؤشر', 'القيمة'])
+        writer.writerow(['إجمالي المستخدمين', len(users)])
+        writer.writerow(['إجمالي الرسائل', len(messages)])
+        writer.writerow(['إجمالي المحادثات', len(chats)])
+        writer.writerow(['إجمالي المدفوعات', len(payments)])
+        writer.writerow(['طلبات المعاينة', len(inspections)])
+        writer.writerow(['الشكاوى', len(complaints)])
+        writer.writerow(['أسئلة بدون إجابة', len(unanswered)])
+        writer.writerow([])
+        
+        # 2. User Statistics
+        writer.writerow(['إحصائيات المستخدمين'])
+        writer.writerow(['المؤشر', 'القيمة'])
+        completed = len([u for u in users if u.get('project_percentage', 0) == 100])
+        ongoing = len([u for u in users if 0 < u.get('project_percentage', 0) < 100])
+        not_started = len([u for u in users if u.get('project_percentage', 0) == 0])
+        writer.writerow(['مشاريع مكتملة', completed])
+        writer.writerow(['مشاريع جارية', ongoing])
+        writer.writerow(['مشاريع لم تبدأ', not_started])
+        
+        total_percentage = sum([u.get('project_percentage', 0) for u in users])
+        avg_completion = round(total_percentage / len(users), 1) if users else 0
+        writer.writerow(['متوسط نسبة الإنجاز', f'{avg_completion}%'])
+        writer.writerow([])
+        
+        # 3. Payment Statistics
+        writer.writerow(['إحصائيات المدفوعات'])
+        writer.writerow(['المؤشر', 'القيمة'])
+        total_revenue = sum([p.get('amount', 0) for p in payments])
+        confirmed_payments = [p for p in payments if p.get('status') == 'Confirmed']
+        pending_payments = [p for p in payments if 'pending' in p.get('status', '').lower()]
+        writer.writerow(['إجمالي الإيرادات', f'{total_revenue} جنيه'])
+        writer.writerow(['مدفوعات مؤكدة', len(confirmed_payments)])
+        writer.writerow(['مدفوعات قيد المراجعة', len(pending_payments)])
+        writer.writerow([])
+        
+        # 4. Message Statistics
+        writer.writerow(['إحصائيات الرسائل'])
+        writer.writerow(['الحالة', 'العدد'])
+        pending_msgs = len([m for m in messages if m.get('status') == 'pending'])
+        approved_msgs = len([m for m in messages if m.get('status') == 'approved'])
+        rejected_msgs = len([m for m in messages if m.get('status') == 'rejected'])
+        writer.writerow(['قيد المراجعة', pending_msgs])
+        writer.writerow(['موافق عليها', approved_msgs])
+        writer.writerow(['مرفوضة', rejected_msgs])
+        writer.writerow([])
+        
+        # 5. Service Requests
+        writer.writerow(['الخدمات الأكثر طلباً'])
+        writer.writerow(['الخدمة', 'عدد الطلبات'])
+        from collections import Counter
+        service_counts = Counter([m.get('service', 'general') for m in messages])
+        service_map = {
+            'modern-paints': 'دهانات حديثة',
+            'gypsum-board': 'جبس بورد',
+            'integrated-finishing': 'تشطيب متكامل',
+            'putty-finishing': 'تأسيس ومعجون',
+            'wallpaper': 'ورق حائط',
+            'renovation': 'تجديد وترميم',
+            'general': 'استفسار عام'
+        }
+        for service, count in service_counts.most_common():
+            writer.writerow([service_map.get(service, service), count])
+        writer.writerow([])
+        
+        # 6. AI Chat Efficiency
+        writer.writerow(['كفاءة الذكاء الاصطناعي'])
+        writer.writerow(['المؤشر', 'القيمة'])
+        total_ai_msgs = len(chats)
+        unanswered_count = len(unanswered)
+        answered_count = max(0, total_ai_msgs - unanswered_count)
+        efficiency_rate = round((answered_count / total_ai_msgs * 100), 1) if total_ai_msgs > 0 else 0
+        writer.writerow(['إجمالي المحادثات', total_ai_msgs])
+        writer.writerow(['تم الرد عليها', answered_count])
+        writer.writerow(['بدون إجابة', unanswered_count])
+        writer.writerow(['نسبة الكفاءة', f'{efficiency_rate}%'])
+        writer.writerow([])
+        
+        # 7. Inspection Requests
+        writer.writerow(['طلبات المعاينة'])
+        writer.writerow(['الحالة', 'العدد'])
+        new_inspections = len([i for i in inspections if i.get('status') == 'new_request'])
+        scheduled = len([i for i in inspections if i.get('status') == 'scheduled'])
+        completed_insp = len([i for i in inspections if i.get('status') == 'completed'])
+        writer.writerow(['طلبات جديدة', new_inspections])
+        writer.writerow(['مجدولة', scheduled])
+        writer.writerow(['مكتملة', completed_insp])
+        writer.writerow([])
+        
+        output.seek(0)
+        
+        return send_file(
+            io.BytesIO(output.getvalue().encode('utf-8-sig')),
+            mimetype="text/csv",
+            as_attachment=True,
+            download_name=f"site_analytics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        )
+        
+    except Exception as e:
+        flash(f'حدث خطأ أثناء تصدير الإحصائيات: {str(e)}', 'error')
+        return redirect(url_for('admin.analytics_dashboard'))
+
 @admin_bp.route('/admin/add_user', methods=['POST'])
 def add_user():
         
