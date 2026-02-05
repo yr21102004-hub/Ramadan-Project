@@ -1,0 +1,388 @@
+/* ========================================
+   MOBILE RESPONSIVE ENHANCEMENTS
+   ======================================== */
+
+/* Base Mobile Optimizations */
+@media (max-width: 768px) {
+
+    /* Typography */
+    body {
+        font-size: 14px;
+    }
+
+    h1,
+    .hero-title {
+        font-size: 2rem !important;
+    }
+
+    h2,
+    .section-title {
+        font-size: 1.75rem !important;
+    }
+
+    h3 {
+        font-size: 1.5rem !important;
+    }
+
+    /* Navigation */
+    .navbar {
+        padding: 10px 0 !important;
+    }
+
+    .navbar-brand img {
+        height: 40px !important;
+    }
+
+    .nav-link {
+        padding: 12px 15px !important;
+        font-size: 16px !important;
+    }
+
+    /* Hero Section */
+    .hero {
+        min-height: 60vh !important;
+        padding: 60px 0 !important;
+    }
+
+    .hero-content {
+        padding: 20px !important;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem !important;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 12px 24px !important;
+        font-size: 14px !important;
+    }
+
+    .btn-lg {
+        padding: 14px 28px !important;
+        font-size: 15px !important;
+    }
+
+    /* Cards */
+    .premium-card {
+        padding: 20px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .service-card,
+    .project-card {
+        margin-bottom: 20px !important;
+    }
+
+    /* Sections */
+    .section-padding {
+        padding: 60px 0 !important;
+    }
+
+    /* Container */
+    .container {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+    /* Tables */
+    .table-responsive {
+        border: none !important;
+    }
+
+    .modern-table {
+        font-size: 0.85rem !important;
+    }
+
+    .modern-table th,
+    .modern-table td {
+        padding: 10px 8px !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Hide less important columns on mobile */
+    .modern-table th:nth-child(n+4),
+    .modern-table td:nth-child(n+4) {
+        display: none;
+    }
+
+    /* Forms */
+    .form-control,
+    .form-select {
+        font-size: 16px !important;
+        /* Prevents zoom on iOS */
+        padding: 12px !important;
+    }
+
+    /* Modals */
+    .modal-dialog {
+        margin: 10px !important;
+    }
+
+    .modal-content {
+        border-radius: 15px !important;
+    }
+
+    /* Grid Layouts */
+    .row {
+        margin-left: -10px !important;
+        margin-right: -10px !important;
+    }
+
+    .row>* {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    /* Stats Cards */
+    .stat-card {
+        padding: 15px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .stat-icon {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 1.25rem !important;
+    }
+
+    .stat-info h3 {
+        font-size: 1.5rem !important;
+    }
+
+    /* Navigation Cards */
+    .nav-card {
+        padding: 20px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .nav-card-icon {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.5rem !important;
+    }
+
+    /* Footer */
+    footer {
+        padding: 40px 0 20px !important;
+    }
+
+    .footer-col {
+        margin-bottom: 30px !important;
+    }
+
+    /* Chat Widget */
+    .chat-widget {
+        width: 100% !important;
+        height: 100% !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .chat-toggle-btn {
+        bottom: 20px !important;
+        right: 20px !important;
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    /* Admin Dashboard */
+    .admin-section-bg {
+        padding-top: 80px !important;
+    }
+
+    /* Image Grids */
+    .image-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+
+    /* Service Detail */
+    .service-detail-img {
+        height: 250px !important;
+    }
+
+    /* Project Detail */
+    .project-hero-image {
+        height: 300px !important;
+    }
+
+    /* Spacing Utilities */
+    .mb-5 {
+        margin-bottom: 2rem !important;
+    }
+
+    .mt-5 {
+        margin-top: 2rem !important;
+    }
+
+    .py-5 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    /* Glass Effects - Reduce blur for performance */
+    .glass {
+        backdrop-filter: blur(5px) !important;
+        -webkit-backdrop-filter: blur(5px) !important;
+    }
+
+    /* Animations - Reduce for performance */
+    * {
+        animation-duration: 0.3s !important;
+    }
+
+    [data-aos] {
+        transition-duration: 0.4s !important;
+    }
+
+    /* Scroll Progress Bar */
+    #scroll-progress {
+        height: 3px !important;
+    }
+
+    /* Preloader */
+    .preloader {
+        font-size: 0.9rem !important;
+    }
+
+    .preloader-logo {
+        width: 80px !important;
+        height: 80px !important;
+    }
+}
+
+/* Extra Small Devices (phones in portrait) */
+@media (max-width: 576px) {
+
+    h1,
+    .hero-title {
+        font-size: 1.75rem !important;
+    }
+
+    h2,
+    .section-title {
+        font-size: 1.5rem !important;
+    }
+
+    .btn {
+        width: 100% !important;
+        margin-bottom: 10px !important;
+    }
+
+    .btn-group .btn {
+        width: auto !important;
+    }
+
+    /* Stack buttons vertically */
+    .d-flex.gap-3 {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    /* Full width cards */
+    .col-md-6,
+    .col-lg-4,
+    .col-lg-3 {
+        width: 100% !important;
+    }
+
+    /* Reduce padding further */
+    .container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .premium-card {
+        padding: 15px !important;
+    }
+
+    /* Tables - Show only essential columns */
+    .modern-table th:nth-child(n+3),
+    .modern-table td:nth-child(n+3) {
+        display: none;
+    }
+
+    /* Make first 2 columns visible */
+    .modern-table th:nth-child(1),
+    .modern-table th:nth-child(2),
+    .modern-table td:nth-child(1),
+    .modern-table td:nth-child(2) {
+        display: table-cell !important;
+    }
+}
+
+/* Landscape Orientation Fixes */
+@media (max-width: 768px) and (orientation: landscape) {
+    .hero {
+        min-height: 80vh !important;
+    }
+
+    .section-padding {
+        padding: 40px 0 !important;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Larger touch targets */
+    .btn,
+    .nav-link,
+    a {
+        min-height: 44px !important;
+        min-width: 44px !important;
+    }
+
+    /* Remove hover effects */
+    .premium-card:hover,
+    .service-card:hover,
+    .project-card:hover {
+        transform: none !important;
+    }
+
+    /* Disable parallax on touch devices */
+    .bg-villas-luxury,
+    .bg-apartments-luxury,
+    .bg-factories-luxury,
+    .bg-companies-luxury,
+    .bg-hotels-luxury,
+    .bg-pattern-luxury {
+        background-attachment: scroll !important;
+    }
+}
+
+/* High DPI Screens (Retina) */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+
+    /* Ensure crisp text rendering */
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* Print Styles */
+@media print {
+
+    .navbar,
+    .chat-widget,
+    .chat-toggle-btn,
+    #scroll-progress,
+    .preloader {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    .premium-card,
+    .glass {
+        background: white !important;
+        border: 1px solid #ddd !important;
+    }
+}
